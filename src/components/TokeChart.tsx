@@ -8,9 +8,10 @@ import {
   ResponsiveContainer,
   Area,
 } from "recharts";
-import { useAmounts, useNewStaking } from "./Dao";
 import { sortBy } from "lodash";
 import { T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
+import { useAmounts } from "../api/Erc20";
+import { useNewStaking } from "../api/TokeStaking";
 
 export function TokeChart({ addresses }: { addresses: string[] }) {
   const { data: tokeEvents } = useAmounts(addresses, TOKE_CONTRACT);
