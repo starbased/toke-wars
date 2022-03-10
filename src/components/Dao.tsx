@@ -3,6 +3,7 @@ import { provider } from "../util/providers";
 import { useQuery } from "react-query";
 import { BigNumber } from "ethers";
 import { TokeChart } from "./TokeChart";
+import { FIRST_BLOCK, T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 
 type Props = {
   address: string;
@@ -15,8 +16,11 @@ export function useAmounts(address: string, token: string) {
 
     const events = (
       await Promise.all([
-        contract.queryFilter(contract.filters.Transfer(address)),
-        contract.queryFilter(contract.filters.Transfer(null, address)),
+        contract.queryFilter(contract.filters.Transfer(address), FIRST_BLOCK),
+        contract.queryFilter(
+          contract.filters.Transfer(null, address),
+          FIRST_BLOCK
+        ),
       ])
     )
       .flatMap((obj) => obj)
@@ -50,8 +54,6 @@ export function useAmounts(address: string, token: string) {
 }
 
 export function Dao({ address, name }: Props) {
-  const toke = "0x2e9d63788249371f1DFC918a52f8d799F4a38C94";
-
   return (
     <div>
       <h1>
@@ -59,12 +61,9 @@ export function Dao({ address, name }: Props) {
       </h1>
       <TokeChart address={address} />
       <h2>Toke</h2>
-      <AmountsTable token={toke} address={address} />
+      <AmountsTable token={TOKE_CONTRACT} address={address} />
       <h2>tToke</h2>
-      <AmountsTable
-        token={"0xa760e26aA76747020171fCF8BdA108dFdE8Eb930"}
-        address={address}
-      />
+      <AmountsTable token={T_TOKE_CONTRACT} address={address} />
     </div>
   );
 }

@@ -1,4 +1,3 @@
-import React, { PureComponent } from "react";
 import {
   LineChart,
   Line,
@@ -11,37 +10,29 @@ import {
 } from "recharts";
 import { useAmounts } from "./Dao";
 import { sortBy } from "lodash";
+import { T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 
 export function TokeChart({ address }: { address: string }) {
-  const { data } = useAmounts(
-    address,
-    "0x2e9d63788249371f1DFC918a52f8d799F4a38C94"
-  );
+  const { data: tokeEvents } = useAmounts(address, TOKE_CONTRACT);
+  const { data: tTokeEvents } = useAmounts(address, T_TOKE_CONTRACT);
 
-  const { data: data2 } = useAmounts(
-    address,
-    "0xa760e26aA76747020171fCF8BdA108dFdE8Eb930"
-  );
-
-  if (!data || !data2) {
+  if (!tokeEvents || !tTokeEvents) {
     return <div>loading</div>;
   }
 
-  let foo = [
-    ...data.map(({ time, total }) => ({
+  let data = [
+    ...tTokeEvents.map(({ time, total }) => ({
       time: time.getTime() + 1, //todo: weird hack to get the graph to work, they need to be merged so that duplicate times don't exist
       tToke: parseInt(total),
     })),
-    ...data2.map(({ time, total }) => ({
+    ...tokeEvents.map(({ time, total }) => ({
       time: time.getTime(),
       toke: parseInt(total),
     })),
     { time: new Date().getTime() },
   ];
 
-  foo = sortBy(foo, "time");
-
-  console.log(foo);
+  data = sortBy(data, "time");
 
   return (
     <div style={{ width: "1000px", height: "400px" }}>
@@ -49,7 +40,7 @@ export function TokeChart({ address }: { address: string }) {
         <LineChart
           // width={500}
           // height={300}
-          data={foo}
+          data={data}
           margin={{
             top: 50,
             right: 30,
@@ -65,14 +56,14 @@ export function TokeChart({ address }: { address: string }) {
           <Line
             connectNulls={true}
             type="stepAfter"
-            dataKey="tToke"
-            stroke="#8884d8"
+            dataKey="toke"
+            stroke="#82ca9d"
           />
           <Line
             connectNulls={true}
             type="stepAfter"
-            dataKey="toke"
-            stroke="#82ca9d"
+            dataKey="tToke"
+            stroke="#8884d8"
           />
         </LineChart>
       </ResponsiveContainer>
