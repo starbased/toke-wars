@@ -4,6 +4,7 @@ import { useQuery } from "react-query";
 import { BigNumber } from "ethers";
 import { TokeChart } from "./TokeChart";
 import { FIRST_BLOCK, T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
+import { formatEther } from "ethers/lib/utils";
 
 type Props = {
   address: string;
@@ -42,10 +43,7 @@ export function useAmounts(address: string, token: string) {
 
     return Promise.all(
       output.map(async (obj) => ({
-        total: obj.total
-          .div(10 ** 10)
-          .div(10 ** 8)
-          .toString(),
+        total: formatEther(obj.total),
         time: new Date((await obj.event.getBlock()).timestamp * 1000), //new ethers call per getBlock()
         event: obj.event,
       }))

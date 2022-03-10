@@ -1,24 +1,13 @@
 import { Dao } from "./components/Dao";
-import { Routes, Route, NavLink } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Home } from "./components/Home";
 import { DAOS } from "./constants";
+import { Header } from "./components/Header";
 
 function App() {
   return (
     <div className="App">
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          padding: "5px",
-        }}
-      >
-        {DAOS.map(([_, name]) => (
-          <NavLink to={`daos/${name}`} key={name}>
-            {name}
-          </NavLink>
-        ))}
-      </header>
+      <Header />
       <main>
         <Routes>
           {DAOS.map(([address, name]) => (
