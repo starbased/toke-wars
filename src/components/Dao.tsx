@@ -7,20 +7,17 @@ import { FIRST_BLOCK, T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 import { formatEther } from "ethers/lib/utils";
 import { Table, Badge } from "react-bootstrap";
 
-type Props = {
-  address: string;
-  name: string;
-};
-
-export function useAmounts(address: string, token: string) {
-  return useQuery(["contract", token, address], async () => {
+export function useAmounts(addresses: string[], token: string) {
+  return useQuery(["contract", token, addresses], async () => {
     const contract = ERC20__factory.connect(token, provider);
 
-    const events = (
+    let events = (
       await Promise.all([
-        contract.queryFilter(contract.filters.Transfer(address), FIRST_BLOCK),
+        // @ts-ignore
+        contract.queryFilter(contract.filters.Transfer(addresses), FIRST_BLOCK),
         contract.queryFilter(
-          contract.filters.Transfer(null, address),
+          // @ts-ignore
+          contract.filters.Transfer(null, addresses),
           FIRST_BLOCK
         ),
       ])
@@ -31,9 +28,19 @@ export function useAmounts(address: string, token: string) {
     const output = [];
     let total = BigNumber.from(0);
 
+    const lower_addresses = addresses.map((address) => address.toLowerCase());
+
+    events = events.filter(
+      (event) =>
+        !(
+          lower_addresses.includes(event.args.from.toLowerCase()) &&
+          lower_addresses.includes(event.args.to.toLowerCase())
+        )
+    );
+
     for (let event of events) {
       const { from, value } = event.args;
-      if (from.toLowerCase() === address.toLowerCase()) {
+      if (lower_addresses.includes(from.toLowerCase())) {
         total = total.sub(value);
       } else {
         total = total.add(value);
@@ -52,7 +59,7 @@ export function useAmounts(address: string, token: string) {
   });
 }
 
-function useNewStaking(address: string) {
+function useNewStaking(addresses: string[]) {
   return useQuery(
     "newStaking",
     () => {
@@ -64,28 +71,41 @@ function useNewStaking(address: string) {
     },
     {
       select(data) {
-        return data.filter(
-          (obj) => obj.args.account.toLowerCase() === address.toLowerCase()
+        const lower_addresses = addresses.map((address) =>
+          address.toLowerCase()
+        );
+
+        return data.filter((obj) =>
+          lower_addresses.includes(obj.args.account.toLowerCase())
         );
       },
     }
   );
 }
 
-export function Dao({ address, name }: Props) {
-  const { data: newStaking } = useNewStaking(address);
+type Props = {
+  addresses: string[];
+  name: string;
+};
+
+export function Dao({ addresses, name }: Props) {
+  const { data: newStaking } = useNewStaking(addresses);
 
   return (
     <div>
       <h1>{name}</h1>
-      <h4>
-        <Badge bg="secondary">{address}</Badge>
+      <h4 style={{ display: "flex", gap: "5px" }}>
+        {addresses.map((address) => (
+          <Badge bg="secondary" key={address}>
+            {address}
+          </Badge>
+        ))}
       </h4>
-      <TokeChart address={address} />
+      <TokeChart address={addresses} />
       <h2>Toke</h2>
-      <AmountsTable token={TOKE_CONTRACT} address={address} />
+      <AmountsTable token={TOKE_CONTRACT} addresses={addresses} />
       <h2>tToke</h2>
-      <AmountsTable token={T_TOKE_CONTRACT} address={address} />
+      <AmountsTable token={T_TOKE_CONTRACT} addresses={addresses} />
       <h2>New staking</h2>
       <Table striped bordered hover>
         <thead>
@@ -107,8 +127,14 @@ export function Dao({ address, name }: Props) {
   );
 }
 
-function AmountsTable({ token, address }: { token: string; address: string }) {
-  const { data } = useAmounts(address, token);
+function AmountsTable({
+  token,
+  addresses,
+}: {
+  token: string;
+  addresses: string[];
+}) {
+  const { data } = useAmounts(addresses, token);
 
   return (
     <Table striped bordered hover>

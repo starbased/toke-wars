@@ -1,6 +1,6 @@
 import { DAOS } from "../constants";
 import { LinkContainer } from "react-router-bootstrap";
-import { Navbar, Container, Nav, NavDropdown, Button } from "react-bootstrap";
+import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 
 export function Header() {
   return (
@@ -14,7 +14,7 @@ export function Header() {
       <Nav.Link href="/leaderboard">Leaderboard</Nav.Link>
       <Nav.Link href="/stages">Liquidity Stages</Nav.Link> */}
             <NavDropdown title="DAOs" id="basic-nav-dropdown">
-              {DAOS.map(([_, name]) => (
+              {DAOS.map(({ name }) => (
                 <LinkContainer to={`daos/${name}`} key={name}>
                   <NavDropdown.Item className="me-auto" key={name}>
                     {name}

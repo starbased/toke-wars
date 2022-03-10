@@ -13,11 +13,11 @@ function App() {
         <Row>
           <Col md={{ span: 10, offset: 1 }}>
             <Routes>
-              {DAOS.map(([address, name]) => (
+              {DAOS.map(({ addresses, name }) => (
                 <Route
                   path={`daos/${name}`}
-                  key={address}
-                  element={<Dao address={address} name={name} />}
+                  key={name}
+                  element={<Dao addresses={addresses} name={name} />}
                 />
               ))}
               <Route path="/" element={<Home />} />

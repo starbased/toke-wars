@@ -12,7 +12,7 @@ import { useAmounts } from "./Dao";
 import { sortBy } from "lodash";
 import { T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 
-export function TokeChart({ address }: { address: string }) {
+export function TokeChart({ address }: { address: string[] }) {
   const { data: tokeEvents } = useAmounts(address, TOKE_CONTRACT);
   const { data: tTokeEvents } = useAmounts(address, T_TOKE_CONTRACT);
 
