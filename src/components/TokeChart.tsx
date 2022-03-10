@@ -12,6 +12,7 @@ import { sortBy } from "lodash";
 import { T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 import { useAmounts } from "../api/Erc20";
 import { useNewStaking } from "../api/TokeStaking";
+import { addMonths, differenceInMonths, parseISO } from "date-fns";
 
 export function TokeChart({ addresses }: { addresses: string[] }) {
   const { data: tokeEvents } = useAmounts(addresses, TOKE_CONTRACT);
@@ -59,6 +60,12 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
 
   const dateFormatter = (date: Date) => date.toLocaleDateString("en-US");
 
+  const startDate = parseISO("2021-10-01");
+
+  const ticks = Array.from(
+    Array(differenceInMonths(new Date(), startDate) + 1)
+  ).map((_, i) => addMonths(startDate, i));
+
   return (
     <div style={{ width: "1000px", height: "400px" }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -77,7 +84,9 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
             scale="time"
             type="number"
             tickFormatter={dateFormatter}
-            domain={[() => data[0].time, () => new Date()]}
+            domain={[() => startDate, () => new Date()]}
+            // @ts-ignore
+            ticks={ticks}
           />
           <YAxis />
           <Tooltip labelFormatter={dateFormatter} />
