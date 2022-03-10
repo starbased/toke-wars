@@ -1,4 +1,4 @@
-import { ERC20__factory } from "../typechain";
+import { ERC20__factory, TokeStaking__factory } from "../typechain";
 import { provider } from "../util/providers";
 import { useQuery } from "react-query";
 import { BigNumber } from "ethers";
@@ -51,7 +51,29 @@ export function useAmounts(address: string, token: string) {
   });
 }
 
+function useNewStaking(address: string) {
+  return useQuery(
+    "newStaking",
+    () => {
+      const contract = TokeStaking__factory.connect(
+        "0x96F98Ed74639689C3A11daf38ef86E59F43417D3",
+        provider
+      );
+      return contract.queryFilter(contract.filters.Deposited());
+    },
+    {
+      select(data) {
+        return data.filter(
+          (obj) => obj.args.account.toLowerCase() === address.toLowerCase()
+        );
+      },
+    }
+  );
+}
+
 export function Dao({ address, name }: Props) {
+  const { data: newStaking } = useNewStaking(address);
+
   return (
     <div>
       <h1>
@@ -62,6 +84,23 @@ export function Dao({ address, name }: Props) {
       <AmountsTable token={TOKE_CONTRACT} address={address} />
       <h2>tToke</h2>
       <AmountsTable token={T_TOKE_CONTRACT} address={address} />
+      <h2>New staking</h2>
+      <table>
+        <thead>
+          <tr>
+            <td>Amount</td>
+            <td>Block</td>
+          </tr>
+        </thead>
+        <tbody>
+          {newStaking?.map((obj) => (
+            <tr key={obj.transactionHash}>
+              <td>{formatEther(obj.args[1])}</td>
+              <td>{obj.blockNumber}</td>
+            </tr>
+          )) || null}
+        </tbody>
+      </table>
     </div>
   );
 }
