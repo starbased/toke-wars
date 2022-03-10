@@ -12,12 +12,15 @@
   "dependencies": {
     "axios": "^0.26.1",
     "ethers": "^5.6.0",
+    "lodash": "^4.17.21",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-query": "^3.34.16"
+    "react-query": "^3.34.16",
+    "recharts": "^2.1.9"
   },
   "devDependencies": {
     "@typechain/ethers-v5": "^9.0.0",
+    "@types/lodash": "^4.14.179",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
     "@vitejs/plugin-react": "^1.0.7",

@@ -2,13 +2,14 @@ import { ERC20__factory } from "../typechain";
 import { provider } from "../util/providers";
 import { useQuery } from "react-query";
 import { BigNumber } from "ethers";
+import { TokeChart } from "./TokeChart";
 
 type Props = {
   address: string;
   name: string;
 };
 
-function useAmounts(address: string, token: string) {
+export function useAmounts(address: string, token: string) {
   return useQuery(["contract", token, address], async () => {
     const contract = ERC20__factory.connect(token, provider);
 
@@ -37,7 +38,10 @@ function useAmounts(address: string, token: string) {
 
     return Promise.all(
       output.map(async (obj) => ({
-        total: obj.total,
+        total: obj.total
+          .div(10 ** 10)
+          .div(10 ** 8)
+          .toString(),
         time: new Date((await obj.event.getBlock()).timestamp * 1000), //new ethers call per getBlock()
         event: obj.event,
       }))
@@ -60,6 +64,7 @@ export function Dao({ address, name }: Props) {
         token={"0xa760e26aA76747020171fCF8BdA108dFdE8Eb930"}
         address={address}
       />
+      <TokeChart address={address} />
     </div>
   );
 }
