@@ -5,6 +5,7 @@ import { BigNumber } from "ethers";
 import { TokeChart } from "./TokeChart";
 import { FIRST_BLOCK, T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 import { formatEther } from "ethers/lib/utils";
+import { Container, Row, Col, Table, Badge } from "react-bootstrap";
 
 type Props = {
   address: string;
@@ -76,31 +77,40 @@ export function Dao({ address, name }: Props) {
 
   return (
     <div>
-      <h1>
-        {name} {address}
-      </h1>
-      <TokeChart address={address} />
-      <h2>Toke</h2>
-      <AmountsTable token={TOKE_CONTRACT} address={address} />
-      <h2>tToke</h2>
-      <AmountsTable token={T_TOKE_CONTRACT} address={address} />
-      <h2>New staking</h2>
-      <table>
-        <thead>
-          <tr>
-            <td>Amount</td>
-            <td>Block</td>
-          </tr>
-        </thead>
-        <tbody>
-          {newStaking?.map((obj) => (
-            <tr key={obj.transactionHash}>
-              <td>{formatEther(obj.args[1])}</td>
-              <td>{obj.blockNumber}</td>
-            </tr>
-          )) || null}
-        </tbody>
-      </table>
+      <Container>
+        <Row>
+          <Col md={{ span: 10, offset: 1 }}>
+            <h1>
+              {name}
+            </h1>
+            <h4>
+              <Badge bg="secondary">{address}</Badge>
+            </h4>
+            <TokeChart address={address} />
+            <h2>Toke</h2>
+            <AmountsTable token={TOKE_CONTRACT} address={address} />
+            <h2>tToke</h2>
+            <AmountsTable token={T_TOKE_CONTRACT} address={address} />
+            <h2>New staking</h2>
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <td>Amount</td>
+                  <td>Block</td>
+                </tr>
+              </thead>
+              <tbody>
+                {newStaking?.map((obj) => (
+                  <tr key={obj.transactionHash}>
+                    <td>{formatEther(obj.args[1])}</td>
+                    <td>{obj.blockNumber}</td>
+                  </tr>
+                )) || null}
+              </tbody>
+            </Table>
+        </Col>
+      </Row>
+    </Container>
     </div>
   );
 }
@@ -109,8 +119,8 @@ function AmountsTable({ token, address }: { token: string; address: string }) {
   const { data } = useAmounts(address, token);
 
   return (
-    <table>
-      <thead>
+    <Table striped bordered hover>
+    <thead>
         <tr>
           <td>Amount</td>
           <td>Date</td>
@@ -126,6 +136,6 @@ function AmountsTable({ token, address }: { token: string; address: string }) {
             ))
           : null}
       </tbody>
-    </table>
+    </Table>
   );
 }
