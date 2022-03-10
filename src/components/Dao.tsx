@@ -3,7 +3,12 @@ import { provider } from "../util/providers";
 import { useQuery } from "react-query";
 import { BigNumber } from "ethers";
 import { TokeChart } from "./TokeChart";
-import { FIRST_BLOCK, T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
+import {
+  DAOS,
+  FIRST_BLOCK,
+  T_TOKE_CONTRACT,
+  TOKE_CONTRACT,
+} from "../constants";
 import { formatEther } from "ethers/lib/utils";
 import { Table, Badge } from "react-bootstrap";
 
@@ -59,15 +64,31 @@ export function useAmounts(addresses: string[], token: string) {
   });
 }
 
-function useNewStaking(addresses: string[]) {
+export function useNewStaking(addresses: string[]) {
   return useQuery(
     "newStaking",
-    () => {
+    async () => {
       const contract = TokeStaking__factory.connect(
         "0x96F98Ed74639689C3A11daf38ef86E59F43417D3",
         provider
       );
-      return contract.queryFilter(contract.filters.Deposited());
+      const events = await contract.queryFilter(contract.filters.Deposited());
+
+      const knownAddresses = DAOS.flatMap((d) =>
+        d.addresses.map((o) => o.toLowerCase())
+      );
+
+      const filteredEvents = events.filter((event) =>
+        knownAddresses.includes(event.args.account.toLowerCase())
+      );
+
+      return Promise.all(
+        filteredEvents.map(async (event) => ({
+          total: formatEther(event.args.amount),
+          time: new Date((await event.getBlock()).timestamp * 1000), //new ethers call per getBlock()
+          event,
+        }))
+      );
     },
     {
       select(data) {
@@ -76,7 +97,7 @@ function useNewStaking(addresses: string[]) {
         );
 
         return data.filter((obj) =>
-          lower_addresses.includes(obj.args.account.toLowerCase())
+          lower_addresses.includes(obj.event.args.account.toLowerCase())
         );
       },
     }
@@ -101,7 +122,7 @@ export function Dao({ addresses, name }: Props) {
           </Badge>
         ))}
       </h4>
-      <TokeChart address={addresses} />
+      <TokeChart addresses={addresses} />
       <h2>Toke</h2>
       <AmountsTable token={TOKE_CONTRACT} addresses={addresses} />
       <h2>tToke</h2>
@@ -116,9 +137,9 @@ export function Dao({ addresses, name }: Props) {
         </thead>
         <tbody>
           {newStaking?.map((obj) => (
-            <tr key={obj.transactionHash}>
-              <td>{formatEther(obj.args[1])}</td>
-              <td>{obj.blockNumber}</td>
+            <tr key={obj.event.transactionHash}>
+              <td>{obj.total}</td>
+              <td>{obj.time.toString()}</td>
             </tr>
           )) || null}
         </tbody>

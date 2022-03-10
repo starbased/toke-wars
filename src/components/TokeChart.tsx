@@ -8,20 +8,23 @@ import {
   ResponsiveContainer,
   Area,
 } from "recharts";
-import { useAmounts } from "./Dao";
+import { useAmounts, useNewStaking } from "./Dao";
 import { sortBy } from "lodash";
 import { T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 
-export function TokeChart({ address }: { address: string[] }) {
-  const { data: tokeEvents } = useAmounts(address, TOKE_CONTRACT);
-  const { data: tTokeEvents } = useAmounts(address, T_TOKE_CONTRACT);
+export function TokeChart({ addresses }: { addresses: string[] }) {
+  const { data: tokeEvents } = useAmounts(addresses, TOKE_CONTRACT);
+  const { data: tTokeEvents } = useAmounts(addresses, T_TOKE_CONTRACT);
+  const { data: newStaking } = useNewStaking(addresses);
 
-  if (!tokeEvents || !tTokeEvents) {
+  if (!tokeEvents || !tTokeEvents || !newStaking) {
     return <div>loading</div>;
   }
 
+  const staking = [...tTokeEvents, ...newStaking];
+
   let data = [
-    ...tTokeEvents.map(({ time, total }) => ({
+    ...staking.map(({ time, total }) => ({
       time: time,
       tToke: parseInt(total),
     })),
