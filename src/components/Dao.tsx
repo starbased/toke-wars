@@ -57,6 +57,7 @@ export function Dao({ address, name }: Props) {
       <h1>
         {name} {address}
       </h1>
+      <TokeChart address={address} />
       <h2>Toke</h2>
       <AmountsTable token={toke} address={address} />
       <h2>tToke</h2>
@@ -64,7 +65,6 @@ export function Dao({ address, name }: Props) {
         token={"0xa760e26aA76747020171fCF8BdA108dFdE8Eb930"}
         address={address}
       />
-      <TokeChart address={address} />
     </div>
   );
 }
