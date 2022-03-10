@@ -3,23 +3,28 @@ import { Routes, Route } from "react-router-dom";
 import { Home } from "./components/Home";
 import { DAOS } from "./constants";
 import { Header } from "./components/Header";
+import { Col, Container, Row } from "react-bootstrap";
 
 function App() {
   return (
     <div className="App">
       <Header />
-      <main>
-        <Routes>
-          {DAOS.map(([address, name]) => (
-            <Route
-              path={`daos/${name}`}
-              key={address}
-              element={<Dao address={address} name={name} />}
-            />
-          ))}
-          <Route path="/" element={<Home />} />
-        </Routes>
-      </main>
+      <Container as="main">
+        <Row>
+          <Col md={{ span: 10, offset: 1 }}>
+            <Routes>
+              {DAOS.map(([address, name]) => (
+                <Route
+                  path={`daos/${name}`}
+                  key={address}
+                  element={<Dao address={address} name={name} />}
+                />
+              ))}
+              <Route path="/" element={<Home />} />
+            </Routes>
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 }

@@ -18,6 +18,7 @@
     "react-bootstrap": "^2.2.0",
     "react-dom": "^17.0.2",
     "react-query": "^3.34.16",
+    "react-router-bootstrap": "^0.26.0",
     "react-router-dom": "^6.2.2",
     "recharts": "^2.1.9"
   },
@@ -26,6 +27,7 @@
     "@types/lodash": "^4.14.179",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
+    "@types/react-router-bootstrap": "^0.24.5",
     "@vitejs/plugin-react": "^1.0.7",
     "prettier": "^2.5.1",
     "typechain": "^7.0.1",
