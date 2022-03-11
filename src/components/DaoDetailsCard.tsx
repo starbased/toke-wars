@@ -94,6 +94,14 @@ function StageCard({ title, stage }: StageCardProps) {
   );
 }
 
+function shortenAddress(address: string, showCharacters = 5) {
+  return (
+    address.substring(0, showCharacters) +
+    `...` +
+    address.substring(address.length - showCharacters, address.length)
+  );
+}
+
 interface StatsLinkCardProps {
   title: string;
   addresses: string[];
@@ -108,7 +116,7 @@ function StatsLinkCard({ title, addresses }: StatsLinkCardProps) {
             Current Treasury <ExternalLinkIcon mx="2px" />
           </Link>
         </StatNumber>
-        <StatHelpText>{addresses[0].substring(0, 5)}</StatHelpText>
+        <StatHelpText>{shortenAddress(addresses[0])}</StatHelpText>
       </Stat>
     </BaseCard>
   );
