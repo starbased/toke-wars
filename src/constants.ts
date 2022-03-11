@@ -28,17 +28,21 @@ export const DAOS = [
     addresses: ["0x99F4176EE457afedFfCB1839c7aB7A030a5e4A92"],
     name: "Synthetix",
   },
-  {
-    addresses: ["0x42e61987a5cba002880b3cc5c800952a5804a1c5"],
-    name: "SquidDAO",
-  },
-  { addresses: ["0xf2c58cca8ce82df7a2A4f7F936608d61f45a9a47"], name: "Gamma" },
+  // {
+  //   addresses: ["0x42e61987a5cba002880b3cc5c800952a5804a1c5"],
+  //   name: "SquidDAO",
+  // },
+  // { addresses: ["0xf2c58cca8ce82df7a2A4f7F936608d61f45a9a47"], name: "Gamma" },
   {
     addresses: [
       "0x086C98855dF3C78C6b481b6e1D47BeF42E9aC36B",
       "0xA52Fd396891E7A74b641a2Cb1A6999Fcf56B077e",
     ],
     name: "Redacted",
+  },
+  {
+    addresses: ["0x9e2b6378ee8ad2a4a95fe481d63caba8fb0ebbf9"],
+    name: "Alchemix",
   },
 ];
 
