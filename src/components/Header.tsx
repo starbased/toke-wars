@@ -20,7 +20,7 @@ import { DAOS } from "../constants";
 import { useNavigate } from "react-router-dom";
 import { sortBy } from "lodash";
 
-const Links = ["Reactors", "Leaderboard", "Liquidity Stages"];
+const Links = ["Reactors", "Leaderboard", "Stages"];
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
@@ -57,7 +57,9 @@ export function Header() {
           </Box>
           <HStack as="nav" spacing={4} display={{ base: "none", md: "flex" }}>
             {Links.map((link) => (
-              <NavLink key={link}>{link}</NavLink>
+              <LinkContainer to={link} key={link}>
+                <Link key={link}>{link}</Link>
+              </LinkContainer>
             ))}
             <Menu>
               <MenuButton as={Button} minW={0}>

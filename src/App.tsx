@@ -12,7 +12,7 @@ function App() {
     <div className="App">
       <Header />
       <VStack spacing={20} align="stretch">
-        <Container maxW="container.xl" as="main">
+        <Container maxW="container.xl" as="main" mt="10">
           <Routes>
             {DAOS.map((dao) => (
               <Route

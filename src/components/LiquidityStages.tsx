@@ -1,3 +1,12 @@
+import {
+  VStack,
+  StackDivider,
+  Box,
+  Center,
+  Heading,
+  chakra,
+} from "@chakra-ui/react";
+
 type StageInfo = {
   title: string;
   description: string;
@@ -37,15 +46,35 @@ export const stageMap: Record<number, StageInfo> = {
 export function LiquidityStages() {
   return (
     <div>
-      <h1>liquidity</h1>
-
-      {Object.entries(stageMap).map(([stage, { title, description }]) => (
-        <div key={stage} style={{ paddingTop: "25px" }}>
-          <h2>Stage {stage}</h2>
-          <div>{title}</div>
-          <div>{description}</div>
-        </div>
-      ))}
+      <Center>
+        <VStack spacing={6} align="stretch">
+          <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
+            <chakra.h1
+              textAlign="center"
+              fontSize="4xl"
+              pb={4}
+              fontWeight="bold"
+            >
+              Stages of DAOs
+            </chakra.h1>
+          </Box>
+          {Object.entries(stageMap).map(([stage, { title, description }]) => (
+            <Box maxW="xl" borderWidth="1px" borderRadius="lg" shadow="md">
+              <Box p="6">
+                <div key={stage}>
+                  <Heading as="h1" size="lg" pb={2}>
+                    Stage {stage}
+                  </Heading>
+                  <Heading as="h2" size="md" pb={2}>
+                    {title}
+                  </Heading>
+                  <div>{description}</div>
+                </div>
+              </Box>
+            </Box>
+          ))}
+        </VStack>
+      </Center>
     </div>
   );
 }
