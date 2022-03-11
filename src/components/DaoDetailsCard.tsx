@@ -128,9 +128,7 @@ function StatsLinkCard({ title, addresses }: StatsLinkCardProps) {
   );
 }
 
-interface SkeletonCardProps {
-  skelWidth: 225;
-}
+interface SkeletonCardProps {}
 
 function SkeletonCard({}: SkeletonCardProps) {
   return (
