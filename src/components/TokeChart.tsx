@@ -89,7 +89,10 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
             ticks={ticks}
           />
           <YAxis />
-          <Tooltip labelFormatter={dateFormatter} />
+          <Tooltip
+            labelFormatter={dateFormatter}
+            labelStyle={{ color: "black" }}
+          />
           <Legend />
           <Area
             connectNulls={true}

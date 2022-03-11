@@ -6,21 +6,16 @@ import { Center, Divider } from "@chakra-ui/react";
 import { Container, VStack } from "@chakra-ui/react";
 import { DaoDetailsCard } from "./DaoDetailsCard";
 import BigNumber from "bignumber.js";
+import { addDays } from "date-fns";
 
 type Props = {
   addresses: string[];
   name: string;
 };
 
-export function Dao({ addresses, name }: Props) {
-  const { data: tokeEvents } = useAmounts(addresses, TOKE_CONTRACT);
-  const { data: tTokeEvents } = useAmounts(addresses, T_TOKE_CONTRACT);
-  const { data: newStaking } = useNewStaking(addresses);
-
-  let total = 0;
-
-  if (tokeEvents && tTokeEvents && newStaking) {
-    total = [tokeEvents, tTokeEvents, newStaking]
+function getAmount(array: { total: string; time: Date }[][]) {
+  return (
+    array
       .filter((obj) => obj.length > 0)
       // get the last record
       .map((obj) => obj[obj.length - 1])
@@ -30,7 +25,35 @@ export function Dao({ addresses, name }: Props) {
         new BigNumber(0)
       )
       .decimalPlaces(2)
-      .toNumber();
+      .toNumber()
+  );
+}
+
+export function Dao({ addresses, name }: Props) {
+  const { data: tokeEvents } = useAmounts(addresses, TOKE_CONTRACT);
+  const { data: tTokeEvents } = useAmounts(addresses, T_TOKE_CONTRACT);
+  const { data: newStaking } = useNewStaking(addresses);
+
+  let total = 0;
+  let pastTotal = 0;
+  let changePercent = 0;
+
+  if (tokeEvents && tTokeEvents && newStaking) {
+    const array = [tokeEvents, tTokeEvents, newStaking];
+    total = getAmount(array);
+
+    const daysAgo = addDays(new Date(), -30);
+
+    pastTotal = getAmount(
+      array.map((events) => {
+        const item = [...events]
+          .reverse()
+          .find((event) => event.time < daysAgo);
+        return item ? [item] : [];
+      })
+    );
+
+    changePercent = (total / pastTotal - 1) * 100;
   }
 
   return (
@@ -42,6 +65,7 @@ export function Dao({ addresses, name }: Props) {
             stage="2"
             addresses={addresses}
             total={total}
+            changePercent={changePercent}
           />
           <Divider />
           <Center>

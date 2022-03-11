@@ -52,9 +52,10 @@ export function BaseCard({ title, children }: BaseCardProps) {
 interface StatsCardProps {
   title: string;
   total: number;
+  changePercent: number;
   /* icon: ReactNode; */
 }
-function StatsCard({ title, total }: StatsCardProps) {
+function StatsCard({ title, total, changePercent }: StatsCardProps) {
   return (
     <BaseCard title={title}>
       <Stat>
@@ -66,7 +67,7 @@ function StatsCard({ title, total }: StatsCardProps) {
                 if newStaking contains sum totals,
                 can compare latest to previous
                 */}
-          {(((total - 10000) / total) * 100).toFixed(2)}%
+          {changePercent.toFixed(2)}% over 30 days
         </StatHelpText>
       </Stat>
     </BaseCard>
@@ -116,9 +117,16 @@ type Props = {
   addresses: string[];
   stage: string;
   total: number;
+  changePercent: number;
 };
 
-export function DaoDetailsCard({ name, addresses, stage, total }: Props) {
+export function DaoDetailsCard({
+  name,
+  addresses,
+  stage,
+  total,
+  changePercent,
+}: Props) {
   return (
     <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
       <chakra.h1 textAlign="center" fontSize="4xl" py={10} fontWeight="bold">
@@ -135,6 +143,7 @@ export function DaoDetailsCard({ name, addresses, stage, total }: Props) {
         <StatsCard
           title="Total TOKE Owned"
           total={total}
+          changePercent={changePercent}
           /* icon="┻┳" */
         />
         <StageCard
