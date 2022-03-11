@@ -4,25 +4,25 @@ import { Home } from "./components/Home";
 import { DAOS } from "./constants";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
-import { Container, VStack } from '@chakra-ui/react'
+import { Container, VStack } from "@chakra-ui/react";
+import { LiquidityStages } from "./components/LiquidityStages";
 
 function App() {
   return (
     <div className="App">
       <Header />
-      <VStack
-        spacing={20}
-        align='stretch'
-      >
-        <Container maxW='container.xl' as="main">
+      <VStack spacing={20} align="stretch">
+        <Container maxW="container.xl" as="main">
           <Routes>
-            {DAOS.map(({ addresses, name }) => (
+            {DAOS.map((dao) => (
               <Route
-                path={`daos/${name}`}
-                key={name}
-                element={<Dao addresses={addresses} name={name} />}
+                path={`daos/${dao.name}`}
+                key={dao.name}
+                element={<Dao dao={dao} />}
               />
             ))}
+
+            <Route path="/stages" element={<LiquidityStages />} />
             <Route path="/" element={<Home />} />
           </Routes>
         </Container>

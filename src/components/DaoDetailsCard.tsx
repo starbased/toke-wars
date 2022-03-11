@@ -14,6 +14,8 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
+import { DaoInformation } from "../constants";
+import { stageMap } from "./LiquidityStages";
 
 type BaseCardProps = {
   title: string;
@@ -76,17 +78,17 @@ function StatsCard({ title, total, changePercent }: StatsCardProps) {
 
 interface StageCardProps {
   title: string;
-  stage: string;
+  stage: number;
   /* icon: ReactNode; */
 }
 function StageCard({ title, stage }: StageCardProps) {
+  const stageText = stageMap[stage].title || "";
+
   return (
     <BaseCard title={title}>
       <Stat>
         <StatNumber>{stage}</StatNumber>
-        <StatHelpText>
-          Stage {stage}: Incentivized Liquidity via Emissions
-        </StatHelpText>
+        <StatHelpText>{stageText}</StatHelpText>
       </Stat>
     </BaseCard>
   );
@@ -113,20 +115,13 @@ function StatsLinkCard({ title, addresses }: StatsLinkCardProps) {
 }
 
 type Props = {
-  name: string;
-  addresses: string[];
-  stage: string;
+  dao: DaoInformation;
   total: number;
   changePercent: number;
 };
 
-export function DaoDetailsCard({
-  name,
-  addresses,
-  stage,
-  total,
-  changePercent,
-}: Props) {
+export function DaoDetailsCard({ dao, total, changePercent }: Props) {
+  const { name, addresses, stage } = dao;
   return (
     <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
       <chakra.h1 textAlign="center" fontSize="4xl" py={10} fontWeight="bold">

@@ -1,5 +1,5 @@
 import { TokeChart } from "./TokeChart";
-import { T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
+import { DaoInformation, T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 import { useAmounts } from "../api/Erc20";
 import { useNewStaking } from "../api/TokeStaking";
 import { Center, Divider } from "@chakra-ui/react";
@@ -7,11 +7,6 @@ import { Container, VStack } from "@chakra-ui/react";
 import { DaoDetailsCard } from "./DaoDetailsCard";
 import BigNumber from "bignumber.js";
 import { addDays } from "date-fns";
-
-type Props = {
-  addresses: string[];
-  name: string;
-};
 
 function getAmount(array: { total: string; time: Date }[][]) {
   return (
@@ -29,7 +24,12 @@ function getAmount(array: { total: string; time: Date }[][]) {
   );
 }
 
-export function Dao({ addresses, name }: Props) {
+type Props = {
+  dao: DaoInformation;
+};
+
+export function Dao({ dao }: Props) {
+  const { addresses } = dao;
   const { data: tokeEvents } = useAmounts(addresses, TOKE_CONTRACT);
   const { data: tTokeEvents } = useAmounts(addresses, T_TOKE_CONTRACT);
   const { data: newStaking } = useNewStaking(addresses);
@@ -61,9 +61,7 @@ export function Dao({ addresses, name }: Props) {
       <Container maxW="container.xl">
         <VStack spacing={10} align="stretch">
           <DaoDetailsCard
-            name={name}
-            stage="2"
-            addresses={addresses}
+            dao={dao}
             total={total}
             changePercent={changePercent}
           />

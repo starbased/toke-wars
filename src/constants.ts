@@ -1,12 +1,24 @@
-export const DAOS = [
+export type DaoInformation = {
+  addresses: string[];
+  name: string;
+  stage: number;
+};
+
+export const DAOS: DaoInformation[] = [
   {
     addresses: ["0x245cc372c84b3645bf0ffe6538620b04a217988b"],
     name: "Olympus",
+    stage: 2,
   },
-  { addresses: ["0x5180db0237291a6449dda9ed33ad90a38787621c"], name: "Frax" },
+  {
+    addresses: ["0x5180db0237291a6449dda9ed33ad90a38787621c"],
+    name: "Frax",
+    stage: 2,
+  },
   {
     addresses: ["0x90a48d5cf7343b08da12e067680b4c6dbfe551be"],
     name: "ShapeShift",
+    stage: 5,
   },
   {
     addresses: [
@@ -14,19 +26,30 @@ export const DAOS = [
       "0xde50fb295549eda934d222e7a24d5a8dd132444f",
     ],
     name: "Lobis",
+    stage: 4,
   },
-  { addresses: ["0xe94B5EEC1fA96CEecbD33EF5Baa8d00E4493F4f3"], name: "Sushi" },
+  {
+    addresses: ["0xe94B5EEC1fA96CEecbD33EF5Baa8d00E4493F4f3"],
+    name: "Sushi",
+    stage: 2,
+  },
   {
     addresses: [
       "0xa84918f3280d488eb3369cb713ec53ce386b6cba",
       "0x95E8C5a56ACc8064311d79946c7Be87a1e90d17f",
     ],
     name: "Tracer",
+    stage: 2,
   },
-  { addresses: ["0xDbbfc051D200438dd5847b093B22484B842de9E7"], name: "APWine" },
+  {
+    addresses: ["0xDbbfc051D200438dd5847b093B22484B842de9E7"],
+    name: "APWine",
+    stage: 2,
+  },
   {
     addresses: ["0x99F4176EE457afedFfCB1839c7aB7A030a5e4A92"],
     name: "Synthetix",
+    stage: 2,
   },
   // {
   //   addresses: ["0x42e61987a5cba002880b3cc5c800952a5804a1c5"],
@@ -39,10 +62,12 @@ export const DAOS = [
       "0xA52Fd396891E7A74b641a2Cb1A6999Fcf56B077e",
     ],
     name: "Redacted",
+    stage: 2,
   },
   {
     addresses: ["0x9e2b6378ee8ad2a4a95fe481d63caba8fb0ebbf9"],
     name: "Alchemix",
+    stage: 4,
   },
 ];
 
