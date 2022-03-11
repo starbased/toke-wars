@@ -2,10 +2,15 @@ import {
   VStack,
   StackDivider,
   Box,
+  Text,
   Center,
   Heading,
   chakra,
+  Button,
+  LinkBox,
+  LinkOverlay,
 } from "@chakra-ui/react";
+import { FaMedium } from "react-icons/fa";
 
 type StageInfo = {
   title: string;
@@ -52,12 +57,33 @@ export function LiquidityStages() {
             <chakra.h1
               textAlign="center"
               fontSize="4xl"
-              pb={4}
+              pb={2}
               fontWeight="bold"
             >
-              Stages of DAOs
+              Stages of Liquidity
             </chakra.h1>
           </Box>
+          <Center>
+            <LinkBox>
+              <Button
+                w={"full"}
+                maxW={"md"}
+                variant={"outline"}
+                leftIcon={<FaMedium />}
+              >
+                <Center>
+                  <Text>
+                    <LinkOverlay
+                      href="https://medium.com/tokemak/the-evolution-of-daos-1692509bbb41"
+                      isExternal
+                    >
+                      Read More on "The Evolution of DAOs"
+                    </LinkOverlay>
+                  </Text>
+                </Center>
+              </Button>
+            </LinkBox>
+          </Center>
           {Object.entries(stageMap).map(([stage, { title, description }]) => (
             <Box maxW="xl" borderWidth="1px" borderRadius="lg" shadow="md">
               <Box p="6">
