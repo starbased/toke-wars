@@ -5,6 +5,8 @@ import {
   Flex,
   Link,
   SimpleGrid,
+  Skeleton,
+  Stack,
   Stat,
   StatArrow,
   StatGroup,
@@ -61,16 +63,20 @@ function StatsCard({ title, total, changePercent }: StatsCardProps) {
   return (
     <BaseCard title={title}>
       <Stat>
-        <StatNumber>{total}</StatNumber>
-        <StatHelpText>
-          <StatArrow type="increase" />
-          {/* 
+        <Skeleton isLoaded={total > 0}>
+          <StatNumber>{total.toLocaleString()}</StatNumber>
+        </Skeleton>
+        <Skeleton isLoaded={total > 0}>
+          <StatHelpText>
+            <StatArrow type="increase" />
+            {/* 
                 get percent increase
                 if newStaking contains sum totals,
                 can compare latest to previous
                 */}
-          {changePercent.toFixed(2)}% over 30 days
-        </StatHelpText>
+            {changePercent.toFixed(2)}% over 30 days
+          </StatHelpText>
+        </Skeleton>
       </Stat>
     </BaseCard>
   );
@@ -122,6 +128,24 @@ function StatsLinkCard({ title, addresses }: StatsLinkCardProps) {
   );
 }
 
+interface SkeletonCardProps {
+  skelWidth: 225;
+}
+
+function SkeletonCard({}: SkeletonCardProps) {
+  return (
+    <BaseCard title={""}>
+      <Stat>
+        <Stack>
+          <Skeleton height="20px" width="225px"></Skeleton>
+          <Skeleton height="20px" width="225px"></Skeleton>
+          <Skeleton height="20px" width="225px"></Skeleton>
+        </Stack>
+      </Stat>
+    </BaseCard>
+  );
+}
+
 type Props = {
   dao: DaoInformation;
   total: number;
@@ -142,24 +166,32 @@ export function DaoDetailsCard({ dao, total, changePercent }: Props) {
             </Badge>
           ))}
         </Heading> */}
-      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
-        <StatsCard
-          title="Total TOKE Owned"
-          total={total}
-          changePercent={changePercent}
-          /* icon="┻┳" */
-        />
-        <StageCard
-          title="DAO Stage"
-          stage={stage}
-          /* icon={<FiServer size={'3em'} />} */
-        />
-        <StatsLinkCard
-          title="Zapper"
-          addresses={addresses}
-          /* icon={<GoLocation size={'3em'} />} */
-        />
-      </SimpleGrid>
+      {total > 0 ? (
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
+          <StatsCard
+            title="Total TOKE Owned"
+            total={total}
+            changePercent={changePercent}
+            /* icon="┻┳" */
+          />
+          <StageCard
+            title="DAO Stage"
+            stage={stage}
+            /* icon={<FiServer size={'3em'} />} */
+          />
+          <StatsLinkCard
+            title="Zapper"
+            addresses={addresses}
+            /* icon={<GoLocation size={'3em'} />} */
+          />
+        </SimpleGrid>
+      ) : (
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </SimpleGrid>
+      )}
     </Box>
   );
 }
