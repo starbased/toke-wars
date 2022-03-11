@@ -4,7 +4,7 @@ import { Home } from "./components/Home";
 import { DAOS } from "./constants";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
-import { Container, StackDivider, VStack } from '@chakra-ui/react'
+import { Container, VStack } from '@chakra-ui/react'
 
 function App() {
   return (
@@ -15,16 +15,16 @@ function App() {
         align='stretch'
       >
         <Container maxW='container.xl' as="main">
-              <Routes>
-                {DAOS.map(({ addresses, name }) => (
-                  <Route
-                    path={`daos/${name}`}
-                    key={name}
-                    element={<Dao addresses={addresses} name={name} />}
-                  />
-                ))}
-                <Route path="/" element={<Home />} />
-              </Routes>
+          <Routes>
+            {DAOS.map(({ addresses, name }) => (
+              <Route
+                path={`daos/${name}`}
+                key={name}
+                element={<Dao addresses={addresses} name={name} />}
+              />
+            ))}
+            <Route path="/" element={<Home />} />
+          </Routes>
         </Container>
         <Footer />
       </VStack>

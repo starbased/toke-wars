@@ -5,6 +5,14 @@ import App from "./App";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter } from "react-router-dom";
 import { ChakraProvider } from '@chakra-ui/react'
+import { extendTheme } from '@chakra-ui/react'
+
+const config = {
+  initialColorMode: 'dark',
+  useSystemColorMode: false,
+}
+
+const theme = extendTheme({ config })
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,7 +23,7 @@ const queryClient = new QueryClient({
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ChakraProvider>
+      <ChakraProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <App />
         </QueryClientProvider>
