@@ -5,11 +5,27 @@ import { FIRST_BLOCK } from "../constants";
 import { BigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils";
 
-export function useAmounts(addresses: string[], token: string) {
+function getContract(tokenContract: string) {
+  return ERC20__factory.connect(tokenContract, provider);
+}
+
+export function useCurrentBalance(tokenContract: string, address: string) {
+  return useQuery(["balance", tokenContract, address], () =>
+    getContract(tokenContract).balanceOf(address)
+  );
+}
+
+export function useTotalSupply(tokenContract: string) {
+  return useQuery(["balance", tokenContract], () =>
+    getContract(tokenContract).totalSupply()
+  );
+}
+
+export function useAmounts(addresses: string[], tokenContract: string) {
   return useQuery(
-    ["contract", token, addresses],
+    ["contract", tokenContract, addresses],
     async () => {
-      const contract = ERC20__factory.connect(token, provider);
+      const contract = getContract(tokenContract);
 
       let events = (
         await Promise.all([

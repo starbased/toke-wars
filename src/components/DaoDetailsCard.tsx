@@ -20,7 +20,7 @@ type BaseCardProps = {
   children: ReactNode;
 };
 
-function BaseCard({ title, children }: BaseCardProps) {
+export function BaseCard({ title, children }: BaseCardProps) {
   return (
     <Stat
       px={{ base: 2, md: 4 }}
