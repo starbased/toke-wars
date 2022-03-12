@@ -14,6 +14,7 @@ import {
   YAxis,
 } from "recharts";
 import { useState } from "react";
+import { Box, Center, chakra, Select, Stack, VStack } from "@chakra-ui/react";
 
 function runningTotal<T>(
   events: Iterable<T>,
@@ -78,64 +79,70 @@ export function Reactors() {
   }));
 
   return (
-    <div>
-      <label htmlFor="token">Select a token</label>
-      <select
-        name="token"
-        value={address}
-        style={{ color: "black" }}
-        onChange={(event) => setAddress(event.currentTarget.value)}
-      >
-        {addresses.map(([address, name]) => (
-          <option value={address} key={address}>
-            {name}
-          </option>
-        ))}
-      </select>
-
-      <div style={{ width: "1000px", height: "400px" }}>
-        {formattedData ? (
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={formattedData}
-              margin={{
-                top: 0,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="blockNumber"
-                // scale="time"
-                type="number"
-                // tickFormatter={dateFormatter}
-                domain={[
-                  () => formattedData[0]?.blockNumber,
-                  () => formattedData[formattedData.length - 1]?.blockNumber,
-                ]}
-                // @ts-ignore
-                // ticks={ticks}
-              />
-              <YAxis />
-              <Tooltip
-                // labelFormatter={dateFormatter}
-                labelStyle={{ color: "black" }}
-              />
-              <Legend />
-              <Area
-                connectNulls={true}
-                type="stepAfter"
-                dataKey="total"
-                stroke="#8884d8"
-                fill="#8884d8"
-                stackId="1"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        ) : null}
-      </div>
-    </div>
+    <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
+      <chakra.h1 textAlign="center" fontSize="4xl" pb={10} fontWeight="bold">
+        Reactor TVL
+      </chakra.h1>
+      <VStack spacing={10} align="stretch">
+        <Select
+          placeholder="Select Token"
+          name="token"
+          value={address}
+          onChange={(event) => setAddress(event.currentTarget.value)}
+        >
+          {addresses.map(([address, name]) => (
+            <option value={address} key={address}>
+              {name}
+            </option>
+          ))}
+        </Select>
+        <Center>
+          <div style={{ width: "1000px", height: "400px" }}>
+            {formattedData ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={formattedData}
+                  margin={{
+                    top: 0,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="blockNumber"
+                    // scale="time"
+                    type="number"
+                    // tickFormatter={dateFormatter}
+                    domain={[
+                      () => formattedData[0]?.blockNumber,
+                      () =>
+                        formattedData[formattedData.length - 1]?.blockNumber,
+                    ]}
+                    // @ts-ignore
+                    // ticks={ticks}
+                  />
+                  <YAxis />
+                  <Tooltip
+                    // labelFormatter={dateFormatter}
+                    labelStyle={{ color: "black" }}
+                  />
+                  <Legend />
+                  <Area
+                    connectNulls={true}
+                    type="stepAfter"
+                    dataKey="total"
+                    stroke="#8884d8"
+                    fill="#8884d8"
+                    stackId="1"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : null}
+          </div>
+        </Center>
+      </VStack>
+    </Box>
   );
 }
