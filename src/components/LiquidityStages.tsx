@@ -1,15 +1,13 @@
 import {
   VStack,
   Box,
-  Text,
-  Center,
   Heading,
-  chakra,
   Button,
   LinkBox,
   LinkOverlay,
 } from "@chakra-ui/react";
 import { FaMedium } from "react-icons/fa";
+import { Page } from "./Page";
 
 type StageInfo = {
   title: string;
@@ -49,63 +47,46 @@ export const stageMap: Record<number, StageInfo> = {
 
 export function LiquidityStages() {
   return (
-    <div>
-      <Center>
-        <VStack spacing={6} align="stretch">
-          <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
-            <chakra.h1
-              textAlign="center"
-              fontSize="4xl"
-              pb={2}
-              fontWeight="bold"
-            >
-              Stages of Liquidity
-            </chakra.h1>
-          </Box>
-          <Center>
-            <LinkBox>
-              <Button
-                w={"full"}
-                maxW={"md"}
-                variant={"outline"}
-                leftIcon={<FaMedium />}
-              >
-                <Center>
-                  <Text>
-                    <LinkOverlay
-                      href="https://medium.com/tokemak/the-evolution-of-daos-1692509bbb41"
-                      isExternal
-                    >
-                      Read More on "The Evolution of DAOs"
-                    </LinkOverlay>
-                  </Text>
-                </Center>
-              </Button>
-            </LinkBox>
-          </Center>
-          {Object.entries(stageMap).map(([stage, { title, description }]) => (
-            <Box
-              maxW="xl"
-              borderWidth="1px"
-              borderRadius="lg"
-              shadow="md"
-              key={stage}
-            >
-              <Box p="6">
-                <div key={stage}>
-                  <Heading as="h1" size="lg" pb={2}>
-                    Stage {stage}
-                  </Heading>
-                  <Heading as="h2" size="md" pb={2}>
-                    {title}
-                  </Heading>
-                  <div>{description}</div>
-                </div>
-              </Box>
+    <Page header="Stages of Liquidity">
+      <LinkBox>
+        <Button
+          w={"full"}
+          maxW={"md"}
+          variant={"outline"}
+          leftIcon={<FaMedium />}
+        >
+          <LinkOverlay
+            href="https://medium.com/tokemak/the-evolution-of-daos-1692509bbb41"
+            isExternal
+          >
+            Read More on "The Evolution of DAOs"
+          </LinkOverlay>
+        </Button>
+      </LinkBox>
+
+      <VStack spacing={6} align="stretch">
+        {Object.entries(stageMap).map(([stage, { title, description }]) => (
+          <Box
+            maxW="xl"
+            borderWidth="1px"
+            borderRadius="lg"
+            shadow="md"
+            key={stage}
+          >
+            <Box p="6">
+              <div key={stage}>
+                <Heading as="h1" size="lg" pb={2}>
+                  Stage {stage}
+                </Heading>
+                <Heading as="h2" size="md" pb={2}>
+                  {title}
+                </Heading>
+                <div>{description}</div>
+              </div>
             </Box>
-          ))}
-        </VStack>
-      </Center>
-    </div>
+          </Box>
+        ))}
+      </VStack>
+    </Page>
   );
 }

@@ -3,18 +3,9 @@ import { DAOS, TOKE_CONTRACT } from "../constants";
 import { BigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils";
 import { BaseCard } from "./DaoDetailsCard";
-import {
-  Box,
-  Center,
-  chakra,
-  Divider,
-  SimpleGrid,
-  Stat,
-  StatHelpText,
-  StatNumber,
-  VStack,
-} from "@chakra-ui/react";
+import { SimpleGrid, Stat, StatHelpText, StatNumber } from "@chakra-ui/react";
 import { TokeChart } from "./TokeChart";
+import { Page } from "./Page";
 
 export function Home() {
   const { data: tokeTreasury } = useCurrentBalance(
@@ -37,37 +28,36 @@ export function Home() {
   }
 
   return (
-    <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
-      <chakra.h1 textAlign="center" fontSize="4xl" pb={8} fontWeight="bold">
-        Toke Wars Dashboard
-      </chakra.h1>
-      <VStack spacing={10} align="stretch">
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
-          <BaseCard title="Total Dao owned toke">
-            <Stat>
-              <StatNumber>lots</StatNumber>
-            </Stat>
-          </BaseCard>
+    <Page header="Toke Wars Dashboard">
+      <SimpleGrid
+        columns={{ base: 1, md: 3 }}
+        spacing={{ base: 5, lg: 8 }}
+        style={{ alignSelf: "stretch" }}
+        px={5}
+      >
+        <BaseCard title="Total Dao owned toke">
+          <Stat>
+            <StatNumber>lots</StatNumber>
+          </Stat>
+        </BaseCard>
 
-          <BaseCard title="Circulating Supply">
-            <Stat>
-              <StatNumber>{formatEther(circulating).split(".")[0]}</StatNumber>
-              <StatHelpText>💰</StatHelpText>
-            </Stat>
-          </BaseCard>
+        <BaseCard title="Circulating Supply">
+          <Stat>
+            <StatNumber>{formatEther(circulating).split(".")[0]}</StatNumber>
+            <StatHelpText>💰</StatHelpText>
+          </Stat>
+        </BaseCard>
 
-          <BaseCard title="Daos Accumulating">
-            <Stat>
-              <StatNumber>{DAOS.length}</StatNumber>
-            </Stat>
-          </BaseCard>
-        </SimpleGrid>
-        <Center>
-          <TokeChart
-            addresses={Object.values(DAOS).flatMap((obj) => obj.addresses)}
-          />
-        </Center>
-      </VStack>
-    </Box>
+        <BaseCard title="Daos Accumulating">
+          <Stat>
+            <StatNumber>{DAOS.length}</StatNumber>
+          </Stat>
+        </BaseCard>
+      </SimpleGrid>
+
+      <TokeChart
+        addresses={Object.values(DAOS).flatMap((obj) => obj.addresses)}
+      />
+    </Page>
   );
 }

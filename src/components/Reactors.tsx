@@ -16,12 +16,13 @@ import {
   Line,
 } from "recharts";
 import { useState } from "react";
-import { Box, Center, chakra, Select, VStack } from "@chakra-ui/react";
+import { Box, Select } from "@chakra-ui/react";
 import { BURN, FIRST_BLOCK, REACTORS } from "../constants";
 import { sortBy } from "lodash";
 import axios from "axios";
 import { addDays, eachMonthOfInterval, getUnixTime, isEqual } from "date-fns";
 import { estimateDay, runningTotal } from "../api/utils";
+import { Page } from "./Page";
 
 function useHistoricalPrice(coin?: string) {
   return useQuery(
@@ -96,37 +97,28 @@ export function Reactors() {
   );
 
   return (
-    <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
-      <chakra.h1 textAlign="center" fontSize="4xl" pb={8} fontWeight="bold">
-        Reactor Value Locked
-      </chakra.h1>
-      <VStack spacing={10} align="stretch">
-        <Center>
-          <Box w="250px">
-            <Select
-              placeholder="Select Token"
-              name="token"
-              value={address}
-              onChange={(event) => setAddress(event.currentTarget.value)}
-            >
-              {sortBy(REACTORS, ([, name]) => name.toLowerCase()).map(
-                ([address, name]) => (
-                  <option value={address} key={address}>
-                    {name}
-                  </option>
-                )
-              )}
-            </Select>
-          </Box>
-        </Center>
+    <Page header="Reactor Value Locked">
+      <Box w="250px">
+        <Select
+          placeholder="Select Token"
+          name="token"
+          value={address}
+          onChange={(event) => setAddress(event.currentTarget.value)}
+        >
+          {sortBy(REACTORS, ([, name]) => name.toLowerCase()).map(
+            ([address, name]) => (
+              <option value={address} key={address}>
+                {name}
+              </option>
+            )
+          )}
+        </Select>
+      </Box>
 
-        <Center>
-          <div style={{ width: "1000px", height: "400px" }}>
-            <RvlGraph address={address} token={token} />
-          </div>
-        </Center>
-      </VStack>
-    </Box>
+      <div style={{ width: "100%", height: "400px" }}>
+        <RvlGraph address={address} token={token} />
+      </div>
+    </Page>
   );
 }
 

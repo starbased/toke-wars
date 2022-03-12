@@ -2,12 +2,12 @@ import { TokeChart } from "./TokeChart";
 import { DaoInformation, T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 import { useAmounts } from "../api/Erc20";
 import { useNewStaking } from "../api/TokeStaking";
-import { Center, Divider } from "@chakra-ui/react";
-import { Container, VStack } from "@chakra-ui/react";
+import { Divider } from "@chakra-ui/react";
 import { DaoDetailsCard } from "./DaoDetailsCard";
 import { DaoResourcesCard } from "./DaoResourcesCard";
 import BigNumber from "bignumber.js";
 import { addDays } from "date-fns";
+import { Page } from "./Page";
 
 function getAmount(array: { total: string; time: Date }[][]) {
   return (
@@ -58,21 +58,11 @@ export function Dao({ dao }: Props) {
   }
 
   return (
-    <div>
-      <Container maxW="container.xl">
-        <VStack spacing={10} align="stretch">
-          <DaoDetailsCard
-            dao={dao}
-            total={total}
-            changePercent={changePercent}
-          />
-          <Center>
-            <TokeChart addresses={addresses} />
-          </Center>
-          <Divider />
-          <DaoResourcesCard dao={dao} />
-        </VStack>
-      </Container>
-    </div>
+    <Page header={dao.name}>
+      <DaoDetailsCard dao={dao} total={total} changePercent={changePercent} />
+      <TokeChart addresses={addresses} />
+      <Divider />
+      <DaoResourcesCard dao={dao} />
+    </Page>
   );
 }

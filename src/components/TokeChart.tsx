@@ -67,7 +67,7 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
   ).map((_, i) => addMonths(startDate, i));
 
   return (
-    <div style={{ width: "1000px", height: "400px" }}>
+    <div style={{ width: "100%", height: "400px" }}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={joinedData}

@@ -1,7 +1,6 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Box,
-  chakra,
   Flex,
   Link,
   SimpleGrid,
@@ -151,45 +150,36 @@ type Props = {
 };
 
 export function DaoDetailsCard({ dao, total, changePercent }: Props) {
-  const { name, addresses, stage } = dao;
+  const { addresses, stage } = dao;
+
+  if (total < 0) {
+    return (
+      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+      </SimpleGrid>
+    );
+  }
+
   return (
-    <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
-      <chakra.h1 textAlign="center" fontSize="4xl" pb={8} fontWeight="bold">
-        {name}
-      </chakra.h1>
-      {/*         <Heading as='h4' style={{ display: "flex", gap: "5px" }}>
-          {addresses.map((address) => (
-            <Badge key={address}>
-              {address}
-            </Badge>
-          ))}
-        </Heading> */}
-      {total > 0 ? (
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
-          <StatsCard
-            title="Total TOKE Owned"
-            total={total}
-            changePercent={changePercent}
-            /* icon="┻┳" */
-          />
-          <StageCard
-            title="DAO Stage"
-            stage={stage}
-            /* icon={<FiServer size={'3em'} />} */
-          />
-          <StatsLinkCard
-            title="Zapper"
-            addresses={addresses}
-            /* icon={<GoLocation size={'3em'} />} */
-          />
-        </SimpleGrid>
-      ) : (
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
-          <SkeletonCard />
-          <SkeletonCard />
-          <SkeletonCard />
-        </SimpleGrid>
-      )}
-    </Box>
+    <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
+      <StatsCard
+        title="Total TOKE Owned"
+        total={total}
+        changePercent={changePercent}
+        /* icon="┻┳" */
+      />
+      <StageCard
+        title="DAO Stage"
+        stage={stage}
+        /* icon={<FiServer size={'3em'} />} */
+      />
+      <StatsLinkCard
+        title="Zapper"
+        addresses={addresses}
+        /* icon={<GoLocation size={'3em'} />} */
+      />
+    </SimpleGrid>
   );
 }
