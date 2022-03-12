@@ -154,7 +154,7 @@ export function DaoDetailsCard({ dao, total, changePercent }: Props) {
   const { name, addresses, stage } = dao;
   return (
     <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
-      <chakra.h1 textAlign="center" fontSize="4xl" pb={10} fontWeight="bold">
+      <chakra.h1 textAlign="center" fontSize="4xl" pb={8} fontWeight="bold">
         {name}
       </chakra.h1>
       {/*         <Heading as='h4' style={{ display: "flex", gap: "5px" }}>

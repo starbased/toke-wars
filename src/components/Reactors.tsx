@@ -130,22 +130,26 @@ export function Reactors() {
 
   return (
     <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
-      <chakra.h1 textAlign="center" fontSize="4xl" pb={10} fontWeight="bold">
-        Reactor TVL
+      <chakra.h1 textAlign="center" fontSize="4xl" pb={8} fontWeight="bold">
+        Reactor Value Locked
       </chakra.h1>
       <VStack spacing={10} align="stretch">
-        <Select
-          placeholder="Select Token"
-          name="token"
-          value={address}
-          onChange={(event) => setAddress(event.currentTarget.value)}
-        >
-          {addresses.map(([address, name]) => (
-            <option value={address} key={address}>
-              {name}
-            </option>
-          ))}
-        </Select>
+        <Center>
+          <Box w="250px">
+            <Select
+              placeholder="Select Token"
+              name="token"
+              value={address}
+              onChange={(event) => setAddress(event.currentTarget.value)}
+            >
+              {addresses.map(([address, name]) => (
+                <option value={address} key={address}>
+                  {name}
+                </option>
+              ))}
+            </Select>
+          </Box>
+        </Center>
         <Center>
           <div style={{ width: "1000px", height: "400px" }}>
             {formattedData ? (
