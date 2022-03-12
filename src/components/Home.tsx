@@ -21,7 +21,7 @@ export function Home() {
     "0x8b4334d4812C530574Bd4F2763FcD22dE94A969B"
   );
 
-  //TODO: this doesn't match the amount coingecko says is vesting https://www.coingecko.com/en/coins/tokemak
+  //TODO: this doesn't match the amount coin gecko says is vesting https://www.coingecko.com/en/coins/tokemak
   const { data: vesting } = useCurrentBalance(
     TOKE_CONTRACT,
     "0x96F98Ed74639689C3A11daf38ef86E59F43417D3"

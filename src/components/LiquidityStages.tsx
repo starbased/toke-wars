@@ -39,7 +39,7 @@ export const stageMap: Record<number, StageInfo> = {
   },
   5: {
     title: "Provides Treasury Assets into Tokemak",
-    description: "DAO decides to hold tAsstes in their treasury",
+    description: "DAO decides to hold tAssets in their treasury",
   },
   6: {
     title: "Vesting Contract Interacts Directly with Tokemak",

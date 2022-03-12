@@ -118,7 +118,7 @@ function StatsLinkCard({ title, addresses }: StatsLinkCardProps) {
     <BaseCard title={title}>
       <Stat>
         <StatNumber>
-          <Link href={"http://zapper.fi/account/" + addresses[0]} isExternal>
+          <Link href={"https://zapper.fi/account/" + addresses[0]} isExternal>
             Current Treasury <ExternalLinkIcon mx="2px" />
           </Link>
         </StatNumber>
@@ -135,9 +135,9 @@ function SkeletonCard({}: SkeletonCardProps) {
     <BaseCard title={""}>
       <Stat>
         <Stack>
-          <Skeleton height="20px" width="225px"></Skeleton>
-          <Skeleton height="20px" width="225px"></Skeleton>
-          <Skeleton height="20px" width="225px"></Skeleton>
+          <Skeleton height="20px" width="225px" />
+          <Skeleton height="20px" width="225px" />
+          <Skeleton height="20px" width="225px" />
         </Stack>
       </Stat>
     </BaseCard>
