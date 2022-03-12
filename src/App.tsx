@@ -24,7 +24,7 @@ function App() {
             ))}
 
             <Route path="/stages" element={<LiquidityStages />} />
-            <Route path="/Reactors" element={<Reactors />} />
+            <Route path="/reactors" element={<Reactors />} />
             <Route path="/" element={<Home />} />
           </Routes>
         </Container>

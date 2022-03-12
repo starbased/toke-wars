@@ -6,6 +6,7 @@ import { BaseCard } from "./DaoDetailsCard";
 import {
   Box,
   Center,
+  chakra,
   Divider,
   SimpleGrid,
   Stat,
@@ -37,6 +38,9 @@ export function Home() {
 
   return (
     <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
+      <chakra.h1 textAlign="center" fontSize="4xl" pb={10} fontWeight="bold">
+        Toke Wars Dashboard
+      </chakra.h1>
       <VStack spacing={10} align="stretch">
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
           <BaseCard title="Total Dao owned toke">
