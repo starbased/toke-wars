@@ -62,9 +62,6 @@ export function Home() {
             </Stat>
           </BaseCard>
         </SimpleGrid>
-
-        <Divider />
-
         <Center>
           <TokeChart
             addresses={Object.values(DAOS).flatMap((obj) => obj.addresses)}

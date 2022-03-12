@@ -5,6 +5,7 @@ import { useNewStaking } from "../api/TokeStaking";
 import { Center, Divider } from "@chakra-ui/react";
 import { Container, VStack } from "@chakra-ui/react";
 import { DaoDetailsCard } from "./DaoDetailsCard";
+import { DaoResourcesCard } from "./DaoResourcesCard";
 import BigNumber from "bignumber.js";
 import { addDays } from "date-fns";
 
@@ -65,10 +66,11 @@ export function Dao({ dao }: Props) {
             total={total}
             changePercent={changePercent}
           />
-          <Divider />
           <Center>
             <TokeChart addresses={addresses} />
           </Center>
+          <Divider />
+          <DaoResourcesCard dao={dao} />
         </VStack>
       </Container>
     </div>
