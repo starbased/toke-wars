@@ -31,8 +31,8 @@ type Props = {
 
 export function Dao({ dao }: Props) {
   const { addresses } = dao;
-  const { data: tokeEvents } = useAmounts(addresses, TOKE_CONTRACT);
-  const { data: tTokeEvents } = useAmounts(addresses, T_TOKE_CONTRACT);
+  const { data: tokeEvents } = useAmounts(TOKE_CONTRACT, addresses);
+  const { data: tTokeEvents } = useAmounts(T_TOKE_CONTRACT, addresses);
   const { data: newStaking } = useNewStaking(addresses);
 
   let total = 0;

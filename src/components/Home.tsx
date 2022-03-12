@@ -5,11 +5,15 @@ import { formatEther } from "ethers/lib/utils";
 import { BaseCard } from "./DaoDetailsCard";
 import {
   Box,
+  Center,
+  Divider,
   SimpleGrid,
   Stat,
   StatHelpText,
   StatNumber,
+  VStack,
 } from "@chakra-ui/react";
+import { TokeChart } from "./TokeChart";
 
 export function Home() {
   const { data: tokeTreasury } = useCurrentBalance(
@@ -33,26 +37,36 @@ export function Home() {
 
   return (
     <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
-      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
-        <BaseCard title="Total Dao owned toke">
-          <Stat>
-            <StatNumber>lots</StatNumber>
-          </Stat>
-        </BaseCard>
+      <VStack spacing={10} align="stretch">
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
+          <BaseCard title="Total Dao owned toke">
+            <Stat>
+              <StatNumber>lots</StatNumber>
+            </Stat>
+          </BaseCard>
 
-        <BaseCard title="Circulating Supply">
-          <Stat>
-            <StatNumber>{formatEther(circulating).split(".")[0]}</StatNumber>
-            <StatHelpText>💰</StatHelpText>
-          </Stat>
-        </BaseCard>
+          <BaseCard title="Circulating Supply">
+            <Stat>
+              <StatNumber>{formatEther(circulating).split(".")[0]}</StatNumber>
+              <StatHelpText>💰</StatHelpText>
+            </Stat>
+          </BaseCard>
 
-        <BaseCard title="Daos Accumulating">
-          <Stat>
-            <StatNumber>{DAOS.length}</StatNumber>
-          </Stat>
-        </BaseCard>
-      </SimpleGrid>
+          <BaseCard title="Daos Accumulating">
+            <Stat>
+              <StatNumber>{DAOS.length}</StatNumber>
+            </Stat>
+          </BaseCard>
+        </SimpleGrid>
+
+        <Divider />
+
+        <Center>
+          <TokeChart
+            addresses={Object.values(DAOS).flatMap((obj) => obj.addresses)}
+          />
+        </Center>
+      </VStack>
     </Box>
   );
 }

@@ -6,6 +6,7 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { Container, VStack } from "@chakra-ui/react";
 import { LiquidityStages } from "./components/LiquidityStages";
+import { Reactors } from "./components/Reactors";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             ))}
 
             <Route path="/stages" element={<LiquidityStages />} />
+            <Route path="/Reactors" element={<Reactors />} />
             <Route path="/" element={<Home />} />
           </Routes>
         </Container>

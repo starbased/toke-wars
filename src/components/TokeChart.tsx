@@ -15,8 +15,8 @@ import { useNewStaking } from "../api/TokeStaking";
 import { addMonths, differenceInMonths, parseISO } from "date-fns";
 
 export function TokeChart({ addresses }: { addresses: string[] }) {
-  const { data: tokeEvents } = useAmounts(addresses, TOKE_CONTRACT);
-  const { data: tTokeEvents } = useAmounts(addresses, T_TOKE_CONTRACT);
+  const { data: tokeEvents } = useAmounts(TOKE_CONTRACT, addresses);
+  const { data: tTokeEvents } = useAmounts(T_TOKE_CONTRACT, addresses);
   const { data: newStaking } = useNewStaking(addresses);
 
   if (!tokeEvents || !tTokeEvents || !newStaking) {

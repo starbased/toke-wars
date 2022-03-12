@@ -1,6 +1,5 @@
 import {
   VStack,
-  StackDivider,
   Box,
   Text,
   Center,
@@ -85,7 +84,13 @@ export function LiquidityStages() {
             </LinkBox>
           </Center>
           {Object.entries(stageMap).map(([stage, { title, description }]) => (
-            <Box maxW="xl" borderWidth="1px" borderRadius="lg" shadow="md">
+            <Box
+              maxW="xl"
+              borderWidth="1px"
+              borderRadius="lg"
+              shadow="md"
+              key={stage}
+            >
               <Box p="6">
                 <div key={stage}>
                   <Heading as="h1" size="lg" pb={2}>
