@@ -1,69 +1,29 @@
-import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
-  Center,
   chakra,
-  Flex,
-  Link,
   LinkBox,
   LinkOverlay,
   SimpleGrid,
-  Text,
-  Stat,
-  useColorModeValue,
 } from "@chakra-ui/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 import { FaBitcoin, FaDiscord, FaTwitter } from "react-icons/fa";
 import { DaoInformation } from "../constants";
-
-type BaseCardProps = {
-  title: string;
-  children: ReactNode;
-};
-
-export function BaseCard({ title, children }: BaseCardProps) {
-  return (
-    <Stat
-      px={{ base: 2, md: 4 }}
-      py="5"
-      shadow="xl"
-      border="1px solid"
-      borderColor={useColorModeValue("gray.800", "gray.500")}
-      rounded="lg"
-    >
-      <Flex justifyContent="space-between">{children}</Flex>
-    </Stat>
-  );
-}
 
 interface LinkCardProps {
   title: string;
   url: string;
-  icon: ReactNode;
+  icon: ReactElement;
 }
 function LinkCard({ title, url, icon }: LinkCardProps) {
   return (
-    <Center>
-      <LinkBox>
-        <Button
-          w={"full"}
-          maxW={"md"}
-          variant={"outline"}
-          /* need to fix icons */
-          leftIcon={<FaTwitter />}
-        >
-          <Center>
-            <Text>
-              <LinkOverlay href={url} isExternal>
-                {title}
-              </LinkOverlay>
-            </Text>
-          </Center>
-        </Button>
-      </LinkBox>
-    </Center>
+    <LinkBox>
+      <Button w={"full"} maxW={"md"} variant={"outline"} leftIcon={icon}>
+        <LinkOverlay href={url} isExternal>
+          {title}
+        </LinkOverlay>
+      </Button>
+    </LinkBox>
   );
 }
 
@@ -88,7 +48,7 @@ export function DaoResourcesCard({ dao }: Props) {
           title="View on CoinGecko"
           url={"https://coingecko.com/coins/" + coingecko}
           icon={<FaBitcoin size={"3em"} />}
-        />{" "}
+        />
         <LinkCard
           title="Chat on Discord"
           url={"https://discord.gg/" + discord}
