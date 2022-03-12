@@ -15,7 +15,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
-import { LinkContainer } from "react-router-bootstrap";
+import { NavLink as NavLinkReact } from "react-router-dom";
 import { DAOS } from "../constants";
 import { useNavigate } from "react-router-dom";
 import { sortBy } from "lodash";
@@ -57,9 +57,9 @@ export function Header() {
           </Box>
           <HStack as="nav" spacing={4} display={{ base: "none", md: "flex" }}>
             {Links.map((link) => (
-              <LinkContainer to={link} key={link}>
-                <Link key={link}>{link}</Link>
-              </LinkContainer>
+              <Link as={NavLinkReact} to={link} key={link}>
+                {link}
+              </Link>
             ))}
             <Menu>
               <MenuButton as={Button} minW={0}>
@@ -67,9 +67,9 @@ export function Header() {
               </MenuButton>
               <MenuList>
                 {sortBy(DAOS, "name").map(({ name }) => (
-                  <LinkContainer to={`daos/${name}`} key={name}>
-                    <MenuItem key={name}>{name}</MenuItem>
-                  </LinkContainer>
+                  <MenuItem key={name}>
+                    <NavLinkReact to={`daos/${name}`}> {name}</NavLinkReact>
+                  </MenuItem>
                 ))}
               </MenuList>
             </Menu>
