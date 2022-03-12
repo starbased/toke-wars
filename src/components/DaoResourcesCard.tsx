@@ -42,17 +42,17 @@ export function DaoResourcesCard({ dao }: Props) {
         <LinkCard
           title="Follow on Twitter"
           url={"https://twitter.com/" + twitter}
-          icon={<FaTwitter size={"3em"} />}
+          icon={<FaTwitter />}
         />
         <LinkCard
           title="View on CoinGecko"
           url={"https://coingecko.com/coins/" + coingecko}
-          icon={<FaBitcoin size={"3em"} />}
+          icon={<FaBitcoin />}
         />
         <LinkCard
           title="Chat on Discord"
           url={"https://discord.gg/" + discord}
-          icon={<FaDiscord size={"3em"} />}
+          icon={<FaDiscord />}
         />
       </SimpleGrid>
     </Box>
