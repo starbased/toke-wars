@@ -18,6 +18,7 @@ import { faListCheck } from "@fortawesome/free-solid-svg-icons";
 import { sortBy } from "lodash";
 import { Page } from "./Page";
 import { NavLink } from "react-router-dom";
+import { DaoLeaderboardRow } from "./DaoLeaderboardRow";
 
 export function Leaderboard() {
   return (
@@ -45,12 +46,8 @@ export function Leaderboard() {
             </Tr>
           </Thead>
           <Tbody>
-            {sortBy(DAOS, "name").map(({ name, stage }) => (
-              <Tr key={name}>
-                <Td>{name}</Td>
-                <Td>{stage}</Td>
-                <Td isNumeric>$12,345</Td>
-              </Tr>
+            {sortBy(DAOS, "total").map((dao) => (
+              <DaoLeaderboardRow dao={dao} key={dao.name} />
             ))}
           </Tbody>
           <Tfoot>
