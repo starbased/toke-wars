@@ -2,9 +2,7 @@ import { provider } from "../util/providers";
 
 import untypedBlocks from "../cache/blocks.json";
 import { BigNumber } from "ethers";
-import { addDays, getUnixTime, set } from "date-fns";
-import axios from "axios";
-import { useQuery } from "react-query";
+import { addDays, set } from "date-fns";
 
 const blocksCache: Record<string, number> = untypedBlocks;
 
@@ -51,42 +49,4 @@ export function estimateDay(block: number, morningBlock = 14369954) {
   });
 
   return addDays(today, -days);
-}
-
-export async function getTokenPrice(coin?: string) {
-  const { data } = await axios.get(
-    `https://api.coingecko.com/api/v3/simple/price`,
-    { params: { ids: coin, vs_currencies: "usd" } }
-  );
-  return data;
-}
-
-export function useHistoricalPrice(coin?: string) {
-  return useQuery(
-    ["price", coin],
-    async () => {
-      const { data } = await axios.get<{ prices: [number, number][] }>(
-        `https://api.coingecko.com/api/v3/coins/${coin}/market_chart/range`,
-        {
-          params: {
-            vs_currency: "usd",
-            //has to be at least 90 days to get in a daily scale
-            //TODO: make sure to go back far enough fetch transactions first
-            from: getUnixTime(addDays(new Date(), -91)),
-            to: getUnixTime(new Date()),
-          },
-        }
-      );
-      return data;
-    },
-    {
-      enabled: !!coin,
-      select(data) {
-        return data.prices.reduce<Record<number, number>>(
-          (acc, [time, price]) => ({ ...acc, [time]: price }),
-          {}
-        );
-      },
-    }
-  );
 }

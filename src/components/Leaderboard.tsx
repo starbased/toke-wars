@@ -5,7 +5,6 @@ import {
   Table,
   TableCaption,
   Tbody,
-  Td,
   Tfoot,
   Th,
   Thead,
@@ -22,37 +21,28 @@ import { DaoLeaderboardRow } from "./DaoLeaderboardRow";
 import { useAmounts } from "../api/Erc20";
 import { useNewStaking } from "../api/TokeStaking";
 import { getAmount } from "../util/maths";
-import { getTokenPrice } from "../api/utils";
-
-let toke_price = await getTokenPrice("tokemak");
 
 export function Leaderboard() {
-  let formattedData = DAOS?.map((dao) => {
+  let formattedData = DAOS.map((dao) => {
     const { addresses } = dao;
     const { data: tokeEvents } = useAmounts(TOKE_CONTRACT, addresses);
     const { data: tTokeEvents } = useAmounts(T_TOKE_CONTRACT, addresses);
     const { data: newStaking } = useNewStaking(addresses);
 
     let totalTOKE = 0;
-    let totalUSD = 0;
 
     if (tokeEvents && tTokeEvents && newStaking) {
       const array = [tokeEvents, tTokeEvents, newStaking];
       totalTOKE = getAmount(array);
-      totalUSD = getAmount(array) * toke_price.tokemak?.usd;
     }
 
     return {
-      name: dao.name,
-      stage: dao.stage,
-      totalTOKE: totalTOKE,
-      totalUSD: totalUSD,
-      addresses: dao.addresses,
-      twitter: dao.twitter,
-      coingecko: dao.coingecko,
-      discord: dao.discord,
+      ...dao,
+      totalTOKE,
     };
   });
+
+  formattedData = orderBy(formattedData, "totalTOKE", "desc");
 
   return (
     <Page header="Leaderboard">
@@ -80,7 +70,7 @@ export function Leaderboard() {
             </Tr>
           </Thead>
           <Tbody>
-            {orderBy(formattedData, "totalTOKE", "desc").map((dao) => (
+            {formattedData.map((dao) => (
               <DaoLeaderboardRow dao={dao} key={dao.name} />
             ))}
           </Tbody>

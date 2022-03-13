@@ -18,10 +18,8 @@ import {
 import { ReactNode } from "react";
 import { DaoInformation } from "../constants";
 import { stageMap } from "./LiquidityStages";
-import { getTokenPrice } from "../api/utils";
-import { formatMoney, numberWithCommas } from "../util/maths";
-
-let toke_price = await getTokenPrice("tokemak");
+import { formatMoney, formatNumber } from "../util/maths";
+import { useTokenPrice } from "../api/coinGecko";
 
 type BaseCardProps = {
   title: string;
@@ -64,14 +62,16 @@ interface StatsCardProps {
   /* icon: ReactNode; */
 }
 function StatsCard({ title, total, changePercent }: StatsCardProps) {
+  const { data: toke_price } = useTokenPrice("tokemak");
+
   return (
     <BaseCard title={title}>
       <Stat>
         <Skeleton isLoaded={total > 0}>
           <StatNumber>
-            {numberWithCommas(total.toFixed())}
+            {formatNumber(total)}
             <Badge ml="2" variant="subtle">
-              {formatMoney(total * toke_price.tokemak?.usd)}
+              {formatMoney(total * toke_price)}
             </Badge>
           </StatNumber>
         </Skeleton>

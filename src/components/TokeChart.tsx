@@ -13,7 +13,7 @@ import { T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 import { useAmounts } from "../api/Erc20";
 import { useNewStaking } from "../api/TokeStaking";
 import { addMonths, differenceInMonths, parseISO } from "date-fns";
-import { numberWithCommas } from "../util/maths";
+import { formatNumber } from "../util/maths";
 
 export function TokeChart({ addresses }: { addresses: string[] }) {
   const { data: tokeEvents } = useAmounts(TOKE_CONTRACT, addresses);
@@ -91,14 +91,14 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
           />
           <YAxis
             tickFormatter={(tick) => {
-              return numberWithCommas(tick.toFixed());
+              return formatNumber(tick);
             }}
           />
           <Tooltip
             labelFormatter={dateFormatter}
             labelStyle={{ color: "black" }}
             formatter={(value) => {
-              return numberWithCommas(Number(value).toFixed());
+              return formatNumber(Number(value));
             }}
           />
           <Legend />

@@ -16,20 +16,25 @@ export function getAmount(array: { total: string; time: Date }[][]) {
   );
 }
 
-export function formatMoney(number) {
-  let dollarUS = Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    useGrouping: true,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-  return dollarUS.format(number);
-}
-
-export function numberWithCommas(number) {
+function format(number: number | bigint, options: Intl.NumberFormatOptions) {
   if (!number) {
     return number;
   }
-  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return Intl.NumberFormat("en-US", options).format(number);
+}
+
+export function formatMoney(number: number | bigint) {
+  return format(number, {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+}
+
+export function formatNumber(number: number | bigint) {
+  return format(number, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
 }

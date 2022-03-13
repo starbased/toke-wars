@@ -20,11 +20,12 @@ import { Box, HStack, Select, Skeleton, Stack } from "@chakra-ui/react";
 import { BURN, FIRST_BLOCK, REACTORS } from "../constants";
 import { sortBy } from "lodash";
 import { eachMonthOfInterval, isEqual } from "date-fns";
-import { estimateDay, runningTotal, useHistoricalPrice } from "../api/utils";
+import { estimateDay, runningTotal } from "../api/utils";
 import { Page } from "./Page";
 import { LinkCard } from "./LinkCard";
 import { FaRadiationAlt } from "react-icons/fa";
-import { formatMoney, numberWithCommas } from "../util/maths";
+import { useHistoricalPrice } from "../api/coinGecko";
+import { formatMoney, formatNumber } from "../util/maths";
 
 function useReactorOverTime(address: string) {
   return useQuery(
@@ -191,14 +192,14 @@ function RvlGraph({ address, token }: { address: string; token: string }) {
               1.25,
           ]}
           tickFormatter={(tick) => {
-            return numberWithCommas(tick.toFixed());
+            return formatNumber(tick);
           }}
         />
         <Tooltip
           labelFormatter={dateFormatter}
           labelStyle={{ color: "black" }}
           formatter={(value) => {
-            return numberWithCommas(Number(value).toFixed());
+            return formatNumber(Number(value));
           }}
         />
         <Legend />

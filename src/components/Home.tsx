@@ -6,17 +6,18 @@ import { BaseCard } from "./DaoDetailsCard";
 import { SimpleGrid, Stat, StatHelpText, StatNumber } from "@chakra-ui/react";
 import { TokeChart } from "./TokeChart";
 import { Page } from "./Page";
-import { formatMoney, numberWithCommas } from "../util/maths";
-import { getTokenPrice } from "../api/utils";
+import { formatMoney, formatNumber } from "../util/maths";
 import { REACTORS } from "../constants";
-
-let toke_price = await getTokenPrice("tokemak");
+import { useTokenPrice } from "../api/coinGecko";
+import { parseInt } from "lodash";
 
 export function Home() {
   const { data: tokeTreasury } = useCurrentBalance(
     TOKE_CONTRACT,
     "0x8b4334d4812C530574Bd4F2763FcD22dE94A969B"
   );
+
+  const { data: toke_price } = useTokenPrice("tokemak");
 
   //TODO: this doesn't match the amount coin gecko says is vesting https://www.coingecko.com/en/coins/tokemak
   const { data: vesting } = useCurrentBalance(
@@ -42,23 +43,18 @@ export function Home() {
       >
         <BaseCard title="Total DAO Owned TOKE">
           <Stat>
-            <StatNumber>{numberWithCommas("1000000")}</StatNumber>
-            <StatHelpText>
-              {formatMoney(parseInt("1000000") * toke_price.tokemak?.usd)}
-            </StatHelpText>
+            <StatNumber>{formatNumber(1000000)}</StatNumber>
+            <StatHelpText>{formatMoney(1000000 * toke_price)}</StatHelpText>
           </Stat>
         </BaseCard>
 
         <BaseCard title="Circulating Supply">
           <Stat>
             <StatNumber>
-              {numberWithCommas(formatEther(circulating).split(".")[0])}
+              {formatNumber(parseInt(formatEther(circulating)))}
             </StatNumber>
             <StatHelpText>
-              {formatMoney(
-                parseInt(formatEther(circulating).split(".")[0]) *
-                  toke_price.tokemak?.usd
-              )}
+              {formatMoney(parseFloat(formatEther(circulating)) * toke_price)}
             </StatHelpText>
           </Stat>
         </BaseCard>
