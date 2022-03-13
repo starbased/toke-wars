@@ -1,0 +1,173 @@
+import { formatEther } from "ethers/lib/utils";
+
+import { CycleInfo } from "./Rewards";
+import { useMemo, useState } from "react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  Label,
+} from "recharts";
+import mapValues from "lodash/mapValues";
+import mergeWith from "lodash/mergeWith";
+import { FormControl, FormLabel, Switch } from "@chakra-ui/react";
+
+type Props = {
+  rewards: (CycleInfo | undefined)[];
+};
+
+export function Graph({ rewards }: Props) {
+  const [hidden, setHidden] = useState<string[]>([]);
+  const [showByCycle, setShowByCycle] = useState<boolean>(true);
+
+  const colors = [
+    "#63b598",
+    "#ce7d78",
+    "#ea9e70",
+    "#a48a9e",
+    "#c6e1e8",
+    "#648177",
+    "#0d5ac1",
+    "#f205e6",
+    "#1c0365",
+    "#f2510e",
+    "#4ca2f9",
+    "#a4e43f",
+    "#d298e2",
+    "#6119d0",
+    "#d2737d",
+    "#c0a43c",
+    "#651be6",
+    "#79806e",
+    "#61da5e",
+  ];
+
+  const { byCycle, aggregate } = useMemo(() => {
+    const byCycle: Record<string, string>[] = [];
+    const aggregate: Record<string, string>[] = [];
+
+    let last: Record<string, string> = {};
+
+    for (let i in rewards) {
+      const nameObj = { name: i.toString() };
+      const data = rewards[i];
+
+      if (!data) {
+        byCycle.push(nameObj);
+        aggregate.push({
+          ...last,
+          ...nameObj,
+        });
+      } else {
+        let current = data?.summary?.breakdown.reduce((acc, obj) => {
+          return { ...acc, [obj.description]: obj.amount };
+        }, {});
+
+        byCycle.push({
+          ...mapValues(current, formatEther),
+          ...nameObj,
+        });
+
+        aggregate.push({
+          ...mapValues(
+            // eslint-disable-next-line no-loop-func
+            mergeWith(current, last, (a, b) => {
+              if (a && b) {
+                return (BigInt(a) + BigInt(b)).toString();
+              } else if (a) {
+                return a;
+              } else {
+                return b;
+              }
+            }),
+            formatEther
+          ),
+          ...nameObj,
+        });
+
+        last = current;
+      }
+    }
+
+    return { byCycle, aggregate };
+  }, [rewards]);
+
+  const set = new Set<string>(Object.keys(aggregate[aggregate.length - 1]));
+  set.delete("name");
+
+  return (
+    <>
+      <FormControl display="flex" alignItems="center">
+        <FormLabel>"Aggregate amounts"</FormLabel>
+        <Switch
+          isChecked={!showByCycle}
+          onChange={() => setShowByCycle(!showByCycle)}
+        />
+      </FormControl>
+
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart
+          width={500}
+          height={400}
+          data={showByCycle ? byCycle : aggregate}
+          margin={{
+            top: 10,
+            right: 30,
+            left: 10,
+            bottom: 10,
+          }}
+        >
+          <CartesianGrid stroke="#424242" strokeDasharray="3 3" />
+          <XAxis dataKey="name">
+            <Label
+              style={{ fill: "ghostwhite" }}
+              value="Cycle #"
+              offset={-10}
+              position="insideBottom"
+            />
+          </XAxis>
+          <YAxis>
+            <Label
+              style={{ fill: "ghostwhite" }}
+              value="Rewards (TOKE)"
+              angle={-90}
+              position="insideLeft"
+            />
+          </YAxis>
+          <Tooltip
+            contentStyle={{ color: "black" }}
+            labelFormatter={(value) => "Cycle " + value}
+          />
+          <Legend
+            wrapperStyle={{ bottom: -5 }}
+            onClick={(e) => {
+              if (hidden.includes(e.dataKey)) {
+                hidden.splice(hidden.indexOf(e.dataKey), 1);
+                setHidden([...hidden]);
+              } else {
+                setHidden([...hidden, e.dataKey]);
+              }
+            }}
+          />
+          {Array.from(set).map((key, i) => (
+            <Area
+              hide={hidden.includes(key)}
+              type="monotone"
+              dataKey={key}
+              stackId="1"
+              key={key}
+              fill={colors[i]}
+              stroke={colors[i]}
+            />
+          ))}
+        </AreaChart>
+      </ResponsiveContainer>
+      <div>(Click on labels to show or hide reward types)</div>
+    </>
+  );
+}

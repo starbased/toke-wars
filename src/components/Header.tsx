@@ -20,7 +20,7 @@ import { DAOS } from "../constants";
 import { useNavigate } from "react-router-dom";
 import { sortBy } from "lodash";
 
-const Links = ["Reactors", "Leaderboard", "Stages"];
+const Links = ["Reactors", "Leaderboard", "Stages", "Rewards"];
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <Link
