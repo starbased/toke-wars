@@ -11,6 +11,9 @@ import {
   Divider,
   Heading,
   SimpleGrid,
+  Skeleton,
+  Spinner,
+  Stack,
   Stat,
   StatHelpText,
   StatNumber,
@@ -79,7 +82,19 @@ export function Totals({ latestCycle, address }: Props) {
   const loading = cycleHashes.some(loadingFn) || rewards.some(loadingFn);
 
   if (loading) {
-    return <div>Waiting for cycle rewards</div>;
+    return (
+      <div>
+        <Stack>
+          <chakra.h2>Waiting for Cycle Rewards</chakra.h2>
+          <Skeleton width="200px" height="60px" />
+          <Skeleton width="200px" height="40px" />
+          <Skeleton width="200px" height="60px" />
+          <Skeleton width="200px" height="40px" />
+          <Skeleton width="200px" height="60px" />
+          <Skeleton width="200px" height="40px" />
+        </Stack>
+      </div>
+    );
   }
 
   const total = rewards
@@ -107,6 +122,7 @@ export function Totals({ latestCycle, address }: Props) {
         <BaseCard title="Current Cycle">
           <Stat>
             <StatNumber>{latestCycle.toNumber()}</StatNumber>
+            {/* calc days until next cycle */}
             <StatHelpText>Next Cycle in X Days</StatHelpText>
           </Stat>
         </BaseCard>
@@ -114,7 +130,9 @@ export function Totals({ latestCycle, address }: Props) {
           <Stat>
             <StatNumber>{formatNumber(parseFloat(formattedTotal))}</StatNumber>
             {toke_price ? (
-              <StatHelpText>{formatMoney(1000000 * toke_price)}</StatHelpText>
+              <StatHelpText>
+                {formatMoney(parseFloat(formattedTotal) * toke_price)}
+              </StatHelpText>
             ) : null}
           </Stat>
         </BaseCard>
@@ -169,7 +187,7 @@ export function Totals({ latestCycle, address }: Props) {
           </Tfoot>
 
           <TableCaption>
-            Leaderboard tracks the DAOs with the top TOKE holdings
+            Total TOKE Earned Across All Cycles Per Reactor
           </TableCaption>
         </Table>
       </Box>

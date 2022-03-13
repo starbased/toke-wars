@@ -36,7 +36,9 @@ export function formatMoney(number: number | bigint) {
 
 export function formatNumber(number: number | bigint, fDigits = 0) {
   return format(number, {
-    minimumFractionDigits: fDigits,
-    maximumFractionDigits: fDigits,
+    // minimumFractionDigits is out of range error
+    // on Reactors page if this is paramaterized, default not right?
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   });
 }

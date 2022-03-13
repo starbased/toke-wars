@@ -43,7 +43,7 @@ export function UserInput({ setAddress }: Props) {
             <Box px="2">
               <Input
                 id="address"
-                placeholder="address"
+                placeholder="ETH Address"
                 {...register("address", {
                   required: "This is required",
                   minLength: {

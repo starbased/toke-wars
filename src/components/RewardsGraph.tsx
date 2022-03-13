@@ -21,8 +21,10 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  VStack,
   Spacer,
   Switch,
+  Container,
 } from "@chakra-ui/react";
 
 type Props = {
@@ -110,80 +112,83 @@ export function Graph({ rewards }: Props) {
 
   return (
     <>
-      <div style={{ width: "800px", height: "400px" }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
-            data={showByCycle ? byCycle : aggregate}
-            margin={{
-              top: 0,
-              right: 75,
-              left: 75,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid stroke="#424242" strokeDasharray="3 3" />
-            <XAxis dataKey="name">
-              <Label
-                style={{ fill: "ghostwhite" }}
-                value="Cycle #"
-                offset={-10}
-                position="insideBottom"
-              />
-            </XAxis>
-            <YAxis>
-              <Label
-                style={{ fill: "ghostwhite" }}
-                value="Rewards (TOKE)"
-                angle={-90}
-                position="insideLeft"
-              />
-            </YAxis>
-            <Tooltip
-              contentStyle={{ color: "black" }}
-              labelFormatter={(value) => "Cycle " + value}
-            />
-            <Legend
-              wrapperStyle={{ bottom: -5 }}
-              onClick={(e) => {
-                if (hidden.includes(e.dataKey)) {
-                  hidden.splice(hidden.indexOf(e.dataKey), 1);
-                  setHidden([...hidden]);
-                } else {
-                  setHidden([...hidden, e.dataKey]);
-                }
-              }}
-            />
-            {Array.from(set).map((key, i) => (
-              <Area
-                hide={hidden.includes(key)}
-                type="monotone"
-                dataKey={key}
-                stackId="1"
-                key={key}
-                fill={colors[i]}
-                stroke={colors[i]}
-              />
-            ))}
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-
-      <FormControl display="flex" alignItems="center">
-        <Center>
-          <Flex>
-            <Box px="2">
-              <FormLabel>Aggregate</FormLabel>
-            </Box>
-            <Spacer />
-            <Box px="2">
-              <Switch
-                isChecked={!showByCycle}
-                onChange={() => setShowByCycle(!showByCycle)}
-              />
-            </Box>
-          </Flex>
-        </Center>
-      </FormControl>
+      <Container centerContent>
+        <Box padding="4" minWidth="2xl">
+          <VStack spacing="20px">
+            <ResponsiveContainer width="99%" aspect={1.5}>
+              <AreaChart
+                data={showByCycle ? byCycle : aggregate}
+                margin={{
+                  top: 0,
+                  right: 25,
+                  left: 25,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid stroke="#424242" strokeDasharray="3 3" />
+                <XAxis dataKey="name">
+                  <Label
+                    style={{ fill: "ghostwhite" }}
+                    value="Cycle #"
+                    offset={-10}
+                    position="insideBottom"
+                  />
+                </XAxis>
+                <YAxis>
+                  <Label
+                    style={{ fill: "ghostwhite" }}
+                    value="Rewards (TOKE)"
+                    angle={-90}
+                    position="insideLeft"
+                  />
+                </YAxis>
+                <Tooltip
+                  contentStyle={{ color: "black" }}
+                  labelFormatter={(value) => "Cycle " + value}
+                />
+                <Legend
+                  wrapperStyle={{ bottom: -5 }}
+                  onClick={(e) => {
+                    if (hidden.includes(e.dataKey)) {
+                      hidden.splice(hidden.indexOf(e.dataKey), 1);
+                      setHidden([...hidden]);
+                    } else {
+                      setHidden([...hidden, e.dataKey]);
+                    }
+                  }}
+                />
+                {Array.from(set).map((key, i) => (
+                  <Area
+                    hide={hidden.includes(key)}
+                    type="monotone"
+                    dataKey={key}
+                    stackId="1"
+                    key={key}
+                    fill={colors[i]}
+                    stroke={colors[i]}
+                  />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
+            <FormControl display="flex" alignItems="center">
+              <Center>
+                <Flex>
+                  <Box px="2">
+                    <FormLabel>Aggregate</FormLabel>
+                  </Box>
+                  <Spacer />
+                  <Box px="2">
+                    <Switch
+                      isChecked={!showByCycle}
+                      onChange={() => setShowByCycle(!showByCycle)}
+                    />
+                  </Box>
+                </Flex>
+              </Center>
+            </FormControl>
+          </VStack>
+        </Box>
+      </Container>
     </>
   );
 }

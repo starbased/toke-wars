@@ -83,6 +83,18 @@ export function Header() {
             {Links.map((link) => (
               <NavLink key={link}>{link}</NavLink>
             ))}
+            <Menu>
+              <MenuButton as={Button} minW={0}>
+                DAOs
+              </MenuButton>
+              <MenuList>
+                {sortBy(DAOS, "name").map(({ name }) => (
+                  <MenuItem key={name}>
+                    <NavLinkReact to={`daos/${name}`}> {name}</NavLinkReact>
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
           </Stack>
         </Box>
       ) : null}
