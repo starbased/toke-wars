@@ -1,28 +1,14 @@
 import { RewardsHash__factory } from "../typechain";
-import { BigNumber, providers } from "ethers";
+import { providers } from "ethers";
 import { useQuery } from "react-query";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import knownCycleHashes from "../cache/cycleHashes.json";
-import { formatEther } from "ethers/lib/utils";
 import { useState } from "react";
 
-import { UserInput } from "./UserInput";
-import { Totals } from "./Totals";
+import { UserInput } from "./RewardsUserInput";
+import { Totals } from "./RewardsTotals";
 
-import {
-  Badge,
-  Box,
-  Center,
-  Heading,
-  Table,
-  TableCaption,
-  Tbody,
-  Td,
-  Tfoot,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Badge, Box } from "@chakra-ui/react";
 import { Page } from "./Page";
 
 export type CycleInfo = {

@@ -5,7 +5,6 @@ import React, { Suspense } from "react";
 import { getCycleHash, getCycleInfo } from "./Rewards";
 import orderBy from "lodash/orderBy";
 import axios from "axios";
-import { Formatter } from "./Formatter";
 import {
   Box,
   chakra,
@@ -26,10 +25,10 @@ import {
 } from "@chakra-ui/react";
 import { formatNumber, formatMoney } from "../util/maths";
 import { BaseCard } from "./DaoDetailsCard";
-import { useTokenPrice } from "../api/coinGecko";
+// import { useTokenPrice } from "../api/coinGecko";
 
 const Graph = React.lazy(() =>
-  import("./Graph").then(({ Graph }) => ({
+  import("./RewardsGraph").then(({ Graph }) => ({
     default: Graph,
   }))
 );
@@ -40,6 +39,19 @@ type Props = {
 };
 
 export function Totals({ latestCycle, address }: Props) {
+  const { data: toke_price } = useQuery(
+    "price",
+    async () => {
+      const { data } = await axios.get<{ prices: { toke: number } }>(
+        "https://tokemakmarketdata.s3.amazonaws.com/current.json"
+      );
+      return data;
+    },
+    {
+      select: (data) => data.prices.toke,
+      staleTime: 1000 * 60 * 5, // 5 min
+    }
+  );
   const cycleArray = Array.from(
     Array((latestCycle?.toNumber() || -1) + 1).keys()
   );
@@ -87,16 +99,11 @@ export function Totals({ latestCycle, address }: Props) {
   }
 
   const formattedTotal = formatEther(total || 0);
-  const { data: toke_price } = useTokenPrice("tokemak");
+  // const { data: toke_price } = useTokenPrice("tokemak");
 
   return (
     <>
-      <SimpleGrid
-        columns={{ base: 1, md: 2 }}
-        spacing={{ base: 5, lg: 8 }}
-        style={{ alignSelf: "stretch" }}
-        px={5}
-      >
+      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, lg: 8 }}>
         <BaseCard title="Current Cycle">
           <Stat>
             <StatNumber>{latestCycle.toNumber()}</StatNumber>
@@ -112,33 +119,28 @@ export function Totals({ latestCycle, address }: Props) {
           </Stat>
         </BaseCard>
       </SimpleGrid>
-
-      <div style={{ width: "100%", height: "400px" }}>
+      <Box py="10">
         <Suspense fallback={null}>
           <Graph rewards={rewards.map(({ data }) => data)} />
         </Suspense>
-      </div>
+      </Box>
 
       <Divider />
 
+      <Box maxW="7xl" mx="auto" p={5}>
+        <chakra.h1 textAlign="center" fontSize="2xl" fontWeight="bold">
+          Total Earned by Token
+        </chakra.h1>
+      </Box>
       <Box
         maxW="7xl"
         mx="auto"
         pt={5}
-        px={{ base: 2, sm: 12, md: 17 }}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          gap: "25px",
-        }}
+        borderWidth="1px"
+        borderRadius="lg"
+        shadow="md"
+        p="6"
       >
-        <chakra.h1 textAlign="center" fontSize="4xl" fontWeight="bold">
-          Total Earned by Token
-        </chakra.h1>
-      </Box>
-      <Box maxW="xl" borderWidth="1px" borderRadius="lg" shadow="md" p="6">
         <Table variant="simple">
           <Thead>
             <Tr>
@@ -151,7 +153,9 @@ export function Totals({ latestCycle, address }: Props) {
               ([k, v]) => (
                 <Tr key={k}>
                   <Td>{k}</Td>
-                  <Td>{formatEther(v.toString())}</Td>
+                  <Td isNumeric>
+                    {formatNumber(Number(formatEther(v.toString())), 2)}
+                  </Td>
                 </Tr>
               )
             )}
