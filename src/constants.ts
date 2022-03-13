@@ -5,6 +5,7 @@ export type DaoInformation = {
   twitter: string;
   coingecko: string;
   discord: string;
+  total: number;
 };
 
 export const DAOS: DaoInformation[] = [
@@ -15,6 +16,7 @@ export const DAOS: DaoInformation[] = [
     twitter: "OlympusDAO",
     coingecko: "olympus",
     discord: "bzFn5nstFB",
+    total: 0,
   },
   {
     addresses: ["0x5180db0237291a6449dda9ed33ad90a38787621c"],
@@ -23,6 +25,7 @@ export const DAOS: DaoInformation[] = [
     twitter: "fraxfinance",
     coingecko: "frax",
     discord: "MTZu6Hf57d",
+    total: 0,
   },
   {
     addresses: ["0x90a48d5cf7343b08da12e067680b4c6dbfe551be"],
@@ -31,6 +34,7 @@ export const DAOS: DaoInformation[] = [
     twitter: "ShapeShift_io",
     coingecko: "shapeshift-fox-token",
     discord: "shapeshift",
+    total: 0,
   },
   {
     addresses: [
@@ -42,6 +46,7 @@ export const DAOS: DaoInformation[] = [
     twitter: "LobisHQ",
     coingecko: "lobis",
     discord: "lobishq",
+    total: 0,
   },
   {
     addresses: ["0xe94B5EEC1fA96CEecbD33EF5Baa8d00E4493F4f3"],
@@ -50,6 +55,7 @@ export const DAOS: DaoInformation[] = [
     twitter: "SushiSwap",
     coingecko: "sushi",
     discord: "MsVBwEc",
+    total: 0,
   },
   {
     addresses: [
@@ -61,6 +67,7 @@ export const DAOS: DaoInformation[] = [
     twitter: "TracerDAO",
     coingecko: "tracer-dao",
     discord: "rWmrzgrbBp",
+    total: 0,
   },
   {
     addresses: ["0xDbbfc051D200438dd5847b093B22484B842de9E7"],
@@ -69,6 +76,7 @@ export const DAOS: DaoInformation[] = [
     twitter: "APWineFinance",
     coingecko: "apwine",
     discord: "AxbH7sE6sc",
+    total: 0,
   },
   {
     addresses: ["0x99F4176EE457afedFfCB1839c7aB7A030a5e4A92"],
@@ -77,6 +85,7 @@ export const DAOS: DaoInformation[] = [
     twitter: "synthetix_io",
     coingecko: "havven",
     discord: "invite/AEdUHzt",
+    total: 0,
   },
   // {
   //   addresses: ["0x42e61987a5cba002880b3cc5c800952a5804a1c5"],
@@ -93,6 +102,7 @@ export const DAOS: DaoInformation[] = [
     twitter: "redactedcartel",
     coingecko: "butterflydao",
     discord: "invite/thdzk4k5Fg",
+    total: 0,
   },
   {
     addresses: ["0x9e2b6378ee8ad2a4a95fe481d63caba8fb0ebbf9"],
@@ -101,6 +111,7 @@ export const DAOS: DaoInformation[] = [
     twitter: "AlchemixFi",
     coingecko: "alchemix",
     discord: "zAd6dzgwaj",
+    total: 0,
   },
 ];
 

@@ -5,25 +5,9 @@ import { useNewStaking } from "../api/TokeStaking";
 import { Divider } from "@chakra-ui/react";
 import { DaoDetailsCard } from "./DaoDetailsCard";
 import { DaoResourcesCard } from "./DaoResourcesCard";
-import BigNumber from "bignumber.js";
+import { getAmount } from "../util/maths";
 import { addDays } from "date-fns";
 import { Page } from "./Page";
-
-function getAmount(array: { total: string; time: Date }[][]) {
-  return (
-    array
-      .filter((obj) => obj.length > 0)
-      // get the last record
-      .map((obj) => obj[obj.length - 1])
-      //add them up
-      .reduce(
-        (obj, acc) => obj.plus(new BigNumber(acc.total)),
-        new BigNumber(0)
-      )
-      .decimalPlaces(2)
-      .toNumber()
-  );
-}
 
 type Props = {
   dao: DaoInformation;

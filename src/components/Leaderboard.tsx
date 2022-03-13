@@ -12,15 +12,45 @@ import {
   Tr,
   Link,
 } from "@chakra-ui/react";
-import { DAOS } from "../constants";
+import { DAOS, TOKE_CONTRACT, T_TOKE_CONTRACT } from "../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faListCheck } from "@fortawesome/free-solid-svg-icons";
-import { sortBy } from "lodash";
+import { orderBy } from "lodash";
 import { Page } from "./Page";
 import { NavLink } from "react-router-dom";
 import { DaoLeaderboardRow } from "./DaoLeaderboardRow";
+import { useAmounts } from "../api/Erc20";
+import { useNewStaking } from "../api/TokeStaking";
+import { getAmount } from "../util/maths";
+import { getTokenPrice } from "../api/utils";
+
+let toke_price = await getTokenPrice("tokemak");
 
 export function Leaderboard() {
+  let formattedData = DAOS?.map((dao) => {
+    const { addresses } = dao;
+    const { data: tokeEvents } = useAmounts(TOKE_CONTRACT, addresses);
+    const { data: tTokeEvents } = useAmounts(T_TOKE_CONTRACT, addresses);
+    const { data: newStaking } = useNewStaking(addresses);
+
+    let total = 0;
+
+    if (tokeEvents && tTokeEvents && newStaking) {
+      const array = [tokeEvents, tTokeEvents, newStaking];
+      total = getAmount(array) * toke_price.tokemak?.usd;
+    }
+
+    return {
+      name: dao.name,
+      stage: dao.stage,
+      total: total,
+      addresses: dao.addresses,
+      twitter: dao.twitter,
+      coingecko: dao.coingecko,
+      discord: dao.discord,
+    };
+  });
+
   return (
     <Page header="Leaderboard">
       <LinkBox>
@@ -46,7 +76,7 @@ export function Leaderboard() {
             </Tr>
           </Thead>
           <Tbody>
-            {sortBy(DAOS, "total").map((dao) => (
+            {orderBy(formattedData, "total", "desc").map((dao) => (
               <DaoLeaderboardRow dao={dao} key={dao.name} />
             ))}
           </Tbody>

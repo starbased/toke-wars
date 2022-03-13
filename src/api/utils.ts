@@ -3,6 +3,8 @@ import { provider } from "../util/providers";
 import untypedBlocks from "../cache/blocks.json";
 import { BigNumber } from "ethers";
 import { addDays, set } from "date-fns";
+import axios from "axios";
+
 const blocksCache: Record<string, number> = untypedBlocks;
 
 (window as any).blocks = blocksCache;
@@ -48,4 +50,12 @@ export function estimateDay(block: number, morningBlock = 14369954) {
   });
 
   return addDays(today, -days);
+}
+
+export async function getTokenPrice(coin?: string) {
+  const { data } = await axios.get(
+    `https://api.coingecko.com/api/v3/simple/price`,
+    { params: { ids: coin, vs_currencies: "usd" } }
+  );
+  return data;
 }

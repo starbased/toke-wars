@@ -17,6 +17,10 @@ import {
 import { ReactNode } from "react";
 import { DaoInformation } from "../constants";
 import { stageMap } from "./LiquidityStages";
+import { getTokenPrice } from "../api/utils";
+import { formatMoney, numberWithCommas } from "../util/maths";
+
+let toke_price = await getTokenPrice("tokemak");
 
 type BaseCardProps = {
   title: string;
@@ -63,7 +67,10 @@ function StatsCard({ title, total, changePercent }: StatsCardProps) {
     <BaseCard title={title}>
       <Stat>
         <Skeleton isLoaded={total > 0}>
-          <StatNumber>{total.toLocaleString()}</StatNumber>
+          <StatNumber>
+            {numberWithCommas(total.toFixed())} (
+            {formatMoney(total * toke_price.tokemak?.usd)})
+          </StatNumber>
         </Skeleton>
         <Skeleton isLoaded={total > 0}>
           <StatHelpText>
