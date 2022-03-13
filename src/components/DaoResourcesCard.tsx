@@ -1,31 +1,7 @@
-import {
-  Box,
-  Button,
-  chakra,
-  LinkBox,
-  LinkOverlay,
-  SimpleGrid,
-} from "@chakra-ui/react";
-import { ReactElement } from "react";
+import { Box, chakra, SimpleGrid } from "@chakra-ui/react";
 import { FaBitcoin, FaDiscord, FaTwitter } from "react-icons/fa";
 import { DaoInformation } from "../constants";
-
-interface LinkCardProps {
-  title: string;
-  url: string;
-  icon: ReactElement;
-}
-function LinkCard({ title, url, icon }: LinkCardProps) {
-  return (
-    <LinkBox>
-      <Button w={"full"} maxW={"md"} variant={"outline"} leftIcon={icon}>
-        <LinkOverlay href={url} isExternal>
-          {title}
-        </LinkOverlay>
-      </Button>
-    </LinkBox>
-  );
-}
+import { LinkCard } from "./LinkCard";
 
 type Props = {
   dao: DaoInformation;

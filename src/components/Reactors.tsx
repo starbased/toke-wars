@@ -16,43 +16,14 @@ import {
   Line,
 } from "recharts";
 import { useState } from "react";
-import { Box, Select } from "@chakra-ui/react";
+import { Box, HStack, Select } from "@chakra-ui/react";
 import { BURN, FIRST_BLOCK, REACTORS } from "../constants";
 import { sortBy } from "lodash";
-import axios from "axios";
-import { addDays, eachMonthOfInterval, getUnixTime, isEqual } from "date-fns";
-import { estimateDay, runningTotal } from "../api/utils";
+import { eachMonthOfInterval, isEqual } from "date-fns";
+import { estimateDay, runningTotal, useHistoricalPrice } from "../api/utils";
 import { Page } from "./Page";
-
-function useHistoricalPrice(coin?: string) {
-  return useQuery(
-    ["price", coin],
-    async () => {
-      const { data } = await axios.get<{ prices: [number, number][] }>(
-        `https://api.coingecko.com/api/v3/coins/${coin}/market_chart/range`,
-        {
-          params: {
-            vs_currency: "usd",
-            //has to be at least 90 days to get in a daily scale
-            //TODO: make sure to go back far enough fetch transactions first
-            from: getUnixTime(addDays(new Date(), -91)),
-            to: getUnixTime(new Date()),
-          },
-        }
-      );
-      return data;
-    },
-    {
-      enabled: !!coin,
-      select(data) {
-        return data.prices.reduce<Record<number, number>>(
-          (acc, [time, price]) => ({ ...acc, [time]: price }),
-          {}
-        );
-      },
-    }
-  );
-}
+import { LinkCard } from "./LinkCard";
+import { FaRadiationAlt } from "react-icons/fa";
 
 function useReactorOverTime(address: string) {
   return useQuery(
@@ -98,22 +69,31 @@ export function Reactors() {
 
   return (
     <Page header="Reactor Value Locked">
-      <Box w="250px">
-        <Select
-          placeholder="Select Token"
-          name="token"
-          value={address}
-          onChange={(event) => setAddress(event.currentTarget.value)}
-        >
-          {sortBy(REACTORS, ([, name]) => name.toLowerCase()).map(
-            ([address, name]) => (
-              <option value={address} key={address}>
-                {name}
-              </option>
-            )
-          )}
-        </Select>
-      </Box>
+      <HStack spacing="24px">
+        <Box w="220px">
+          <Select
+            placeholder="Select Token"
+            name="token"
+            value={address}
+            onChange={(event) => setAddress(event.currentTarget.value)}
+          >
+            {sortBy(REACTORS, ([, name]) => name.toLowerCase()).map(
+              ([address, name]) => (
+                <option value={address} key={address}>
+                  {name}
+                </option>
+              )
+            )}
+          </Select>
+        </Box>
+        <Box>
+          <LinkCard
+            title="View on Tokemak.xyz"
+            url={"https://tokemak.xyz/"}
+            icon={<FaRadiationAlt />}
+          />
+        </Box>
+      </HStack>
 
       <div style={{ width: "100%", height: "400px" }}>
         <RvlGraph address={address} token={token} />
