@@ -12,8 +12,9 @@ import { sortBy } from "lodash";
 import { T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 import { useAmounts } from "../api/Erc20";
 import { useNewStaking } from "../api/TokeStaking";
-import { addMonths, differenceInMonths, parseISO } from "date-fns";
+import { addMonths, differenceInMonths, isEqual, parseISO } from "date-fns";
 import { formatNumber } from "../util/maths";
+import { formatEther } from "ethers/lib/utils";
 
 export function TokeChart({ addresses }: { addresses: string[] }) {
   const { data: tokeEvents } = useAmounts(TOKE_CONTRACT, addresses);
@@ -28,12 +29,12 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
 
   let data = [
     ...staking.map(({ time, total }) => ({
-      time: time,
-      tToke: parseInt(total),
+      time,
+      tToke: formatEther(total),
     })),
     ...tokeEvents.map(({ time, total }) => ({
-      time: time,
-      toke: parseInt(total),
+      time,
+      toke: formatEther(total),
     })),
   ];
   data = sortBy(data, "time");
@@ -42,20 +43,13 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
     return <div>No data</div>;
   }
 
-  let joinedData = [];
-  let lastDatum = { time: new Date(0), tToke: 0, toke: 0 };
-  for (let datum of data) {
-    if (lastDatum.time.getTime() == datum.time.getTime()) {
-      if ("toke" in datum) {
-        lastDatum.toke = datum.toke;
-      } else if ("tToke" in datum) {
-        lastDatum.tToke = datum.tToke;
-      }
-    } else {
+  let lastDatum = { time: new Date(0), tToke: "0", toke: "0" };
+  let joinedData = data
+    .map((datum) => {
       lastDatum = { ...lastDatum, ...datum };
-      joinedData.push(lastDatum);
-    }
-  }
+      return lastDatum;
+    })
+    .filter(({ time }, i, array) => !isEqual(time, array[i + 1]?.time));
 
   joinedData.push({ ...joinedData[joinedData.length - 1], time: new Date() });
 
@@ -89,11 +83,7 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
             // @ts-ignore
             ticks={ticks}
           />
-          <YAxis
-            tickFormatter={(tick) => {
-              return formatNumber(tick);
-            }}
-          />
+          <YAxis tickFormatter={formatNumber} />
           <Tooltip
             labelFormatter={dateFormatter}
             labelStyle={{ color: "black" }}

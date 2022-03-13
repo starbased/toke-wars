@@ -1,6 +1,8 @@
 import BigNumber from "bignumber.js";
+import { BigNumber as EthBigNumber } from "ethers";
+import { formatEther } from "ethers/lib/utils";
 
-export function getAmount(array: { total: string; time: Date }[][]) {
+export function getAmount(array: { total: EthBigNumber; time: Date }[][]) {
   return (
     array
       .filter((obj) => obj.length > 0)
@@ -8,7 +10,7 @@ export function getAmount(array: { total: string; time: Date }[][]) {
       .map((obj) => obj[obj.length - 1])
       //add them up
       .reduce(
-        (obj, acc) => obj.plus(new BigNumber(acc.total)),
+        (acc, { total }) => acc.plus(new BigNumber(formatEther(total))),
         new BigNumber(0)
       )
       .decimalPlaces(2)
@@ -18,7 +20,7 @@ export function getAmount(array: { total: string; time: Date }[][]) {
 
 function format(number: number | bigint, options: Intl.NumberFormatOptions) {
   if (!number) {
-    return number;
+    return number.toString();
   }
   return Intl.NumberFormat("en-US", options).format(number);
 }

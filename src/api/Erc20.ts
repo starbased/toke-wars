@@ -3,13 +3,12 @@ import { ERC20__factory } from "../typechain";
 import { provider } from "../util/providers";
 import { DAOS, FIRST_BLOCK } from "../constants";
 import { BigNumber } from "ethers";
-import { formatEther } from "ethers/lib/utils";
 import untypedCache from "../cache/ec20Balance.json";
 
 import { Log } from "@ethersproject/abstract-provider/src.ts";
-import { getBlockNumber } from "./utils";
+import { getBlockNumber, runningTotal } from "./utils";
 
-type Event = { args: (string | BigNumber)[] } & Log;
+export type Event<T> = { args: T } & Log;
 
 // @ts-ignore
 const eventCache: Record<string, Event[]> = untypedCache;
@@ -83,7 +82,8 @@ export function useAmounts(
         (window as any).eventCache[localKey] = allEvents;
       }
 
-      const output = [];
+      const output: (Event<[string, string, BigNumber]> & { time: Date })[] =
+        [];
 
       for (let event of allEvents) {
         output.push({
@@ -96,9 +96,9 @@ export function useAmounts(
     {
       select: (events) => {
         // Filter out all events between addresses
-        let filteredEvents = events.filter(({ args }) => {
-          let from = args[0].toLowerCase();
-          let to = args[1].toLowerCase();
+        let filteredEvents = events.filter(({ args: [bigFrom, bigTo] }) => {
+          let from = bigFrom.toLowerCase();
+          let to = bigTo.toLowerCase();
 
           return (
             (filteredAddresses.includes(from) ||
@@ -109,26 +109,14 @@ export function useAmounts(
           );
         });
 
-        const output = [];
-        let total = BigNumber.from(0);
-
-        for (let event of filteredEvents) {
-          const [from, , value] = event.args;
-
-          if (filteredAddresses.includes(from.toLowerCase())) {
-            total = total.sub(value);
-          } else {
-            total = total.add(value);
-          }
-
-          output.push({
-            total: formatEther(total),
-            time: event.time,
-            event,
-          });
-        }
-
-        return output;
+        return runningTotal(
+          filteredEvents,
+          ({ args: [from, , value] }) =>
+            (bn) =>
+              filteredAddresses.includes(from.toLowerCase())
+                ? bn.sub(value)
+                : bn.add(value)
+        );
       },
     }
   );
