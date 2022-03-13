@@ -13,6 +13,7 @@ import { T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 import { useAmounts } from "../api/Erc20";
 import { useNewStaking } from "../api/TokeStaking";
 import { addMonths, differenceInMonths, parseISO } from "date-fns";
+import { numberWithCommas } from "../util/maths";
 
 export function TokeChart({ addresses }: { addresses: string[] }) {
   const { data: tokeEvents } = useAmounts(TOKE_CONTRACT, addresses);
@@ -88,16 +89,24 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
             // @ts-ignore
             ticks={ticks}
           />
-          <YAxis />
+          <YAxis
+            tickFormatter={(tick) => {
+              return numberWithCommas(tick.toFixed());
+            }}
+          />
           <Tooltip
             labelFormatter={dateFormatter}
             labelStyle={{ color: "black" }}
+            formatter={(value) => {
+              return numberWithCommas(Number(value).toFixed());
+            }}
           />
           <Legend />
           <Area
             connectNulls={true}
             type="stepAfter"
             dataKey="tToke"
+            name="tTOKE"
             stroke="#8884d8"
             fill="#8884d8"
             stackId="1"
@@ -106,6 +115,7 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
             connectNulls={true}
             type="stepAfter"
             dataKey="toke"
+            name="TOKE"
             stroke="#82ca9d"
             fill="#82ca9d"
             stackId="1"

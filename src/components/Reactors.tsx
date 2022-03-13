@@ -16,7 +16,7 @@ import {
   Line,
 } from "recharts";
 import { useState } from "react";
-import { Box, HStack, Select } from "@chakra-ui/react";
+import { Box, HStack, Select, Skeleton, Stack } from "@chakra-ui/react";
 import { BURN, FIRST_BLOCK, REACTORS } from "../constants";
 import { sortBy } from "lodash";
 import { eachMonthOfInterval, isEqual } from "date-fns";
@@ -24,6 +24,7 @@ import { estimateDay, runningTotal, useHistoricalPrice } from "../api/utils";
 import { Page } from "./Page";
 import { LinkCard } from "./LinkCard";
 import { FaRadiationAlt } from "react-icons/fa";
+import { formatMoney, numberWithCommas } from "../util/maths";
 
 function useReactorOverTime(address: string) {
   return useQuery(
@@ -107,7 +108,16 @@ function RvlGraph({ address, token }: { address: string; token: string }) {
   const { data: prices } = useHistoricalPrice(token);
 
   if (!prices || !reactorData) {
-    return <div>loading</div>;
+    return (
+      <Stack>
+        <Skeleton height="60px" />
+        <Skeleton height="40px" />
+        <Skeleton height="60px" />
+        <Skeleton height="40px" />
+        <Skeleton height="60px" />
+        <Skeleton height="40px" />
+      </Stack>
+    );
   }
 
   //TODO: join to prices to make sure a value exists for every day
@@ -138,8 +148,8 @@ function RvlGraph({ address, token }: { address: string; token: string }) {
         data={formattedData}
         margin={{
           top: 0,
-          right: 30,
-          left: 20,
+          right: 75,
+          left: 75,
           bottom: 5,
         }}
       >
@@ -167,6 +177,9 @@ function RvlGraph({ address, token }: { address: string; token: string }) {
               Math.max(...formattedData.map(({ value }) => parseFloat(value))) *
               1.25,
           ]}
+          tickFormatter={(tick) => {
+            return formatMoney(tick.toFixed());
+          }}
         />
         <YAxis
           yAxisId="right"
@@ -177,15 +190,22 @@ function RvlGraph({ address, token }: { address: string; token: string }) {
               Math.max(...formattedData.map(({ total }) => parseFloat(total))) *
               1.25,
           ]}
+          tickFormatter={(tick) => {
+            return numberWithCommas(tick.toFixed());
+          }}
         />
         <Tooltip
           labelFormatter={dateFormatter}
           labelStyle={{ color: "black" }}
+          formatter={(value) => {
+            return numberWithCommas(Number(value).toFixed());
+          }}
         />
         <Legend />
         <Line
           connectNulls={true}
           dataKey="total"
+          name="Total Tokens"
           stroke="#8884d8"
           yAxisId="right"
           dot={false}
@@ -193,6 +213,7 @@ function RvlGraph({ address, token }: { address: string; token: string }) {
         <Area
           connectNulls={true}
           dataKey="value"
+          name="USD Value"
           // stroke="blue"
           // fill="#8884d8"
         />
