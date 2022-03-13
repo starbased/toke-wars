@@ -6,6 +6,11 @@ import { BaseCard } from "./DaoDetailsCard";
 import { SimpleGrid, Stat, StatHelpText, StatNumber } from "@chakra-ui/react";
 import { TokeChart } from "./TokeChart";
 import { Page } from "./Page";
+import { formatMoney, numberWithCommas } from "../util/maths";
+import { getTokenPrice } from "../api/utils";
+import { REACTORS } from "../constants";
+
+let toke_price = await getTokenPrice("tokemak");
 
 export function Home() {
   const { data: tokeTreasury } = useCurrentBalance(
@@ -35,22 +40,33 @@ export function Home() {
         style={{ alignSelf: "stretch" }}
         px={5}
       >
-        <BaseCard title="Total Dao owned toke">
+        <BaseCard title="Total DAO Owned TOKE">
           <Stat>
-            <StatNumber>lots</StatNumber>
+            <StatNumber>{numberWithCommas("1000000")}</StatNumber>
+            <StatHelpText>
+              {formatMoney(parseInt("1000000") * toke_price.tokemak?.usd)}
+            </StatHelpText>
           </Stat>
         </BaseCard>
 
         <BaseCard title="Circulating Supply">
           <Stat>
-            <StatNumber>{formatEther(circulating).split(".")[0]}</StatNumber>
-            <StatHelpText>💰</StatHelpText>
+            <StatNumber>
+              {numberWithCommas(formatEther(circulating).split(".")[0])}
+            </StatNumber>
+            <StatHelpText>
+              {formatMoney(
+                parseInt(formatEther(circulating).split(".")[0]) *
+                  toke_price.tokemak?.usd
+              )}
+            </StatHelpText>
           </Stat>
         </BaseCard>
 
-        <BaseCard title="Daos Accumulating">
+        <BaseCard title="DAOs Accumulating">
           <Stat>
             <StatNumber>{DAOS.length}</StatNumber>
+            <StatHelpText>Total Reactors: {REACTORS.length}</StatHelpText>
           </Stat>
         </BaseCard>
       </SimpleGrid>

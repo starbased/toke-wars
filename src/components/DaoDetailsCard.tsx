@@ -1,5 +1,6 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
+  Badge,
   Box,
   Flex,
   Link,
@@ -68,8 +69,10 @@ function StatsCard({ title, total, changePercent }: StatsCardProps) {
       <Stat>
         <Skeleton isLoaded={total > 0}>
           <StatNumber>
-            {numberWithCommas(total.toFixed())} (
-            {formatMoney(total * toke_price.tokemak?.usd)})
+            {numberWithCommas(total.toFixed())}
+            <Badge ml="2" variant="subtle">
+              {formatMoney(total * toke_price.tokemak?.usd)}
+            </Badge>
           </StatNumber>
         </Skeleton>
         <Skeleton isLoaded={total > 0}>

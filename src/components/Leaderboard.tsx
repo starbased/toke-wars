@@ -33,17 +33,20 @@ export function Leaderboard() {
     const { data: tTokeEvents } = useAmounts(T_TOKE_CONTRACT, addresses);
     const { data: newStaking } = useNewStaking(addresses);
 
-    let total = 0;
+    let totalTOKE = 0;
+    let totalUSD = 0;
 
     if (tokeEvents && tTokeEvents && newStaking) {
       const array = [tokeEvents, tTokeEvents, newStaking];
-      total = getAmount(array) * toke_price.tokemak?.usd;
+      totalTOKE = getAmount(array);
+      totalUSD = getAmount(array) * toke_price.tokemak?.usd;
     }
 
     return {
       name: dao.name,
       stage: dao.stage,
-      total: total,
+      totalTOKE: totalTOKE,
+      totalUSD: totalUSD,
       addresses: dao.addresses,
       twitter: dao.twitter,
       coingecko: dao.coingecko,
@@ -72,11 +75,12 @@ export function Leaderboard() {
             <Tr>
               <Th>Name</Th>
               <Th>Stage</Th>
-              <Th isNumeric>TOKE Holdings (USD)</Th>
+              <Th isNumeric>TOKE Holdings</Th>
+              <Th isNumeric>USD Value</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {orderBy(formattedData, "total", "desc").map((dao) => (
+            {orderBy(formattedData, "totalTOKE", "desc").map((dao) => (
               <DaoLeaderboardRow dao={dao} key={dao.name} />
             ))}
           </Tbody>
@@ -84,7 +88,8 @@ export function Leaderboard() {
             <Tr>
               <Th>Name</Th>
               <Th>Stage</Th>
-              <Th isNumeric>TOKE Holdings (USD)</Th>
+              <Th isNumeric>TOKE Holdings</Th>
+              <Th isNumeric>USD Value</Th>
             </Tr>
           </Tfoot>
 
