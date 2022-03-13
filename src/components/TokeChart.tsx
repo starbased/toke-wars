@@ -74,8 +74,8 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
           data={joinedData}
           margin={{
             top: 0,
-            right: 30,
-            left: 20,
+            right: 75,
+            left: 75,
             bottom: 5,
           }}
         >
