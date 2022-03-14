@@ -1,15 +1,16 @@
-import { RewardsHash__factory } from "../typechain";
+import { RewardsHash__factory } from "../../typechain";
 import { useQuery } from "react-query";
 import axios from "axios";
-import knownCycleHashes from "../cache/cycleHashes.json";
+import knownCycleHashes from "../../cache/cycleHashes.json";
 import { useState } from "react";
 
-import { UserInput } from "./RewardsUserInput";
-import { Totals } from "./RewardsTotals";
+import { UserInput } from "./UserInput";
+import { Totals } from "./Totals";
 
 import { Badge } from "@chakra-ui/react";
-import { Page } from "./Page";
-import { provider } from "../util/providers";
+import { Page } from "../Page";
+import { provider } from "../../util/providers";
+import { useParams } from "react-router-dom";
 
 export type CycleInfo = {
   payload: {
@@ -89,7 +90,8 @@ export function getCycleInfo(
 }
 
 export function Rewards() {
-  const [address, setAddress] = useState("");
+  const { address: urlAddress } = useParams();
+  const [address, setAddress] = useState(urlAddress || "");
 
   const { data: latestCycle } = useQuery(
     "lastCycle",

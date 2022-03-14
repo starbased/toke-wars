@@ -8,7 +8,7 @@ import { Container, VStack } from "@chakra-ui/react";
 import { LiquidityStages } from "./components/LiquidityStages";
 import { Reactors } from "./components/Reactors";
 import { Leaderboard } from "./components/Leaderboard";
-import { Rewards } from "./components/Rewards";
+import { Rewards } from "./components/Rewards/Rewards";
 import { Test } from "./components/Test";
 
 function App() {
@@ -30,6 +30,7 @@ function App() {
             <Route path="/reactors" element={<Reactors />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/rewards" element={<Rewards />} />
+            <Route path="/rewards/:address" element={<Rewards />} />
             <Route path="/test" element={<Test />} />
             <Route path="/" element={<Home />} />
           </Routes>

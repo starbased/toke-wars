@@ -23,9 +23,9 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { formatNumber, formatMoney } from "../util/maths";
-import { BaseCard } from "./DaoDetailsCard";
-import { RewardsGraph } from "./RewardsGraph";
+import { formatNumber, formatMoney } from "../../util/maths";
+import { BaseCard } from "../DaoDetailsCard";
+import { Graph } from "./Graph";
 
 type Props = {
   latestCycle: BigNumber;
@@ -129,7 +129,7 @@ export function Totals({ latestCycle, address }: Props) {
         </BaseCard>
       </SimpleGrid>
 
-      <RewardsGraph rewards={rewards.map(({ data }) => data)} />
+      <Graph rewards={rewards.map(({ data }) => data)} />
 
       <Divider />
 

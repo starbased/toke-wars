@@ -28,7 +28,7 @@ type Props = {
   rewards: (CycleInfo | undefined)[];
 };
 
-export function RewardsGraph({ rewards }: Props) {
+export function Graph({ rewards }: Props) {
   const [hidden, setHidden] = useState<string[]>([]);
   const [showByCycle, setShowByCycle] = useState<boolean>(true);
 
