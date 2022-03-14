@@ -191,12 +191,12 @@ function RvlGraph({ address, token }: { address: string; token: string }) {
               Math.max(...formattedData.map(({ total }) => parseFloat(total))) *
               1.25,
           ]}
-          tickFormatter={formatNumber}
+          tickFormatter={(value) => formatNumber(value)}
         />
         <Tooltip
           labelFormatter={dateFormatter}
           labelStyle={{ color: "black" }}
-          formatter={formatNumber}
+          formatter={(value) => formatNumber(value)}
         />
         <Legend />
         <Line
