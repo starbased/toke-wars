@@ -83,7 +83,7 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
             // @ts-ignore
             ticks={ticks}
           />
-          <YAxis tickFormatter={formatNumber} />
+          <YAxis tickFormatter={(value) => formatNumber(value)} />
           <Tooltip
             labelFormatter={dateFormatter}
             labelStyle={{ color: "black" }}
