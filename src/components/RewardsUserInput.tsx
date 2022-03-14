@@ -7,7 +7,6 @@ import {
   FormControl,
   FormErrorMessage,
   Input,
-  SimpleGrid,
   Spacer,
 } from "@chakra-ui/react";
 import { getAddress } from "ethers/lib/utils";
@@ -25,8 +24,6 @@ export function UserInput({ setAddress }: Props) {
   } = useForm();
 
   function onSubmit(values) {
-    console.log("evt", values.address);
-
     const value = values.address.trim();
     try {
       setAddress(getAddress(value).toLowerCase());

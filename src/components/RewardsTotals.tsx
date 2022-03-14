@@ -1,7 +1,6 @@
 import { BigNumber } from "ethers";
 import { useQueries, useQuery } from "react-query";
 import { formatEther } from "ethers/lib/utils";
-import React, { Suspense } from "react";
 import { getCycleHash, getCycleInfo } from "./Rewards";
 import orderBy from "lodash/orderBy";
 import axios from "axios";
@@ -9,10 +8,8 @@ import {
   Box,
   chakra,
   Divider,
-  Heading,
   SimpleGrid,
   Skeleton,
-  Spinner,
   Stack,
   Stat,
   StatHelpText,
@@ -28,13 +25,7 @@ import {
 } from "@chakra-ui/react";
 import { formatNumber, formatMoney } from "../util/maths";
 import { BaseCard } from "./DaoDetailsCard";
-// import { useTokenPrice } from "../api/coinGecko";
-
-const Graph = React.lazy(() =>
-  import("./RewardsGraph").then(({ Graph }) => ({
-    default: Graph,
-  }))
-);
+import { RewardsGraph } from "./RewardsGraph";
 
 type Props = {
   latestCycle: BigNumber;
@@ -137,11 +128,8 @@ export function Totals({ latestCycle, address }: Props) {
           </Stat>
         </BaseCard>
       </SimpleGrid>
-      <Box py="10">
-        <Suspense fallback={null}>
-          <Graph rewards={rewards.map(({ data }) => data)} />
-        </Suspense>
-      </Box>
+
+      <RewardsGraph rewards={rewards.map(({ data }) => data)} />
 
       <Divider />
 

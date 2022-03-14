@@ -7,7 +7,7 @@ import { useState } from "react";
 import { UserInput } from "./RewardsUserInput";
 import { Totals } from "./RewardsTotals";
 
-import { Badge, Box } from "@chakra-ui/react";
+import { Badge } from "@chakra-ui/react";
 import { Page } from "./Page";
 import { provider } from "../util/providers";
 
@@ -29,9 +29,6 @@ const contract = RewardsHash__factory.connect(
   "0x5ec3EC6A8aC774c7d53665ebc5DDf89145d02fB6",
   provider
 );
-
-// @ts-ignore
-window.contract = contract;
 
 export function getCycleHash(cycle: number, enabled = true) {
   return {
@@ -103,21 +100,19 @@ export function Rewards() {
   return (
     <Page header="Rewards">
       <UserInput {...{ setAddress }} />
-      <Box>
-        {!latestCycle ? (
-          <div>loading</div>
-        ) : (
-          <>
-            {address !== "" ? (
-              <>
-                <Totals {...{ address, latestCycle }} />
-              </>
-            ) : (
-              <Badge>Enter an address to continue</Badge>
-            )}
-          </>
-        )}
-      </Box>
+      {!latestCycle ? (
+        <div>loading</div>
+      ) : (
+        <>
+          {address !== "" ? (
+            <>
+              <Totals {...{ address, latestCycle }} />
+            </>
+          ) : (
+            <Badge>Enter an address to continue</Badge>
+          )}
+        </>
+      )}
     </Page>
   );
 }
