@@ -25,17 +25,17 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
     return <div>loading</div>;
   }
 
-  const staking = [...tTokeEvents, ...newStaking];
+  function makeMapFn(key: string) {
+    return ({ time, total }) => ({
+      time,
+      [key]: formatEther(total),
+    });
+  }
 
   let data = [
-    ...staking.map(({ time, total }) => ({
-      time,
-      tToke: formatEther(total),
-    })),
-    ...tokeEvents.map(({ time, total }) => ({
-      time,
-      toke: formatEther(total),
-    })),
+    ...tTokeEvents.map(makeMapFn("tToke")),
+    ...newStaking.map(makeMapFn("newStake")),
+    ...tokeEvents.map(makeMapFn("toke")),
   ];
   data = sortBy(data, "time");
 
@@ -93,7 +93,12 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
           />
           <Legend />
           <Area
-            connectNulls={true}
+            type="stepAfter"
+            dataKey="newStake"
+            name="newStake"
+            stackId="1"
+          />
+          <Area
             type="stepAfter"
             dataKey="tToke"
             name="tTOKE"
@@ -102,7 +107,6 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
             stackId="1"
           />
           <Area
-            connectNulls={true}
             type="stepAfter"
             dataKey="toke"
             name="TOKE"
