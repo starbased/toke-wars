@@ -8,7 +8,7 @@ import { TokeChart, useTotals } from "./TokeChart";
 import { Page } from "./Page";
 import { formatMoney, formatNumber } from "../util/maths";
 import { REACTORS } from "../constants";
-import { useTokenPrice } from "../api/coinGecko";
+import { useTokePrice } from "../api/coinGecko";
 import { parseInt } from "lodash";
 
 export function Home() {
@@ -20,7 +20,7 @@ export function Home() {
     "0x8b4334d4812C530574Bd4F2763FcD22dE94A969B"
   );
 
-  const { data: toke_price } = useTokenPrice("tokemak");
+  const { data: toke_price } = useTokePrice();
 
   //TODO: this doesn't match the amount coin gecko says is vesting https://www.coingecko.com/en/coins/tokemak
   const { data: vesting } = useCurrentBalance(

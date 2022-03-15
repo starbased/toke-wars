@@ -9,25 +9,25 @@ let geckoAPI = axios.create({
   },
 });
 
-export function useTokenPrice(coin: string) {
+export function useTokePrice() {
   return useQuery(
-    ["tokenPrice", coin],
+    "tokemakPrice",
     async () => {
-      const { data } = await geckoAPI.get<Record<string, { usd: number }>>(
-        `simple/price`,
-        { params: { ids: coin, vs_currencies: "usd" } }
+      const { data } = await axios.get<{ prices: { toke: number } }>(
+        "https://tokemakmarketdata.s3.amazonaws.com/current.json"
       );
-      return data[coin].usd;
+      return data;
     },
     {
-      staleTime: 1000 * 60 * 2,
+      select: (data) => data.prices.toke,
+      staleTime: 1000 * 60 * 2, // 2 min
     }
   );
 }
 
 export function useHistoricalPrice(coin?: string) {
   return useQuery(
-    ["price", coin],
+    ["market_chart/range", coin],
     async () => {
       const { data } = await geckoAPI.get<{ prices: [number, number][] }>(
         `coins/${coin}/market_chart/range`,

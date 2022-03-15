@@ -43,6 +43,7 @@ export function UserInput({ setAddress }: Props) {
           <Box px="2" minW={425}>
             <Input
               defaultValue={address}
+              autoFocus
               id="address"
               placeholder="ETH Address"
               {...register("address", {

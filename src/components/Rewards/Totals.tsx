@@ -1,9 +1,8 @@
 import { BigNumber } from "ethers";
-import { useQueries, useQuery } from "react-query";
+import { useQueries } from "react-query";
 import { formatEther } from "ethers/lib/utils";
 import { getCycleHash, getCycleInfo } from "./Rewards";
 import orderBy from "lodash/orderBy";
-import axios from "axios";
 import {
   Box,
   chakra,
@@ -26,6 +25,7 @@ import {
 import { formatNumber, formatMoney } from "../../util/maths";
 import { BaseCard } from "../DaoDetailsCard";
 import { Graph } from "./Graph";
+import { useTokePrice } from "../../api/coinGecko";
 
 type Props = {
   latestCycle: BigNumber;
@@ -33,19 +33,7 @@ type Props = {
 };
 
 export function Totals({ latestCycle, address }: Props) {
-  const { data: toke_price } = useQuery(
-    "price",
-    async () => {
-      const { data } = await axios.get<{ prices: { toke: number } }>(
-        "https://tokemakmarketdata.s3.amazonaws.com/current.json"
-      );
-      return data;
-    },
-    {
-      select: (data) => data.prices.toke,
-      staleTime: 1000 * 60 * 5, // 5 min
-    }
-  );
+  const { data: toke_price } = useTokePrice();
   const cycleArray = Array.from(
     Array((latestCycle?.toNumber() || -1) + 1).keys()
   );

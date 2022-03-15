@@ -1,14 +1,14 @@
 import { DaoInformation } from "../constants";
 import { Td, Tr } from "@chakra-ui/react";
 import { formatMoney, formatNumber } from "../util/maths";
-import { useTokenPrice } from "../api/coinGecko";
+import { useTokePrice } from "../api/coinGecko";
 
 type Props = {
   dao: DaoInformation & { totalTOKE: number };
 };
 
 export function DaoLeaderboardRow({ dao }: Props) {
-  const { data: toke_price } = useTokenPrice("tokemak");
+  const { data: toke_price } = useTokePrice();
 
   return (
     <Tr key={dao.name}>

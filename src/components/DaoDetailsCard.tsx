@@ -19,7 +19,7 @@ import { ReactNode } from "react";
 import { DaoInformation } from "../constants";
 import { stageMap } from "./LiquidityStages";
 import { formatMoney, formatNumber } from "../util/maths";
-import { useTokenPrice } from "../api/coinGecko";
+import { useTokePrice } from "../api/coinGecko";
 
 type BaseCardProps = {
   title: string;
@@ -62,7 +62,7 @@ interface StatsCardProps {
   /* icon: ReactNode; */
 }
 function StatsCard({ title, total, changePercent }: StatsCardProps) {
-  const { data: toke_price } = useTokenPrice("tokemak");
+  const { data: toke_price } = useTokePrice();
 
   return (
     <BaseCard title={title}>
