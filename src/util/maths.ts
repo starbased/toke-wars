@@ -1,11 +1,13 @@
 import BigNumber from "bignumber.js";
-import { BigNumber as EthBigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils";
+import { CumulativeRecord } from "./Types";
 
-export function getAmount(array: { total: EthBigNumber; time: Date }[][]) {
+export function getAmount(array: (CumulativeRecord[] | undefined)[]) {
   return (
     array
-      .filter((obj) => obj.length > 0)
+      .filter(
+        (obj): obj is CumulativeRecord[] => obj !== undefined && obj.length > 0
+      )
       // get the last record
       .map((obj) => obj[obj.length - 1])
       //add them up

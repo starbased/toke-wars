@@ -13,15 +13,30 @@ import { T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 import { useAmounts } from "../api/Erc20";
 import { useNewStaking } from "../api/TokeStaking";
 import { addMonths, differenceInMonths, isEqual, parseISO } from "date-fns";
-import { formatNumber } from "../util/maths";
+import { formatNumber, getAmount } from "../util/maths";
 import { formatEther } from "ethers/lib/utils";
 
-export function TokeChart({ addresses }: { addresses: string[] }) {
+export function useTotals(addresses) {
   const { data: tokeEvents } = useAmounts(TOKE_CONTRACT, addresses);
   const { data: tTokeEvents } = useAmounts(T_TOKE_CONTRACT, addresses);
   const { data: newStaking } = useNewStaking(addresses);
 
-  if (!tokeEvents || !tTokeEvents || !newStaking) {
+  const total = getAmount([tokeEvents, tTokeEvents, newStaking]);
+
+  return {
+    tokeEvents,
+    tTokeEvents,
+    newStaking,
+    total,
+    isLoading: !tokeEvents || !tTokeEvents || !newStaking,
+  };
+}
+
+export function TokeChart({ addresses }: { addresses: string[] }) {
+  const { tokeEvents, tTokeEvents, newStaking, isLoading } =
+    useTotals(addresses);
+
+  if (isLoading) {
     return <div>loading</div>;
   }
 

@@ -11,30 +11,18 @@ import {
   Tr,
   Link,
 } from "@chakra-ui/react";
-import { DAOS, TOKE_CONTRACT, T_TOKE_CONTRACT } from "../constants";
+import { DAOS } from "../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faListCheck } from "@fortawesome/free-solid-svg-icons";
 import { orderBy } from "lodash";
 import { Page } from "./Page";
 import { NavLink } from "react-router-dom";
 import { DaoLeaderboardRow } from "./DaoLeaderboardRow";
-import { useAmounts } from "../api/Erc20";
-import { useNewStaking } from "../api/TokeStaking";
-import { getAmount } from "../util/maths";
+import { useTotals } from "./TokeChart";
 
 export function Leaderboard() {
   let formattedData = DAOS.map((dao) => {
-    const { addresses } = dao;
-    const { data: tokeEvents } = useAmounts(TOKE_CONTRACT, addresses);
-    const { data: tTokeEvents } = useAmounts(T_TOKE_CONTRACT, addresses);
-    const { data: newStaking } = useNewStaking(addresses);
-
-    let totalTOKE = 0;
-
-    if (tokeEvents && tTokeEvents && newStaking) {
-      const array = [tokeEvents, tTokeEvents, newStaking];
-      totalTOKE = getAmount(array);
-    }
+    const { total: totalTOKE } = useTotals(dao.addresses);
 
     return {
       ...dao,

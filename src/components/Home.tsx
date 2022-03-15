@@ -4,7 +4,7 @@ import { BigNumber } from "ethers";
 import { formatEther } from "ethers/lib/utils";
 import { BaseCard } from "./DaoDetailsCard";
 import { SimpleGrid, Stat, StatHelpText, StatNumber } from "@chakra-ui/react";
-import { TokeChart } from "./TokeChart";
+import { TokeChart, useTotals } from "./TokeChart";
 import { Page } from "./Page";
 import { formatMoney, formatNumber } from "../util/maths";
 import { REACTORS } from "../constants";
@@ -12,6 +12,9 @@ import { useTokenPrice } from "../api/coinGecko";
 import { parseInt } from "lodash";
 
 export function Home() {
+  const addresses = Object.values(DAOS).flatMap((obj) => obj.addresses);
+  const { total: daoOwned } = useTotals(addresses);
+
   const { data: tokeTreasury } = useCurrentBalance(
     TOKE_CONTRACT,
     "0x8b4334d4812C530574Bd4F2763FcD22dE94A969B"
@@ -43,8 +46,8 @@ export function Home() {
       >
         <BaseCard title="Total DAO Owned TOKE">
           <Stat>
-            <StatNumber>{formatNumber(1000000)}</StatNumber>
-            <StatHelpText>{formatMoney(1000000 * toke_price)}</StatHelpText>
+            <StatNumber>{formatNumber(daoOwned)}</StatNumber>
+            <StatHelpText>{formatMoney(daoOwned * toke_price)}</StatHelpText>
           </Stat>
         </BaseCard>
 
@@ -67,9 +70,7 @@ export function Home() {
         </BaseCard>
       </SimpleGrid>
 
-      <TokeChart
-        addresses={Object.values(DAOS).flatMap((obj) => obj.addresses)}
-      />
+      <TokeChart addresses={addresses} />
     </Page>
   );
 }
