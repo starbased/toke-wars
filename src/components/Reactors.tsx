@@ -100,6 +100,12 @@ export function Reactors() {
       <div style={{ width: "100%", height: "400px" }}>
         <RvlGraph address={address} token={token} />
       </div>
+      <div style={{ alignSelf: "flex-end", color: "gray" }}>
+        Price data from{" "}
+        <a href="https://www.coingecko.com" target="_blank">
+          CoinGecko
+        </a>
+      </div>
     </Page>
   );
 }
