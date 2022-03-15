@@ -4,7 +4,7 @@ import { Home } from "./components/Home";
 import { DAOS } from "./constants";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
-import { Container, VStack } from "@chakra-ui/react";
+import { Container } from "@chakra-ui/react";
 import { LiquidityStages } from "./components/LiquidityStages";
 import { Reactors } from "./components/Reactors";
 import { Leaderboard } from "./components/Leaderboard";
@@ -13,10 +13,10 @@ import { Test } from "./components/Test";
 
 function App() {
   return (
-    <div className="App">
+    <>
       <Header />
-      <VStack spacing={20} align="stretch">
-        <Container maxW="container.xl" as="main" mt="10">
+      <main>
+        <Container maxW="container.xl" my="10">
           <Routes>
             {DAOS.map((dao) => (
               <Route
@@ -35,9 +35,9 @@ function App() {
             <Route path="/" element={<Home />} />
           </Routes>
         </Container>
-        <Footer />
-      </VStack>
-    </div>
+      </main>
+      <Footer />
+    </>
   );
 }
 
