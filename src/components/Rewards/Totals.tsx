@@ -26,6 +26,7 @@ import { formatNumber, formatMoney } from "../../util/maths";
 import { BaseCard } from "../DaoDetailsCard";
 import { Graph } from "./Graph";
 import { useTokePrice } from "../../api/coinGecko";
+import { CycleInfo } from "./CycleInfo";
 
 type Props = {
   latestCycle: BigNumber;
@@ -98,13 +99,7 @@ export function Totals({ latestCycle, address }: Props) {
   return (
     <>
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, lg: 8 }}>
-        <BaseCard title="Current Cycle">
-          <Stat>
-            <StatNumber>{latestCycle.toNumber()}</StatNumber>
-            {/* calc days until next cycle */}
-            <StatHelpText>Next Cycle in X Days</StatHelpText>
-          </Stat>
-        </BaseCard>
+        <CycleInfo />
         <BaseCard title="Total Earned">
           <Stat>
             <StatNumber>{formatNumber(parseFloat(formattedTotal))}</StatNumber>
