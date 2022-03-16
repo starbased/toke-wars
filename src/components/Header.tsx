@@ -13,6 +13,7 @@ import {
   useDisclosure,
   useColorModeValue,
   Stack,
+  Image,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { NavLink as NavLinkReact } from "react-router-dom";
@@ -59,7 +60,7 @@ export function Header() {
           onClick={isOpen ? onClose : onOpen}
         />
         <Box onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
-          Toke Wars
+          <Image src="/src/tokewars.png" alt="Toke Wars Logo" height={50} />
         </Box>
 
         <HStack spacing={4} display={{ base: "none", md: "flex" }}>
