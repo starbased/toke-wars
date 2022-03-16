@@ -60,7 +60,11 @@ export function Header() {
           onClick={isOpen ? onClose : onOpen}
         />
         <Box onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
-          <Image src="/src/tokewars.png" alt="Toke Wars Logo" height={50} />
+          <Image
+            src="https://tratium.nyc3.digitaloceanspaces.com/images/tokemak/tokewars.png"
+            alt="Toke Wars Logo"
+            width={40}
+          />
         </Box>
 
         <HStack spacing={4} display={{ base: "none", md: "flex" }}>
