@@ -54,3 +54,18 @@ export function useHistoricalPrice(coin?: string) {
     }
   );
 }
+
+export function useMarketData(coin?: string) {
+  return useQuery([`coins/${coin}`, coin], async () => {
+    const { data } = await geckoAPI.get<{ market_data }>(`coins/${coin}`, {
+      params: {
+        localization: "en",
+        tickers: false,
+        community_data: false,
+        developer_data: false,
+        sparkline: false,
+      },
+    });
+    return data;
+  });
+}

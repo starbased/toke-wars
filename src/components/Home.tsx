@@ -10,6 +10,7 @@ import { formatMoney, formatNumber } from "../util/maths";
 import { REACTORS } from "../constants";
 import { useTokePrice } from "../api/coinGecko";
 import { parseInt } from "lodash";
+import { useMarketData } from "../api/coinGecko";
 
 export function Home() {
   const addresses = Object.values(DAOS).flatMap((obj) => obj.addresses);
@@ -29,6 +30,7 @@ export function Home() {
   );
 
   const { data: totalSupply } = useTotalSupply(TOKE_CONTRACT);
+  const { data: tokenInfo } = useMarketData("tokemak");
 
   let circulating = BigNumber.from(0);
 
@@ -54,10 +56,12 @@ export function Home() {
         <BaseCard title="Circulating Supply">
           <Stat>
             <StatNumber>
-              {formatNumber(parseInt(formatEther(circulating)))}
+              {formatNumber(
+                parseInt(tokenInfo?.market_data?.circulating_supply)
+              )}
             </StatNumber>
             <StatHelpText>
-              {formatMoney(parseFloat(formatEther(circulating)) * toke_price)}
+              {formatMoney(parseFloat(tokenInfo?.market_data?.market_cap?.usd))}
             </StatHelpText>
           </Stat>
         </BaseCard>
