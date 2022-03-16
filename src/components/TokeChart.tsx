@@ -110,7 +110,7 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
           <Area
             type="stepAfter"
             dataKey="newStake"
-            name="newStake"
+            name="TOKE (Migrated)"
             stackId="1"
           />
           <Area
