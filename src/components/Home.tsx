@@ -1,6 +1,13 @@
 import { DAOS } from "../constants";
+import { HomeResourcesCard } from "./HomeResourcesCard";
 import { BaseCard } from "./DaoDetailsCard";
-import { SimpleGrid, Stat, StatHelpText, StatNumber } from "@chakra-ui/react";
+import {
+  Divider,
+  SimpleGrid,
+  Stat,
+  StatHelpText,
+  StatNumber,
+} from "@chakra-ui/react";
 import { TokeChart, useTotals } from "./TokeChart";
 import { Page } from "./Page";
 import { formatMoney, formatNumber } from "../util/maths";
@@ -53,6 +60,8 @@ export function Home() {
       </SimpleGrid>
 
       <TokeChart addresses={addresses} />
+      <Divider />
+      <HomeResourcesCard />
     </Page>
   );
 }
