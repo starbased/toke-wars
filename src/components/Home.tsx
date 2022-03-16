@@ -1,7 +1,4 @@
-import { useCurrentBalance, useTotalSupply } from "../api/Erc20";
-import { DAOS, TOKE_CONTRACT } from "../constants";
-import { BigNumber } from "ethers";
-import { formatEther } from "ethers/lib/utils";
+import { DAOS } from "../constants";
 import { BaseCard } from "./DaoDetailsCard";
 import { SimpleGrid, Stat, StatHelpText, StatNumber } from "@chakra-ui/react";
 import { TokeChart, useTotals } from "./TokeChart";
@@ -16,27 +13,8 @@ export function Home() {
   const addresses = Object.values(DAOS).flatMap((obj) => obj.addresses);
   const { total: daoOwned } = useTotals(addresses);
 
-  const { data: tokeTreasury } = useCurrentBalance(
-    TOKE_CONTRACT,
-    "0x8b4334d4812C530574Bd4F2763FcD22dE94A969B"
-  );
-
   const { data: toke_price } = useTokePrice();
-
-  //TODO: this doesn't match the amount coin gecko says is vesting https://www.coingecko.com/en/coins/tokemak
-  const { data: vesting } = useCurrentBalance(
-    TOKE_CONTRACT,
-    "0x96F98Ed74639689C3A11daf38ef86E59F43417D3"
-  );
-
-  const { data: totalSupply } = useTotalSupply(TOKE_CONTRACT);
   const { data: tokenInfo } = useMarketData("tokemak");
-
-  let circulating = BigNumber.from(0);
-
-  if (totalSupply && tokeTreasury && vesting) {
-    circulating = totalSupply.sub(vesting).sub(tokeTreasury);
-  }
 
   return (
     <Page header="Toke Wars Dashboard">

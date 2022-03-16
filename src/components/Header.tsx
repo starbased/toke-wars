@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { sortBy } from "lodash";
 
 const Links = ["Reactors", "Leaderboard", "Stages", "Rewards"];
+import tokeWars from "../tokewars.png";
 
 const NavLink = ({ children, to }: { children: ReactNode; to: string }) => (
   <Link
@@ -60,11 +61,7 @@ export function Header() {
           onClick={isOpen ? onClose : onOpen}
         />
         <Box onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
-          <Image
-            src="https://tratium.nyc3.digitaloceanspaces.com/images/tokemak/tokewars.png"
-            alt="Toke Wars Logo"
-            width={40}
-          />
+          <Image src={tokeWars} alt="Toke Wars Logo" width={40} />
         </Box>
 
         <HStack spacing={4} display={{ base: "none", md: "flex" }}>
