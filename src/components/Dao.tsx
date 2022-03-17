@@ -2,7 +2,7 @@ import { TokeChart, useTotals } from "./TokeChart";
 import { DaoInformation } from "../constants";
 import { Divider } from "@chakra-ui/react";
 import { DaoDetailsCard } from "./DaoDetailsCard";
-import { DaoResourcesCard } from "./DaoResourcesCard";
+import { ResourcesCard } from "./ResourcesCard";
 import { getAmount } from "../util/maths";
 import { addDays } from "date-fns";
 import { Page } from "./Page";
@@ -42,7 +42,7 @@ export function Dao({ dao }: Props) {
       <DaoDetailsCard dao={dao} total={total} changePercent={changePercent} />
       <TokeChart addresses={addresses} />
       <Divider />
-      <DaoResourcesCard dao={dao} />
+      <ResourcesCard token={dao.coingecko} />
     </Page>
   );
 }

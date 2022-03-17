@@ -1,5 +1,5 @@
 import { DAOS } from "../constants";
-import { HomeResourcesCard } from "./HomeResourcesCard";
+import { ResourcesCard } from "./ResourcesCard";
 import { BaseCard } from "./DaoDetailsCard";
 import {
   Divider,
@@ -14,14 +14,14 @@ import { formatMoney, formatNumber } from "../util/maths";
 import { REACTORS } from "../constants";
 import { useTokePrice } from "../api/coinGecko";
 import { parseInt } from "lodash";
-import { useMarketData } from "../api/coinGecko";
+import { useGeckoData } from "../api/coinGecko";
 
 export function Home() {
   const addresses = Object.values(DAOS).flatMap((obj) => obj.addresses);
   const { total: daoOwned } = useTotals(addresses);
 
   const { data: toke_price } = useTokePrice();
-  const { data: tokenInfo } = useMarketData("tokemak");
+  const { data: tokenInfo } = useGeckoData("tokemak");
 
   return (
     <Page header="Toke Wars Dashboard">
@@ -61,7 +61,7 @@ export function Home() {
 
       <TokeChart addresses={addresses} />
       <Divider />
-      <HomeResourcesCard />
+      <ResourcesCard token={"tokemak"} />
     </Page>
   );
 }

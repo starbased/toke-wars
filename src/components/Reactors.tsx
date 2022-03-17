@@ -16,7 +16,14 @@ import {
   Line,
 } from "recharts";
 import { useState } from "react";
-import { Box, HStack, Select, Skeleton, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  Divider,
+  HStack,
+  Select,
+  Skeleton,
+  Stack,
+} from "@chakra-ui/react";
 import { BURN, FIRST_BLOCK, REACTORS } from "../constants";
 import { sortBy } from "lodash";
 import { eachMonthOfInterval, isEqual } from "date-fns";
@@ -26,6 +33,7 @@ import { LinkCard } from "./LinkCard";
 import { FaRadiationAlt } from "react-icons/fa";
 import { useHistoricalPrice } from "../api/coinGecko";
 import { formatMoney, formatNumber } from "../util/maths";
+import { ResourcesCard } from "./ResourcesCard";
 
 function useReactorOverTime(address: string) {
   return useQuery(
@@ -100,6 +108,9 @@ export function Reactors() {
       <div style={{ width: "100%", height: "400px" }}>
         <RvlGraph address={address} token={token} />
       </div>
+      <Divider />
+      <ResourcesCard token={token} />
+
       <div style={{ alignSelf: "flex-end", color: "gray" }}>
         Price data from{" "}
         <a href="https://www.coingecko.com" target="_blank">
