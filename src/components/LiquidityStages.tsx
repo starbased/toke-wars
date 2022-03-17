@@ -18,7 +18,7 @@ export const stageMap: Record<number, StageInfo> = {
   1: {
     title: "Incentivized Liquidity via Emissions",
     description:
-      "This is your run of the mill liquidity for most DAOs. This would be the normal TOKEN-ETH pair on something like Uniswap or Sushiswap where the incentives are coming from the DOAs own token emissions.",
+      "This is your run of the mill liquidity for most DAOs. This would be the normal TOKEN-ETH pair on something like Uniswap or Sushiswap where the incentives are coming from the DAO's own token emissions.",
   },
   2: {
     title: "Tokemak Reactor Established",
