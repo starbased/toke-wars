@@ -60,7 +60,7 @@ export function Header() {
           display={{ md: "none" }}
           onClick={isOpen ? onClose : onOpen}
         />
-        <Box onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
+        <Box onClick={() => navigate("/")} style={{ cursor: "pointer" }} mr="4">
           <Image src={tokeWars} alt="Toke Wars Logo" width={40} />
         </Box>
 
