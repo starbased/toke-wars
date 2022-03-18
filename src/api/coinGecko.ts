@@ -55,15 +55,19 @@ export function useHistoricalPrice(coin?: string) {
   );
 }
 
+type CoinInfo = {
+  id: string;
+  symbol: string;
+  name: string;
+  links: {
+    chat_url: string[];
+    twitter_screen_name: string;
+  };
+};
+
 export function useGeckoData(coin?: string) {
-  return useQuery([`coins/${coin}`, coin], async () => {
-    const { data } = await geckoAPI.get<{
-      id;
-      symbol;
-      name;
-      market_data;
-      links;
-    }>(`coins/${coin}`, {
+  return useQuery([`coins`, coin], async () => {
+    const { data } = await geckoAPI.get<CoinInfo>(`coins/${coin}`, {
       params: {
         localization: "en",
         tickers: false,

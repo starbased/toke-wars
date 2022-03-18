@@ -10,7 +10,6 @@ type Props = {
 export function ResourcesCard({ token }: Props) {
   const { data: tokenInfo } = useGeckoData(token);
 
-  console.log(tokenInfo);
   return (
     <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
       <chakra.h2 textAlign="center" fontSize="xl" pb={8} fontWeight="bold">
