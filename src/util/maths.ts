@@ -22,7 +22,7 @@ export function getAmount(array: (CumulativeRecord[] | undefined)[]) {
 
 function format(number: number | bigint, options: Intl.NumberFormatOptions) {
   if (!number) {
-    return number.toString();
+    return "";
   }
   return Intl.NumberFormat("en-US", options).format(number);
 }

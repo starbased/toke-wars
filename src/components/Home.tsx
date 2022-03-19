@@ -13,7 +13,6 @@ import { Page } from "./Page";
 import { formatMoney, formatNumber } from "../util/maths";
 import { REACTORS } from "../constants";
 import { useTokePrice } from "../api/coinGecko";
-import { parseInt } from "lodash";
 import { useGeckoData } from "../api/coinGecko";
 
 export function Home() {
@@ -41,12 +40,10 @@ export function Home() {
         <BaseCard title="Circulating Supply">
           <Stat>
             <StatNumber>
-              {formatNumber(
-                parseInt(tokenInfo?.market_data?.circulating_supply)
-              )}
+              {formatNumber(tokenInfo?.market_data?.circulating_supply)}
             </StatNumber>
             <StatHelpText>
-              {formatMoney(parseFloat(tokenInfo?.market_data?.market_cap?.usd))}
+              {formatMoney(tokenInfo?.market_data?.market_cap?.usd)}
             </StatHelpText>
           </Stat>
         </BaseCard>

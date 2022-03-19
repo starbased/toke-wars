@@ -14,7 +14,7 @@ export async function getBlockNumber(blockHash: string) {
   }
   await new Promise((resolve) => setTimeout(resolve, 100));
   const output = (await provider.getBlock(blockHash)).timestamp;
-  console.log("miss", new Date(output * 1000));
+  console.debug("date cache miss", new Date(output * 1000));
   (window as any).blocks = { ...(window as any).blocks, [blockHash]: output };
   return output;
 }

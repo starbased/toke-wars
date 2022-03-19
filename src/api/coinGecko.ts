@@ -63,6 +63,12 @@ type CoinInfo = {
     chat_url: string[];
     twitter_screen_name: string;
   };
+  market_data: {
+    circulating_supply: number;
+    market_cap: {
+      usd: number;
+    };
+  };
 };
 
 export function useGeckoData(coin?: string) {
