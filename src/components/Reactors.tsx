@@ -13,6 +13,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  Label,
   Line,
 } from "recharts";
 import { useState } from "react";
@@ -32,7 +33,7 @@ import { Page } from "./Page";
 import { LinkCard } from "./LinkCard";
 import { FaRadiationAlt } from "react-icons/fa";
 import { useHistoricalPrice } from "../api/coinGecko";
-import { formatMoney, formatNumber } from "../util/maths";
+import { formatNumber } from "../util/maths";
 import { ResourcesCard } from "./ResourcesCard";
 
 function useReactorOverTime(address: string) {
@@ -142,23 +143,31 @@ function RvlGraph({ address, token }: { address: string; token: string }) {
   let foo = Object.keys(prices);
 
   let formattedData = reactorData?.map(({ total, time }) => {
-    const formattedTotal = formatEther(total);
+    const formattedTotal = new BN(formatEther(total)).toNumber();
     const value = new BN(formattedTotal)
       .times(
         prices[
           foo.find((s) => time.getTime() < parseInt(s)) || foo[foo.length - 1]
         ]
       )
-      .toFixed(2);
+      .toNumber();
 
     return {
       total: formattedTotal,
-      time,
-      value,
+      time: time.getTime(),
+      value: value,
     };
   });
 
-  const dateFormatter = (date: Date) => date.toLocaleDateString("en-US");
+  const dateFormatter = (date: number) =>
+    new Date(date).toLocaleDateString("en-US");
+
+  const ticks = eachMonthOfInterval({
+    start: formattedData[0].time,
+    end: new Date(),
+  });
+
+  let formatter = Intl.NumberFormat("en", { notation: "compact" });
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -177,39 +186,43 @@ function RvlGraph({ address, token }: { address: string; token: string }) {
           scale="time"
           type="number"
           domain={[
-            () => formattedData[0].time,
+            () => ticks[0].getTime(),
             () => formattedData[formattedData.length - 1].time,
           ]}
           tickFormatter={dateFormatter}
           tickCount={5}
           // @ts-ignore
-          ticks={eachMonthOfInterval({
-            start: formattedData[0].time,
-            end: new Date(),
-          })}
+          ticks={ticks}
         />
         <YAxis
-          domain={[
-            () => 0,
-            () =>
-              Math.max(...formattedData.map(({ value }) => parseFloat(value))) *
-              1.25,
-          ]}
           tickFormatter={(tick) => {
-            return formatMoney(tick.toFixed());
+            return formatter.format(tick.toFixed());
           }}
-        />
+          unit="$"
+        >
+          <Label
+            style={{ fill: "ghostwhite" }}
+            value="USD Value"
+            angle={-90}
+            offset={10}
+            position="left"
+          />
+        </YAxis>
         <YAxis
           yAxisId="right"
           orientation="right"
-          domain={[
-            () => 0,
-            () =>
-              Math.max(...formattedData.map(({ total }) => parseFloat(total))) *
-              1.25,
-          ]}
-          tickFormatter={(value) => formatNumber(value)}
-        />
+          tickFormatter={(tick) => {
+            return formatter.format(tick);
+          }}
+        >
+          <Label
+            style={{ fill: "ghostwhite" }}
+            value="Total Tokens"
+            angle={90}
+            offset={0}
+            position="right"
+          />
+        </YAxis>
         <Tooltip
           labelFormatter={dateFormatter}
           labelStyle={{ color: "black" }}
