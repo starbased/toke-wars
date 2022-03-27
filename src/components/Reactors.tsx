@@ -28,7 +28,7 @@ import {
 import { BURN, FIRST_BLOCK, REACTORS } from "../constants";
 import { sortBy } from "lodash";
 import { eachMonthOfInterval, isEqual } from "date-fns";
-import { estimateDay, runningTotal } from "../api/utils";
+import { estimateTime, runningTotal } from "../api/utils";
 import { Page } from "./Page";
 import { LinkCard } from "./LinkCard";
 import { FaRadiationAlt } from "react-icons/fa";
@@ -52,11 +52,18 @@ function useReactorOverTime(address: string) {
       events = events.filter(
         ({ args: { from, to } }) => from === BURN || to === BURN
       );
+      const firstBlock = await events[0].getBlock();
 
-      return events.map((event) => ({
-        ...event,
-        time: estimateDay(event.blockNumber),
-      }));
+      return Promise.all(
+        events.map(async (event) => ({
+          ...event,
+          time: await estimateTime(
+            event.blockNumber,
+            firstBlock.number,
+            new Date(firstBlock.timestamp * 1000)
+          ),
+        }))
+      );
     },
     {
       select: (events) =>
@@ -140,14 +147,15 @@ function RvlGraph({ address, token }: { address: string; token: string }) {
   }
 
   //TODO: join to prices to make sure a value exists for every day
-  let foo = Object.keys(prices);
+  let days = Object.keys(prices);
 
   let formattedData = reactorData?.map(({ total, time }) => {
     const formattedTotal = new BN(formatEther(total)).toNumber();
     const value = new BN(formattedTotal)
       .times(
         prices[
-          foo.find((s) => time.getTime() < parseInt(s)) || foo[foo.length - 1]
+          days.find((s) => time.getTime() < parseInt(s)) ||
+            days[days.length - 1]
         ]
       )
       .toNumber();

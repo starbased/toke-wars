@@ -6,7 +6,7 @@ import { BigNumber } from "ethers";
 import untypedCache from "../cache/ec20Balance.json";
 
 import { Log } from "@ethersproject/abstract-provider/src.ts";
-import { getBlockNumber, runningTotal } from "./utils";
+import { estimateTime, runningTotal } from "./utils";
 
 export type Event<T> = { args: T } & Log;
 
@@ -15,18 +15,6 @@ const eventCache: Record<string, Event[]> = untypedCache;
 
 function getContract(tokenContract: string) {
   return ERC20__factory.connect(tokenContract, provider);
-}
-
-export function useCurrentBalance(tokenContract: string, address: string) {
-  return useQuery(["balance", tokenContract, address], () =>
-    getContract(tokenContract).balanceOf(address)
-  );
-}
-
-export function useTotalSupply(tokenContract: string) {
-  return useQuery(["balance", tokenContract], () =>
-    getContract(tokenContract).totalSupply()
-  );
 }
 
 (window as any).eventCache = eventCache;
@@ -88,7 +76,7 @@ export function useAmounts(
       for (let event of allEvents) {
         output.push({
           ...event,
-          time: new Date((await getBlockNumber(event.blockHash)) * 1000),
+          time: await estimateTime(event.blockNumber),
         });
       }
       return output;

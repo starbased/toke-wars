@@ -3,7 +3,7 @@ import { TokeStaking__factory } from "../typechain";
 import { provider } from "../util/providers";
 import { DAOS, TOKE_STAKING_CONTRACT } from "../constants";
 import { BigNumber } from "ethers";
-import { getBlockNumber, runningTotal } from "./utils";
+import { estimateTime, runningTotal } from "./utils";
 import { getCacheInfo, Event } from "./Erc20";
 
 export function useNewStaking(addresses: string[]) {
@@ -43,7 +43,7 @@ export function useNewStaking(addresses: string[]) {
       for (let event of allEvents) {
         output.push({
           ...event,
-          time: new Date((await getBlockNumber(event.blockHash)) * 1000),
+          time: await estimateTime(event.blockNumber),
         });
       }
       return output;

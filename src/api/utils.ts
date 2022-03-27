@@ -1,23 +1,7 @@
 import { provider } from "../util/providers";
 
-import untypedBlocks from "../cache/blocks.json";
 import { BigNumber } from "ethers";
-import { addDays, set } from "date-fns";
-
-const blocksCache: Record<string, number> = untypedBlocks;
-
-(window as any).blocks = blocksCache;
-export async function getBlockNumber(blockHash: string) {
-  const cache = (window as any).blocks[blockHash];
-  if (cache) {
-    return cache;
-  }
-  await new Promise((resolve) => setTimeout(resolve, 100));
-  const output = (await provider.getBlock(blockHash)).timestamp;
-  console.debug("date cache miss", new Date(output * 1000));
-  (window as any).blocks = { ...(window as any).blocks, [blockHash]: output };
-  return output;
-}
+import { parseISO } from "date-fns";
 
 export function runningTotal<T>(
   events: Iterable<T>,
@@ -39,14 +23,25 @@ export function runningTotal<T>(
   return output;
 }
 
-export function estimateDay(block: number, morningBlock = 14369954) {
-  const days = Math.floor((morningBlock - block) / 6461.5);
-  const today = set(new Date(), {
-    milliseconds: 0,
-    seconds: 0,
-    minutes: 0,
-    hours: 0,
-  });
+const currentBlockP = provider
+  .getBlockNumber()
+  .then((block) => provider.getBlock(block));
 
-  return addDays(today, -days);
+export async function estimateTime(
+  block: number,
+  startBlock = 13331168,
+  startTime = parseISO("2021-10-01T04:00:00.000Z")
+) {
+  const currentBlock = await currentBlockP;
+
+  const totalBlocks = startBlock - currentBlock.number;
+
+  const totalMs = startTime.getTime() - currentBlock.timestamp * 1000;
+
+  const msPerBlock = totalMs / totalBlocks;
+  const blocksFromStart = block - startBlock;
+
+  return new Date(
+    Math.floor(blocksFromStart * msPerBlock) + startTime.getTime()
+  );
 }
