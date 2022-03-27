@@ -91,7 +91,7 @@ export function getCycleInfo(
 
 export function Rewards() {
   const { address: urlAddress } = useParams();
-  const [address, setAddress] = useState(urlAddress || "");
+  const [address, setAddress] = useState(urlAddress?.toLowerCase() || "");
 
   const { data: latestCycle } = useQuery(
     "lastCycle",

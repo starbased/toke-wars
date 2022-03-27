@@ -94,11 +94,17 @@ export function Totals({ latestCycle, address }: Props) {
   }
 
   const formattedTotal = formatEther(total || 0);
-  // const { data: toke_price } = useTokenPrice("tokemak");
+
+  let rewardsThisCycle = "";
+
+  if (rewards) {
+    const lastRewards = rewards[rewards.length - 1];
+    rewardsThisCycle = formatEther(lastRewards.data.summary.cycleTotal);
+  }
 
   return (
     <>
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, lg: 8 }}>
+      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
         <CycleInfo />
         <BaseCard title="Total Earned">
           <Stat>
@@ -106,6 +112,19 @@ export function Totals({ latestCycle, address }: Props) {
             {toke_price ? (
               <StatHelpText>
                 {formatMoney(parseFloat(formattedTotal) * toke_price)}
+              </StatHelpText>
+            ) : null}
+          </Stat>
+        </BaseCard>
+
+        <BaseCard title="Rewards This Cycle">
+          <Stat>
+            <StatNumber>
+              {formatNumber(parseFloat(rewardsThisCycle), 3)}
+            </StatNumber>
+            {toke_price ? (
+              <StatHelpText>
+                {formatMoney(parseFloat(rewardsThisCycle) * toke_price)}
               </StatHelpText>
             ) : null}
           </Stat>
