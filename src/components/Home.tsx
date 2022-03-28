@@ -14,6 +14,7 @@ import { formatMoney, formatNumber } from "../util/maths";
 import { REACTORS } from "../constants";
 import { useTokePrice } from "../api/coinGecko";
 import { useGeckoData } from "../api/coinGecko";
+import { HoldingsByDaoChart } from "./HoldingsByDaoChart";
 
 export function Home() {
   const addresses = Object.values(DAOS).flatMap((obj) => obj.addresses);
@@ -56,6 +57,7 @@ export function Home() {
         </BaseCard>
       </SimpleGrid>
 
+      <HoldingsByDaoChart />
       <TokeChart addresses={addresses} />
       <Divider />
       <ResourcesCard token={"tokemak"} />

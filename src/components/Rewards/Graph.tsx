@@ -28,31 +28,30 @@ type Props = {
   rewards: (CycleInfo | undefined)[];
 };
 
+export const graphColors = [
+  "#63b598",
+  "#ce7d78",
+  "#ea9e70",
+  "#a48a9e",
+  "#c6e1e8",
+  "#648177",
+  "#0d5ac1",
+  "#f205e6",
+  "#f2510e",
+  "#4ca2f9",
+  "#a4e43f",
+  "#d298e2",
+  "#6119d0",
+  "#d2737d",
+  "#c0a43c",
+  "#651be6",
+  "#79806e",
+  "#61da5e",
+];
+
 export function Graph({ rewards }: Props) {
   const [hidden, setHidden] = useState<string[]>([]);
   const [showByCycle, setShowByCycle] = useState<boolean>(true);
-
-  const colors = [
-    "#63b598",
-    "#ce7d78",
-    "#ea9e70",
-    "#a48a9e",
-    "#c6e1e8",
-    "#648177",
-    "#0d5ac1",
-    "#f205e6",
-    "#1c0365",
-    "#f2510e",
-    "#4ca2f9",
-    "#a4e43f",
-    "#d298e2",
-    "#6119d0",
-    "#d2737d",
-    "#c0a43c",
-    "#651be6",
-    "#79806e",
-    "#61da5e",
-  ];
 
   const { byCycle, aggregate } = useMemo(() => {
     const byCycle: Record<string, string>[] = [];
@@ -158,8 +157,8 @@ export function Graph({ rewards }: Props) {
               dataKey={key}
               stackId="1"
               key={key}
-              fill={colors[i]}
-              stroke={colors[i]}
+              fill={graphColors[i]}
+              stroke={graphColors[i]}
             />
           ))}
         </AreaChart>
