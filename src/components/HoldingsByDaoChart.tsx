@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   Area,
 } from "recharts";
-import { sortBy } from "lodash";
+import { orderBy, sortBy } from "lodash";
 import { DAOS, T_TOKE_CONTRACT, TOKE_CONTRACT } from "../constants";
 import { useAmounts } from "../api/Erc20";
 import { useNewStaking } from "../api/TokeStaking";
@@ -47,7 +47,7 @@ export function HoldingsByDaoChart() {
       useTotals(addresses);
 
     if (isLoading) {
-      return [];
+      return;
     }
 
     let data = [
@@ -76,6 +76,11 @@ export function HoldingsByDaoChart() {
       };
     });
   });
+
+  if (daoTotals.includes(undefined)) {
+    return <div>Loading Chart</div>;
+  }
+
   daoTotals = sortBy(daoTotals, "time");
 
   let lastDatum2 = { time: new Date(0) };
@@ -93,6 +98,12 @@ export function HoldingsByDaoChart() {
   const ticks = Array.from(
     Array(differenceInMonths(new Date(), startDate) + 1)
   ).map((_, i) => addMonths(startDate, i));
+
+  const orderedDaos = orderBy(
+    DAOS,
+    (dao) => parseFloat(joinedData[joinedData.length - 1][dao.name]),
+    "desc"
+  );
 
   return (
     <div style={{ width: "100%", height: "400px" }}>
@@ -126,7 +137,7 @@ export function HoldingsByDaoChart() {
           />
           <Legend />
 
-          {DAOS.map(({ name }, i) => (
+          {orderedDaos.map(({ name }, i) => (
             <Area
               key={name}
               dataKey={name}

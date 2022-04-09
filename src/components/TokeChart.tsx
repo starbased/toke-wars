@@ -37,7 +37,7 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
     useTotals(addresses);
 
   if (isLoading) {
-    return <div>loading</div>;
+    return <div>Loading Chart</div>;
   }
 
   function makeMapFn(key: string) {
