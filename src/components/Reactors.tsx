@@ -36,9 +36,30 @@ import { useHistoricalPrice } from "../api/coinGecko";
 import { formatNumber } from "../util/maths";
 import { ResourcesCard } from "./ResourcesCard";
 
+function useTAssetQuery(address: string) {
+  return useQuery(
+    ["reactor", address, "totals"],
+    async () => {
+      const contract = TAsset__factory.connect(address, provider);
+      const [withheldLiquidity, totalSupply] = await Promise.all([
+        contract.withheldLiquidity(),
+        contract.totalSupply(),
+      ]);
+
+      return {
+        withheldLiquidity: new BN(withheldLiquidity.toString()),
+        totalSupply: new BN(totalSupply.toString()),
+      };
+    },
+    {
+      staleTime: 5 * 1000 * 60,
+    }
+  );
+}
+
 function useReactorOverTime(address: string) {
   return useQuery(
-    ["reactor", address],
+    ["reactor", address, "valueOverTime"],
     async () => {
       const contract = TAsset__factory.connect(address, provider);
 
@@ -85,6 +106,8 @@ export function Reactors() {
     ([reactorAddress]) => address === reactorAddress
   );
 
+  const { data } = useTAssetQuery(address);
+
   return (
     <Page header="Reactor Value Locked">
       <HStack spacing="24px">
@@ -113,6 +136,18 @@ export function Reactors() {
         </Box>
       </HStack>
 
+      {data ? (
+        <>
+          <div>
+            {data.withheldLiquidity
+              .div(data.totalSupply)
+              .times(100)
+              .toFixed(2) + "% available for withdrawal next cycle"}
+          </div>
+        </>
+      ) : (
+        ""
+      )}
       <div style={{ width: "100%", height: "400px" }}>
         <RvlGraph address={address} token={token} />
       </div>
@@ -129,11 +164,12 @@ export function Reactors() {
   );
 }
 
-function RvlGraph({ address, token }: { address: string; token: string }) {
+function RvlGraph({ address, token }: { address: string; token?: string }) {
   const { data: reactorData } = useReactorOverTime(address);
-  const { data: prices } = useHistoricalPrice(token);
+  let { data: prices } = useHistoricalPrice(token);
+  prices = prices || {};
 
-  if (!prices || !reactorData) {
+  if ((!!token && !prices) || !reactorData) {
     return (
       <Stack>
         <Skeleton height="60px" />

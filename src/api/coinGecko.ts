@@ -72,16 +72,20 @@ type CoinInfo = {
 };
 
 export function useGeckoData(coin?: string) {
-  return useQuery([`coins`, coin], async () => {
-    const { data } = await geckoAPI.get<CoinInfo>(`coins/${coin}`, {
-      params: {
-        localization: "en",
-        tickers: false,
-        community_data: false,
-        developer_data: false,
-        sparkline: false,
-      },
-    });
-    return data;
-  });
+  return useQuery(
+    [`coins`, coin],
+    async () => {
+      const { data } = await geckoAPI.get<CoinInfo>(`coins/${coin}`, {
+        params: {
+          localization: "en",
+          tickers: false,
+          community_data: false,
+          developer_data: false,
+          sparkline: false,
+        },
+      });
+      return data;
+    },
+    { enabled: !!coin }
+  );
 }

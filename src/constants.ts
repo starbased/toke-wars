@@ -123,6 +123,8 @@ export const REACTORS = [
   ["0x7211508D283353e77b9A7ed2f22334C219AD4b4C", "alUSD", "alchemix-usd"],
   ["0x2Fc6e9c1b2C07E18632eFE51879415a580AD22E1", "GAMMA", "gamma-strategies"],
   ["0x41f6a95Bacf9bC43704c4A4902BA5473A8B00263", "gOHM", "governance-ohm"],
+  ["0x1b429e75369EA5cD84421C1cc182cee5f3192fd3", "tUniLP"],
+  ["0x8858A739eA1dd3D80FE577EF4e0D03E88561FaA3", "tSushiLP"],
 ];
 
 export const FIRST_BLOCK = 12961612;
