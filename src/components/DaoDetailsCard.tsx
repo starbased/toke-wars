@@ -18,7 +18,7 @@ import {
 import { ReactNode } from "react";
 import { DaoInformation } from "../constants";
 import { stageMap } from "./LiquidityStages";
-import { formatMoney, formatNumber } from "../util/maths";
+import { formatMoney, formatNumber, shortenAddress } from "../util/maths";
 import { useTokePrice } from "../api/coinGecko";
 
 type BaseCardProps = {
@@ -106,14 +106,6 @@ function StageCard({ title, stage }: StageCardProps) {
         <StatHelpText>{stageText}</StatHelpText>
       </Stat>
     </BaseCard>
-  );
-}
-
-function shortenAddress(address: string, showCharacters = 5) {
-  return (
-    address.substring(0, showCharacters) +
-    `...` +
-    address.substring(address.length - showCharacters, address.length)
   );
 }
 

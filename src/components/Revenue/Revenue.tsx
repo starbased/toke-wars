@@ -7,6 +7,9 @@ import { groupBy, orderBy } from "lodash";
 import { useGeckoData } from "../../api/coinGecko";
 import { BigNumber } from "bignumber.js";
 import { Formatter } from "../Formatter";
+import { Box, Table, Thead, Tr, Th, Tbody, Td, chakra } from "@chakra-ui/react";
+import { shortenAddress } from "../../util/maths";
+import { Page } from "../Page";
 
 export function Revenue() {
   const tokens = {
@@ -71,73 +74,92 @@ export function Revenue() {
   );
 
   return (
-    <div>
-      <h1>events</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Block Number</th>
-            <th>Tx</th>
-            <th>Coin</th>
-            <th>Amount</th>
-            <th>USD Value</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {data?.map((tx) => (
-            <tr key={tx.transactionHash + tx.address}>
-              <td>{tx.blockNumber}</td>
-              <td>
-                <a
-                  href={`https://etherscan.io/tx/${tx.transactionHash}`}
-                  target="_blank"
-                >
-                  {tx.transactionHash}
-                </a>
-              </td>
-              <td>{tokens[tx.address.toLowerCase()].name}</td>
-              <td>{formatEther(tx.args.value.toString())}</td>
-              <td>
+    <Page header="Revenue">
+      <Box
+        borderWidth="1px"
+        borderRadius="lg"
+        shadow="md"
+        p="6"
+        marginBottom="10"
+      >
+        <chakra.h2 textAlign="center" fontSize="xl" pb={8} fontWeight="bold">
+          Totals
+        </chakra.h2>
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>Coin</Th>
+              <Th>Amount</Th>
+              <Th>USD Value</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {totals?.map((tx) => (
+              <Tr key={tx.address}>
+                <Td>{tokens[tx.address.toLowerCase()].name}</Td>
+                <Td>{tx.value}</Td>
+                <Td>
+                  <Formatter currency value={tx.value} />
+                </Td>
+              </Tr>
+            ))}
+            <Tr>
+              <Td>Sum Total</Td>
+              <Td></Td>
+              <Td>
                 <Formatter
                   currency
-                  value={new BigNumber(formatEther(tx.args.value.toString()))
-                    .times(usdValues[tx.address.toLowerCase()])
-                    .toNumber()}
+                  value={totals
+                    .map((obj) => obj.value)
+                    .reduce<number>((a, b) => a + b, 0)}
                 />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <h1>Totals</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Coin</th>
-            <th>Amount</th>
-            <th>USD Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          {totals?.map((tx) => (
-            <tr key={tx.address}>
-              <td>{tokens[tx.address.toLowerCase()].name}</td>
-              <td>{tx.value}</td>
-              <td>
-                <Formatter currency value={tx.value} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <h1>total total: </h1>
-      <Formatter
-        currency
-        value={totals
-          .map((obj) => obj.value)
-          .reduce<number>((a, b) => a + b, 0)}
-      />
-    </div>
+              </Td>
+            </Tr>
+          </Tbody>
+        </Table>
+      </Box>
+      <Box borderWidth="1px" borderRadius="lg" shadow="md" p="6">
+        <chakra.h2 textAlign="center" fontSize="xl" pb={8} fontWeight="bold">
+          Events
+        </chakra.h2>
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th>Block Number</Th>
+              <Th>Tx</Th>
+              <Th>Coin</Th>
+              <Th>Amount</Th>
+              <Th>USD Value</Th>
+            </Tr>
+          </Thead>
+
+          <Tbody>
+            {data?.map((tx) => (
+              <Tr key={tx.transactionHash + tx.address}>
+                <Td>{tx.blockNumber}</Td>
+                <Td>
+                  <a
+                    href={`https://etherscan.io/tx/${tx.transactionHash}`}
+                    target="_blank"
+                  >
+                    {shortenAddress(tx.transactionHash)}
+                  </a>
+                </Td>
+                <Td>{tokens[tx.address.toLowerCase()].name}</Td>
+                <Td>{formatEther(tx.args.value.toString())}</Td>
+                <Td>
+                  <Formatter
+                    currency
+                    value={new BigNumber(formatEther(tx.args.value.toString()))
+                      .times(usdValues[tx.address.toLowerCase()])
+                      .toNumber()}
+                  />
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </Box>
+    </Page>
   );
 }
