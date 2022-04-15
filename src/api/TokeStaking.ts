@@ -5,6 +5,7 @@ import { DAOS, TOKE_STAKING_CONTRACT } from "../constants";
 import { BigNumber } from "ethers";
 import { estimateTime, runningTotal } from "./utils";
 import { getCacheInfo, Event } from "./Erc20";
+import { sortBy } from "lodash";
 
 export function useNewStaking(addresses: string[]) {
   const queryKey = "newStaking";
@@ -41,11 +42,10 @@ export function useNewStaking(addresses: string[]) {
         knownAddresses.includes(address.toLowerCase())
       );
 
-      const allEvents = [
-        ...cached,
-        ...filteredDeposits,
-        ...filteredWithdrawals,
-      ];
+      const allEvents = sortBy(
+        [...cached, ...filteredDeposits, ...filteredWithdrawals],
+        "blockNumber"
+      );
 
       if (filteredDeposits.length > 0) {
         (window as any).eventCache[queryKey] = allEvents;
