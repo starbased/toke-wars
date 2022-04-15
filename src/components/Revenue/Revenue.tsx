@@ -17,9 +17,14 @@ import {
   Td,
   chakra,
   Link,
+  Button,
+  LinkBox,
 } from "@chakra-ui/react";
 import { shortenAddress } from "../../util/maths";
 import { Page } from "../Page";
+import { faListCheck, faTerminal } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { NavLink } from "react-router-dom";
 
 export function Revenue() {
   const tokens = {
@@ -67,7 +72,7 @@ export function Revenue() {
       return { ...acc };
     }, {});
 
-  data = orderBy(data, "blockNumber");
+  data = orderBy(data, "blockNumber", "desc");
 
   const totals = Object.entries(groupBy(data, "address")).map(
     ([address, data]) => {
@@ -85,7 +90,22 @@ export function Revenue() {
   );
 
   return (
-    <Page header="Revenue">
+    <Page header="Protocol Revenue">
+      <LinkBox>
+        <Link
+          target="_blank"
+          href="https://tokenterminal.com/terminal/projects/tokemak"
+        >
+          <Button
+            w={"full"}
+            maxW={"md"}
+            variant={"outline"}
+            leftIcon={<FontAwesomeIcon icon={faTerminal} />}
+          >
+            More Data via Token Terminal
+          </Button>
+        </Link>
+      </LinkBox>
       <Box
         borderWidth="1px"
         borderRadius="lg"
@@ -123,8 +143,10 @@ export function Revenue() {
               </Tr>
             ))}
             <Tr>
-              <Td>Sum Total</Td>
-              <Td></Td>
+              <Td>Total</Td>
+              <Td>
+                {/* no point in summing token quantities since they are not comparable */}
+              </Td>
               <Td>
                 <Formatter
                   currency
