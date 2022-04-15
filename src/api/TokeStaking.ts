@@ -7,7 +7,6 @@ import { estimateTime, runningTotal } from "./utils";
 import { getCacheInfo, Event } from "./Erc20";
 
 export function useNewStaking(addresses: string[]) {
-  //todo: this only deals with deposits not withdrawals right now
   const queryKey = "newStaking";
   return useQuery(
     queryKey,
@@ -17,28 +16,43 @@ export function useNewStaking(addresses: string[]) {
         provider
       );
 
-      const { cached, startingBlock } = getCacheInfo(queryKey);
-
-      const events = await contract.queryFilter(
-        contract.filters.Deposited(),
-        startingBlock
-      );
-
       // Filter out all addresses not cared about
       const knownAddresses = DAOS.flatMap((dao) =>
         dao.addresses.map((address) => address.toLowerCase())
       );
 
-      const filteredEvents = events.filter(({ args: [address] }) =>
+      const { cached, startingBlock } = getCacheInfo(queryKey);
+
+      const deposits = await contract.queryFilter(
+        contract.filters.Deposited(),
+        startingBlock
+      );
+
+      const filteredDeposits = deposits.filter(({ args: [address] }) =>
         knownAddresses.includes(address.toLowerCase())
       );
 
-      const allEvents = [...cached, ...filteredEvents];
-      if (filteredEvents.length > 0) {
+      const withdrawals = await contract.queryFilter(
+        contract.filters.WithdrawCompleted(),
+        startingBlock
+      );
+
+      const filteredWithdrawals = withdrawals.filter(({ args: [address] }) =>
+        knownAddresses.includes(address.toLowerCase())
+      );
+
+      const allEvents = [
+        ...cached,
+        ...filteredDeposits,
+        ...filteredWithdrawals,
+      ];
+
+      if (filteredDeposits.length > 0) {
         (window as any).eventCache[queryKey] = allEvents;
       }
 
-      const output: (Event<[string, BigNumber]> & { time: Date })[] = [];
+      const output: (Event<[string, BigNumber, BigNumber]> & { time: Date })[] =
+        [];
 
       for (let event of allEvents) {
         output.push({
@@ -60,9 +74,9 @@ export function useNewStaking(addresses: string[]) {
 
         return runningTotal(
           filteredData,
-          ({ args: [, value] }) =>
+          ({ args: [, add, minus] }) =>
             (bn) =>
-              bn.add(value)
+              bn.add(add).sub(minus)
         );
       },
     }
