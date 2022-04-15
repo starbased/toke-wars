@@ -7,7 +7,17 @@ import { groupBy, orderBy } from "lodash";
 import { useGeckoData } from "../../api/coinGecko";
 import { BigNumber } from "bignumber.js";
 import { Formatter } from "../Formatter";
-import { Box, Table, Thead, Tr, Th, Tbody, Td, chakra } from "@chakra-ui/react";
+import {
+  Box,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
+  chakra,
+  Link,
+} from "@chakra-ui/react";
 import { shortenAddress } from "../../util/maths";
 import { Page } from "../Page";
 
@@ -33,7 +43,8 @@ export function Revenue() {
           contract.filters.Transfer(
             "0xA86e412109f77c45a3BC1c5870b880492Fb86A14",
             "0x8b4334d4812C530574Bd4F2763FcD22dE94A969B"
-          )
+          ),
+          14489954
         );
       },
     }))
@@ -60,13 +71,13 @@ export function Revenue() {
 
   const totals = Object.entries(groupBy(data, "address")).map(
     ([address, data]) => {
+      const value = formatEther(
+        data.map((obj) => obj.args.value).reduce((a, b) => a.add(b))
+      );
       return {
         address,
-        value: new BigNumber(
-          formatEther(
-            data.map((obj) => obj.args.value).reduce((a, b) => a.add(b))
-          )
-        )
+        value,
+        usdValue: new BigNumber(value)
           .times(usdValues[address.toLowerCase()])
           .toNumber(),
       };
@@ -97,9 +108,17 @@ export function Revenue() {
             {totals?.map((tx) => (
               <Tr key={tx.address}>
                 <Td>{tokens[tx.address.toLowerCase()].name}</Td>
-                <Td>{tx.value}</Td>
                 <Td>
-                  <Formatter currency value={tx.value} />
+                  <Formatter
+                    value={parseFloat(tx.value)}
+                    options={{
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }}
+                  />
+                </Td>
+                <Td>
+                  <Formatter currency value={tx.usdValue} />
                 </Td>
               </Tr>
             ))}
@@ -110,7 +129,7 @@ export function Revenue() {
                 <Formatter
                   currency
                   value={totals
-                    .map((obj) => obj.value)
+                    .map((obj) => obj.usdValue)
                     .reduce<number>((a, b) => a + b, 0)}
                 />
               </Td>
@@ -138,15 +157,24 @@ export function Revenue() {
               <Tr key={tx.transactionHash + tx.address}>
                 <Td>{tx.blockNumber}</Td>
                 <Td>
-                  <a
+                  <Link
                     href={`https://etherscan.io/tx/${tx.transactionHash}`}
                     target="_blank"
                   >
                     {shortenAddress(tx.transactionHash)}
-                  </a>
+                  </Link>
                 </Td>
                 <Td>{tokens[tx.address.toLowerCase()].name}</Td>
-                <Td>{formatEther(tx.args.value.toString())}</Td>
+
+                <Td>
+                  <Formatter
+                    value={parseFloat(formatEther(tx.args.value.toString()))}
+                    options={{
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }}
+                  />
+                </Td>
                 <Td>
                   <Formatter
                     currency
