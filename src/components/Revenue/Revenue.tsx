@@ -59,9 +59,13 @@ export function Revenue() {
     ([address, data]) => {
       return {
         address,
-        value: formatEther(
-          data.map((obj) => obj.args.value).reduce((a, b) => a.add(b))
-        ),
+        value: new BigNumber(
+          formatEther(
+            data.map((obj) => obj.args.value).reduce((a, b) => a.add(b))
+          )
+        )
+          .times(usdValues[address.toLowerCase()])
+          .toNumber(),
       };
     }
   );
@@ -106,7 +110,6 @@ export function Revenue() {
           ))}
         </tbody>
       </table>
-
       <h1>Totals</h1>
       <table>
         <thead>
@@ -122,17 +125,19 @@ export function Revenue() {
               <td>{tokens[tx.address.toLowerCase()].name}</td>
               <td>{tx.value}</td>
               <td>
-                <Formatter
-                  currency
-                  value={new BigNumber(tx.value)
-                    .times(usdValues[tx.address.toLowerCase()])
-                    .toNumber()}
-                />
+                <Formatter currency value={tx.value} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <h1>total total: </h1>
+      <Formatter
+        currency
+        value={totals
+          .map((obj) => obj.value)
+          .reduce<number>((a, b) => a + b, 0)}
+      />
     </div>
   );
 }
