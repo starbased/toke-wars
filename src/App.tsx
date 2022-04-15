@@ -10,6 +10,7 @@ import { Reactors } from "./components/Reactors";
 import { Leaderboard } from "./components/Leaderboard";
 import { Rewards } from "./components/Rewards/Rewards";
 import { Test } from "./components/Test";
+import { Revenue } from "./components/Revenue/Revenue";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="/rewards" element={<Rewards />} />
             <Route path="/rewards/:address" element={<Rewards />} />
             <Route path="/test" element={<Test />} />
+            <Route path="/revenue" element={<Revenue />} />
             <Route path="/" element={<Home />} />
           </Routes>
         </Container>

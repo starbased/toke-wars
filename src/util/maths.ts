@@ -42,3 +42,11 @@ export function formatNumber(number: number | bigint, fDigits = 0) {
     maximumFractionDigits: fDigits,
   });
 }
+
+export function shortenAddress(address: string, showCharacters = 5) {
+  return (
+    address.substring(0, showCharacters) +
+    `...` +
+    address.substring(address.length - showCharacters, address.length)
+  );
+}

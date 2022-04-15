@@ -21,7 +21,7 @@ import { DAOS } from "../constants";
 import { useNavigate } from "react-router-dom";
 import { sortBy } from "lodash";
 
-const Links = ["Reactors", "Leaderboard", "Stages", "Rewards"];
+const Links = ["Reactors", "Leaderboard", "Revenue", "Stages", "Rewards"];
 import tokeWars from "../tokewars.png";
 
 const NavLink = ({ children, to }: { children: ReactNode; to: string }) => (

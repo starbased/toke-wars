@@ -59,6 +59,7 @@ type CoinInfo = {
   id: string;
   symbol: string;
   name: string;
+  contract_address: string;
   links: {
     chat_url: string[];
     twitter_screen_name: string;
@@ -66,6 +67,9 @@ type CoinInfo = {
   market_data: {
     circulating_supply: number;
     market_cap: {
+      usd: number;
+    };
+    current_price: {
       usd: number;
     };
   };
