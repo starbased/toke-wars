@@ -102,6 +102,14 @@ export const DAOS: DaoInformation[] = [
     coingecko: "alchemix",
     discord: "zAd6dzgwaj",
   },
+  {
+    addresses: ["0x73141d278a9c71d2ef2a0b83565e9d5728fa15cb"],
+    name: "Congruent",
+    stage: 1,
+    twitter: "CongruentFi",
+    coingecko: "congruent-dao-token",
+    discord: "tsepr8rndw",
+  },
 ];
 
 export const REACTORS = [
