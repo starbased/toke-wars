@@ -41,6 +41,17 @@ function makeMapFn(key: string) {
   });
 }
 
+const dateFormatter = (date: Date) => date.toLocaleDateString("en-US");
+
+export const labelFunction = (label, payload) => {
+  const { time, ...other } = payload[0]?.payload || {};
+
+  const total = Object.values(other)
+    .map((obj: string) => new BigNumber(obj))
+    .reduce((a, b) => a.plus(b), new BigNumber(0));
+  return dateFormatter(label) + ` (${formatNumber(total.toNumber())})`;
+};
+
 export function HoldingsByDaoChart() {
   let daoTotals = DAOS.flatMap(({ addresses, name }) => {
     const { tokeEvents, tTokeEvents, newStaking, isLoading } =
@@ -91,8 +102,6 @@ export function HoldingsByDaoChart() {
 
   joinedData.push({ ...joinedData[joinedData.length - 1], time: new Date() });
 
-  const dateFormatter = (date: Date) => date.toLocaleDateString("en-US");
-
   const startDate = parseISO("2021-10-01");
 
   const ticks = Array.from(
@@ -129,7 +138,7 @@ export function HoldingsByDaoChart() {
           />
           <YAxis tickFormatter={(value) => formatNumber(value)} />
           <Tooltip
-            labelFormatter={dateFormatter}
+            labelFormatter={labelFunction}
             labelStyle={{ color: "black" }}
             formatter={(value) => {
               return formatNumber(Number(value));

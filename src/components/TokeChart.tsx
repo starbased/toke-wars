@@ -15,6 +15,7 @@ import { useNewStaking } from "../api/TokeStaking";
 import { addMonths, differenceInMonths, isEqual, parseISO } from "date-fns";
 import { formatNumber, getAmount } from "../util/maths";
 import { formatEther } from "ethers/lib/utils";
+import { labelFunction } from "./HoldingsByDaoChart";
 
 export function useTotals(addresses) {
   const { data: tokeEvents } = useAmounts(TOKE_CONTRACT, addresses);
@@ -100,7 +101,7 @@ export function TokeChart({ addresses }: { addresses: string[] }) {
           />
           <YAxis tickFormatter={(value) => formatNumber(value)} />
           <Tooltip
-            labelFormatter={dateFormatter}
+            labelFormatter={labelFunction}
             labelStyle={{ color: "black" }}
             formatter={(value) => {
               return formatNumber(Number(value));
