@@ -10,6 +10,7 @@ import {
   Thead,
   Tr,
   Link,
+  Td,
 } from "@chakra-ui/react";
 import { DAOS } from "../constants";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,8 +20,13 @@ import { Page } from "./Page";
 import { NavLink } from "react-router-dom";
 import { DaoLeaderboardRow } from "./DaoLeaderboardRow";
 import { useTotals } from "./TokeChart";
+import { formatMoney, formatNumber } from "../util/maths";
+import { useTokePrice } from "../api/coinGecko";
 
 export function Leaderboard() {
+  const addresses = Object.values(DAOS).flatMap((obj) => obj.addresses);
+  const { total: daoOwned } = useTotals(addresses);
+
   let formattedData = DAOS.map((dao) => {
     const { total: totalTOKE } = useTotals(dao.addresses);
 
@@ -47,7 +53,7 @@ export function Leaderboard() {
         </Link>
       </LinkBox>
 
-      <Box maxW="xl" borderWidth="1px" borderRadius="lg" shadow="md" p="6">
+      <Box borderWidth="1px" borderRadius="lg" shadow="md" p="6">
         <Table variant="simple">
           <Thead>
             <Tr>
@@ -55,11 +61,12 @@ export function Leaderboard() {
               <Th>Stage</Th>
               <Th isNumeric>TOKE Holdings</Th>
               <Th isNumeric>USD Value</Th>
+              <Th isNumeric>%</Th>
             </Tr>
           </Thead>
           <Tbody>
             {formattedData.map((dao) => (
-              <DaoLeaderboardRow dao={dao} key={dao.name} />
+              <DaoLeaderboardRow dao={dao} total={daoOwned} key={dao.name} />
             ))}
           </Tbody>
           <Tfoot>
@@ -68,9 +75,9 @@ export function Leaderboard() {
               <Th>Stage</Th>
               <Th isNumeric>TOKE Holdings</Th>
               <Th isNumeric>USD Value</Th>
+              <Th isNumeric>%</Th>
             </Tr>
           </Tfoot>
-
           <TableCaption>
             Leaderboard tracks the DAOs with the top TOKE holdings
           </TableCaption>
