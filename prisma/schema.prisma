@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ReactorValue {
+  transactionHash String  @map("transaction_hash") @db.VarChar
+  contractAddress String  @map("contract_address") @db.VarChar
+  to              String  @db.VarChar
+  from            String  @db.VarChar
+  value           Decimal @db.Decimal
+  blockNumber     Int     @map("block_number")
+  id              Int     @id(map: "reactor_values_pk") @default(autoincrement())
+
+  @@index([contractAddress], map: "reactor_values_contract_address_index")
+  @@map("reactor_values")
+}
+
+model Reactor {
+  address      String   @id(map: "reactors_pk") @unique(map: "reactors_address_uindex") @db.VarChar
+  symbol       String   @db.VarChar
+  coingeckoId  String?  @map("coingecko_id") @db.VarChar
+  isStablecoin Boolean? @default(false) @map("is_stablecoin")
+
+  @@map("reactors")
+}

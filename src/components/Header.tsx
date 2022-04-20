@@ -3,7 +3,7 @@ import {
   Box,
   Flex,
   HStack,
-  Link,
+  Link as DisplayLink,
   IconButton,
   Button,
   Menu,
@@ -13,37 +13,46 @@ import {
   useDisclosure,
   useColorModeValue,
   Stack,
-  Image,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
-import { NavLink as NavLinkReact } from "react-router-dom";
-import { DAOS } from "../constants";
-import { useNavigate } from "react-router-dom";
 import { sortBy } from "lodash";
-
-const Links = ["Reactors", "Leaderboard", "Revenue", "Stages", "Rewards"];
-import tokeWars from "../tokewars.png";
+import { DAOS } from "../util/constants";
+import { useRouter } from "next/router";
+import Image from "next/image";
+import Link from "next/link";
 
 const NavLink = ({ children, to }: { children: ReactNode; to: string }) => (
-  <Link
-    px={2}
-    py={1}
-    as={NavLinkReact}
-    to={to}
-    rounded="md"
-    _hover={{
-      textDecoration: "none",
-      bg: useColorModeValue("gray.200", "gray.700"),
-    }}
-    href="#"
-  >
-    {children}
+  <Link href={to} passHref>
+    <DisplayLink
+      px={2}
+      py={1}
+      rounded="md"
+      _hover={{
+        textDecoration: "none",
+        bg: useColorModeValue("gray.200", "gray.700"),
+      }}
+    >
+      {children}
+    </DisplayLink>
   </Link>
 );
 
 export function Header() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const navigate = useNavigate();
+  const router = useRouter();
+
+  const links = (
+    <>
+      <NavLink to="/reactor/0xd3b5d9a561c293fb42b446fe7e237daa9bf9aa84">
+        Reactors
+      </NavLink>
+      {["Leaderboard", "Revenue", "Stages", "Rewards"].map((link) => (
+        <NavLink to={"/" + link.toLowerCase()} key={link}>
+          {link}
+        </NavLink>
+      ))}
+    </>
+  );
 
   return (
     <Box
@@ -60,16 +69,21 @@ export function Header() {
           display={{ md: "none" }}
           onClick={isOpen ? onClose : onOpen}
         />
-        <Box onClick={() => navigate("/")} style={{ cursor: "pointer" }} mr="4">
-          <Image src={tokeWars} alt="Toke Wars Logo" width={40} />
+        <Box
+          onClick={() => router.push("/")}
+          style={{ cursor: "pointer", display: "flex" }}
+          mr="4"
+        >
+          <Image
+            src="/images/tokewars.png" // Route of the image file
+            height={22} // Desired size with correct aspect ratio
+            width={160} // Desired size with correct aspect ratio
+            alt="Toke Wars Logo"
+          />
         </Box>
 
         <HStack spacing={4} display={{ base: "none", md: "flex" }}>
-          {Links.map((link) => (
-            <NavLink to={link} key={link}>
-              {link}
-            </NavLink>
-          ))}
+          {links}
 
           <Menu>
             <MenuButton as={Button} minW={0}>
@@ -77,7 +91,10 @@ export function Header() {
             </MenuButton>
             <MenuList>
               {sortBy(DAOS, "name").map(({ name }) => (
-                <MenuItem key={name} onClick={() => navigate(`daos/${name}`)}>
+                <MenuItem
+                  key={name}
+                  onClick={() => router.push(`daos/${name}`)}
+                >
                   {name}
                 </MenuItem>
               ))}
@@ -89,11 +106,7 @@ export function Header() {
       {isOpen ? (
         <Box pb={4} display={{ md: "none" }}>
           <Stack as="nav" spacing={4}>
-            {Links.map((link) => (
-              <NavLink key={link} to={link}>
-                {link}
-              </NavLink>
-            ))}
+            {links}
             <Menu>
               <MenuButton as={Button} minW={0}>
                 DAOs
@@ -101,7 +114,7 @@ export function Header() {
               <MenuList>
                 {sortBy(DAOS, "name").map(({ name }) => (
                   <MenuItem key={name}>
-                    <NavLinkReact to={`daos/${name}`}> {name}</NavLinkReact>
+                    <Link href={`daos/${name}`}> {name}</Link>
                   </MenuItem>
                 ))}
               </MenuList>
