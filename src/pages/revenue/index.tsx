@@ -1,29 +1,29 @@
 import {
   Box,
+  Button,
+  chakra,
+  Link,
   LinkBox,
+  Table,
   Tbody,
   Td,
   Th,
   Thead,
+  Icon as UiIcon,
   Tr,
-  Link,
-  Table,
-  chakra,
-  Button,
 } from "@chakra-ui/react";
-import { groupBy, orderBy, sortBy } from "lodash";
+import { orderBy } from "lodash";
 import { Page } from "../../components/Page";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ERC20__factory } from "../../typechain";
 import { shortenAddress } from "../../util/maths";
-import { TransferEvent } from "../../typechain/ERC20";
 import { Formatter } from "../../components/Formatter";
-import { formatEther } from "ethers/lib/utils";
 import { GetStaticProps } from "next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTerminal } from "@fortawesome/free-solid-svg-icons";
 import { getProvider } from "../../util";
 import { getGeckoData } from "../../util/api/coinGecko";
 import { BigNumber } from "bignumber.js";
+import Image from "next/image";
 
 type Props = {
   values: {
@@ -36,6 +36,14 @@ type Props = {
     price: number;
   }[];
 };
+
+function Coin({ coin }: { coin: string }) {
+  return (
+    <div style={{ display: "flex", gap: "5px" }}>
+      {coin} <Image height={20} width={20} src={`/images/coins/${coin}.png`} />
+    </div>
+  );
+}
 
 export default function Revenue({ values }: Props) {
   const totals = values.map(({ coin, transactions, price }) => {
@@ -78,7 +86,7 @@ export default function Revenue({ values }: Props) {
             w={"full"}
             maxW={"md"}
             variant={"outline"}
-            // leftIcon={<FontAwesomeIcon icon={faTerminal} />}
+            leftIcon={<UiIcon as={FontAwesomeIcon} icon={faTerminal} />}
           >
             More Data via Token Terminal
           </Button>
@@ -105,7 +113,9 @@ export default function Revenue({ values }: Props) {
           <Tbody>
             {totals?.map(({ coin, amount, usdValue }) => (
               <Tr key={coin}>
-                <Td>{coin}</Td>
+                <Td>
+                  <Coin coin={coin} />
+                </Td>
                 <Td>
                   <Formatter
                     value={amount.toNumber()}
@@ -164,7 +174,9 @@ export default function Revenue({ values }: Props) {
                     {shortenAddress(tx.transactionHash)}
                   </Link>
                 </Td>
-                <Td>{tx.coin}</Td>
+                <Td>
+                  <Coin coin={tx.coin} />
+                </Td>
 
                 <Td>
                   <Formatter
@@ -208,7 +220,8 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       const transactions = (
         await contract.queryFilter(
           contract.filters.Transfer(
-            "0xA86e412109f77c45a3BC1c5870b880492Fb86A14",
+            // "0xA86e412109f77c45a3BC1c5870b880492Fb86A14",
+            null,
             "0x8b4334d4812C530574Bd4F2763FcD22dE94A969B"
           ),
           14489954
