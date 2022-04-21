@@ -11,11 +11,15 @@ import {
   Thead,
   Icon as UiIcon,
   Tr,
+  SimpleGrid,
+  Stat,
+  StatHelpText,
+  StatNumber,
 } from "@chakra-ui/react";
 import { orderBy } from "lodash";
 import { Page } from "../../components/Page";
 import { ERC20__factory } from "../../typechain";
-import { shortenAddress } from "../../util/maths";
+import { formatMoney, formatNumber, shortenAddress } from "../../util/maths";
 import { Formatter } from "../../components/Formatter";
 import { GetStaticProps } from "next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,6 +30,8 @@ import { BigNumber } from "bignumber.js";
 import Image from "next/image";
 import { Coin } from "../../components/coin";
 import { intlFormat, isAfter, sub } from "date-fns";
+import { BaseCard } from "../../components/DaoDetailsCard";
+import { DAOS, REACTORS } from "../../constants";
 
 type Props = {
   values: {
@@ -88,27 +94,51 @@ export default function Revenue({ values }: Props) {
 
   return (
     <Page header="Protocol Revenue">
-      <LinkBox>
-        <Link
-          target="_blank"
-          href="https://tokenterminal.com/terminal/projects/tokemak"
-        >
-          <Button
-            w={"full"}
-            maxW={"md"}
-            variant={"outline"}
-            leftIcon={<UiIcon as={FontAwesomeIcon} icon={faTerminal} />}
-          >
-            More Data via Token Terminal
-          </Button>
-        </Link>
-      </LinkBox>
+      <SimpleGrid
+        columns={{ base: 1, md: 3 }}
+        spacing={{ base: 5, lg: 8 }}
+        style={{ alignSelf: "stretch" }}
+        px={5}
+      >
+        <BaseCard title="Total Weekly Revenue">
+          <Stat>
+            <StatNumber>
+              {" "}
+              <Formatter
+                currency
+                value={usdValueOverRange(data, { weeks: 1 })}
+              />
+            </StatNumber>
+          </Stat>
+        </BaseCard>
+
+        <BaseCard title="Total Monthly Revenue">
+          <Stat>
+            <StatNumber>
+              <Formatter
+                currency
+                value={usdValueOverRange(data, { months: 1 })}
+              />
+            </StatNumber>
+          </Stat>
+        </BaseCard>
+        <BaseCard title="Projected Yearly Revenue">
+          <Stat>
+            <StatNumber>
+              <Formatter
+                currency
+                value={usdValueOverRange(data, { months: 1 }) * 12}
+              />
+            </StatNumber>
+          </Stat>
+        </BaseCard>
+      </SimpleGrid>
       <Box
         borderWidth="1px"
         borderRadius="lg"
         shadow="md"
         p="6"
-        marginBottom="10"
+        marginBottom="2"
       >
         <chakra.h2 textAlign="center" fontSize="xl" pb={8} fontWeight="bold">
           Totals
@@ -158,17 +188,21 @@ export default function Revenue({ values }: Props) {
           </Tbody>
         </Table>
       </Box>
-
-      <div>
-        last Week value{" "}
-        <Formatter currency value={usdValueOverRange(data, { weeks: 1 })} />
-      </div>
-
-      <div>
-        last Month value{" "}
-        <Formatter currency value={usdValueOverRange(data, { months: 1 })} />
-      </div>
-
+      <LinkBox>
+        <Link
+          target="_blank"
+          href="https://tokenterminal.com/terminal/projects/tokemak"
+        >
+          <Button
+            w={"full"}
+            maxW={"md"}
+            variant={"outline"}
+            leftIcon={<UiIcon as={FontAwesomeIcon} icon={faTerminal} />}
+          >
+            More Data via Token Terminal
+          </Button>
+        </Link>
+      </LinkBox>
       <Box borderWidth="1px" borderRadius="lg" shadow="md" p="6">
         <chakra.h2 textAlign="center" fontSize="xl" pb={8} fontWeight="bold">
           Events
