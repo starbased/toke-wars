@@ -64,7 +64,12 @@ export function BaseAreaGraph({
             ticks={ticks}
           />
           <YAxis
-            tickFormatter={(tick) => formatter.format(tick)}
+            tickFormatter={(tick) => {
+              if (tick === 0) {
+                return "";
+              }
+              return formatter.format(tick);
+            }}
             // domain={[0, (max: number) => max * 1.1]}
           />
           <Tooltip
