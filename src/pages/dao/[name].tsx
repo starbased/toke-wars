@@ -3,7 +3,6 @@ import { prisma } from "../../util/db";
 import { Dao } from "@prisma/client";
 import { Page } from "../../components/Page";
 import { isEmpty } from "lodash";
-import { isEqual } from "date-fns";
 import { TokeGraph } from "../../components/TokeGraph";
 import { DaoDetailsCard } from "../../components/DaoDetailsCard";
 import { Divider } from "@chakra-ui/react";

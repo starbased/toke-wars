@@ -2,24 +2,23 @@ import {
   Box,
   Button,
   chakra,
+  Icon as UiIcon,
   Link,
   LinkBox,
+  SimpleGrid,
+  Stat,
+  StatNumber,
   Table,
   Tbody,
   Td,
   Th,
   Thead,
-  Icon as UiIcon,
   Tr,
-  SimpleGrid,
-  Stat,
-  StatHelpText,
-  StatNumber,
 } from "@chakra-ui/react";
 import { orderBy } from "lodash";
 import { Page } from "../../components/Page";
 import { ERC20__factory } from "../../typechain";
-import { formatMoney, formatNumber, shortenAddress } from "../../util/maths";
+import { shortenAddress } from "../../util/maths";
 import { Formatter } from "../../components/Formatter";
 import { GetStaticProps } from "next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -27,11 +26,9 @@ import { faTerminal } from "@fortawesome/free-solid-svg-icons";
 import { getBlocks, getProvider } from "../../util";
 import { getGeckoData } from "../../util/api/coinGecko";
 import { BigNumber } from "bignumber.js";
-import Image from "next/image";
 import { Coin } from "../../components/coin";
 import { intlFormat, isAfter, sub } from "date-fns";
 import { BaseCard } from "../../components/DaoDetailsCard";
-import { DAOS, REACTORS } from "../../constants";
 
 type Props = {
   values: {

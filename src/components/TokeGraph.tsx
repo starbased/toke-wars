@@ -10,7 +10,6 @@ import {
 } from "recharts";
 import { formatNumber } from "../util/maths";
 import { intlFormat } from "date-fns";
-import { BigNumber } from "bignumber.js";
 import { ReactNode } from "react";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
 

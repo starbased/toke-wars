@@ -5,12 +5,11 @@ import {
   Table,
   TableCaption,
   Tbody,
+  Td,
   Tfoot,
   Th,
   Thead,
   Tr,
-  Link as UiLink,
-  Td,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faListCheck } from "@fortawesome/free-solid-svg-icons";
