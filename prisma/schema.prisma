@@ -64,3 +64,10 @@ model Reactor {
 
   @@map("reactors")
 }
+
+model Block {
+  number    Int      @id(map: "blocks_pk") @unique(map: "blocks_block_number_uindex")
+  timestamp DateTime @db.Timestamp(6)
+
+  @@map("blocks")
+}

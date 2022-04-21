@@ -20,11 +20,12 @@ import { Formatter } from "../../components/Formatter";
 import { GetStaticProps } from "next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTerminal } from "@fortawesome/free-solid-svg-icons";
-import { getProvider } from "../../util";
+import { getBlocks, getProvider } from "../../util";
 import { getGeckoData } from "../../util/api/coinGecko";
 import { BigNumber } from "bignumber.js";
 import Image from "next/image";
 import { Coin } from "../../components/coin";
+import { intlFormat, isAfter, sub } from "date-fns";
 
 type Props = {
   values: {
@@ -33,10 +34,27 @@ type Props = {
       transactionHash: string;
       blockNumber: number;
       value: string;
+      timestamp: number;
     }[];
     price: number;
   }[];
 };
+
+function usdValueOverRange(
+  data: { timestamp: number; usdValue: number }[],
+  duration: Duration
+) {
+  const lastWeek = sub(new Date(), duration);
+
+  const index = data.findIndex((obj) =>
+    isAfter(lastWeek, new Date(obj.timestamp))
+  );
+
+  return data
+    .slice(0, index)
+    .map((obj) => obj.usdValue)
+    .reduce((a, b) => a + b, 0);
+}
 
 export default function Revenue({ values }: Props) {
   const totals = values.map(({ coin, transactions, price }) => {
@@ -140,6 +158,17 @@ export default function Revenue({ values }: Props) {
           </Tbody>
         </Table>
       </Box>
+
+      <div>
+        last Week value{" "}
+        <Formatter currency value={usdValueOverRange(data, { weeks: 1 })} />
+      </div>
+
+      <div>
+        last Month value{" "}
+        <Formatter currency value={usdValueOverRange(data, { months: 1 })} />
+      </div>
+
       <Box borderWidth="1px" borderRadius="lg" shadow="md" p="6">
         <chakra.h2 textAlign="center" fontSize="xl" pb={8} fontWeight="bold">
           Events
@@ -147,7 +176,7 @@ export default function Revenue({ values }: Props) {
         <Table variant="simple">
           <Thead>
             <Tr>
-              <Th>Block Number</Th>
+              <Th>Time</Th>
               <Th>Tx</Th>
               <Th>Coin</Th>
               <Th>Amount</Th>
@@ -157,8 +186,16 @@ export default function Revenue({ values }: Props) {
 
           <Tbody>
             {data?.map((tx) => (
-              <Tr key={tx.transactionHash + tx.coin}>
-                <Td>{tx.blockNumber}</Td>
+              <Tr key={tx.transactionHash + tx.coin + tx.amount}>
+                <Td>
+                  {intlFormat(new Date(tx.timestamp), {
+                    year: "2-digit",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </Td>
                 <Td>
                   <Link
                     href={`https://etherscan.io/tx/${tx.transactionHash}`}
@@ -225,11 +262,21 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
         value: value.toString(),
       }));
 
+      const timestamps = (
+        await getBlocks(transactions.map((obj) => obj.blockNumber))
+      ).reduce<Record<number, Date>>(
+        (acc, obj) => ({ ...acc, [obj.number]: obj.timestamp }),
+        {}
+      );
+
       const gecko_data = await getGeckoData(gecko_id);
 
       return {
         coin: name,
-        transactions,
+        transactions: transactions.map((obj) => ({
+          ...obj,
+          timestamp: timestamps[obj.blockNumber].getTime(),
+        })),
         price: gecko_data.market_data.current_price.usd,
       };
     })
