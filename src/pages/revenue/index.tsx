@@ -24,6 +24,7 @@ import { getProvider } from "../../util";
 import { getGeckoData } from "../../util/api/coinGecko";
 import { BigNumber } from "bignumber.js";
 import Image from "next/image";
+import { Coin } from "../../components/coin";
 
 type Props = {
   values: {
@@ -36,20 +37,6 @@ type Props = {
     price: number;
   }[];
 };
-
-function Coin({ coin }: { coin: string }) {
-  return (
-    <div style={{ display: "flex", gap: "5px" }}>
-      {coin}{" "}
-      <Image
-        height={20}
-        width={20}
-        src={`/images/coins/${coin}.png`}
-        alt={""}
-      />
-    </div>
-  );
-}
 
 export default function Revenue({ values }: Props) {
   const totals = values.map(({ coin, transactions, price }) => {
@@ -120,7 +107,7 @@ export default function Revenue({ values }: Props) {
             {totals?.map(({ coin, amount, usdValue }) => (
               <Tr key={coin}>
                 <Td>
-                  <Coin coin={coin} />
+                  <Coin coin={coin}>{coin}</Coin>
                 </Td>
                 <Td>
                   <Formatter
@@ -181,7 +168,7 @@ export default function Revenue({ values }: Props) {
                   </Link>
                 </Td>
                 <Td>
-                  <Coin coin={tx.coin} />
+                  <Coin coin={tx.coin}>{tx.coin}</Coin>
                 </Td>
 
                 <Td>

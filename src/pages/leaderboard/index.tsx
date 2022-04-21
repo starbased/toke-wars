@@ -22,12 +22,14 @@ import { prisma } from "../../util/db";
 import { Dao } from "@prisma/client";
 import { tokePrice, useTokePrice } from "../../util/api/tokemak";
 import { updateAll } from "../../tokeTokenAmounts";
+import { Coin } from "../../components/coin";
 
 type Props = {
   toke_price: number;
   daos: {
     name: string;
     stage: number;
+    coin: string;
     toke: number;
   }[];
 };
@@ -69,7 +71,9 @@ export default function Leaderboard({
           <Tbody>
             {daos.map((dao) => (
               <Tr key={dao.name}>
-                <Td>{dao.name}</Td>
+                <Td>
+                  <Coin coin={dao.coin}>{dao.name}</Coin>
+                </Td>
                 <Td>{dao.stage}</Td>
                 <Td isNumeric>{formatNumber(dao.toke)}</Td>
                 <Td isNumeric>{formatMoney(dao.toke * toke_price || 0)}</Td>
