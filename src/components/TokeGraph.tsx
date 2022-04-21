@@ -9,7 +9,7 @@ import {
   YAxis,
 } from "recharts";
 import { formatNumber } from "../util/maths";
-import { intlFormat } from "date-fns";
+import { addMonths, differenceInMonths, intlFormat, parseISO } from "date-fns";
 import { ReactNode } from "react";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
@@ -34,6 +34,14 @@ export function BaseAreaGraph({
   data,
   children,
 }: Props & { children: ReactNode }) {
+  const startDate = parseISO("2021-10-01");
+
+  const ticks = Array.from(
+    Array(differenceInMonths(new Date(), startDate) + 1)
+  ).map((_, i) => addMonths(startDate, i).getTime());
+
+  let formatter = Intl.NumberFormat("en", { notation: "compact" });
+
   return (
     <div style={{ width: "100%", height: "400px" }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -52,10 +60,11 @@ export function BaseAreaGraph({
             scale="time"
             type="number"
             tickFormatter={dateFormatter}
-            domain={["dataMin", "dataMax"]}
+            domain={[() => startDate.getTime(), "dataMax"]}
+            ticks={ticks}
           />
           <YAxis
-            tickFormatter={(value) => formatNumber(value)}
+            tickFormatter={(tick) => formatter.format(tick)}
             // domain={[0, (max: number) => max * 1.1]}
           />
           <Tooltip

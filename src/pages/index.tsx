@@ -112,13 +112,18 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 
 export async function getData(records: Record[]) {
   let previous = { timestamp: new Date(records[0].timestamp).getTime() };
-  return records
-    .map<{
-      timestamp: number;
-    }>(({ type, total, timestamp }) => ({
-      [type]: total,
-      timestamp: new Date(timestamp).getTime(),
-    }))
+
+  let temp = records.map<{
+    timestamp: number;
+  }>(({ type, total, timestamp }) => ({
+    [type]: total,
+    timestamp: new Date(timestamp).getTime(),
+  }));
+
+  //add a value for now at the end to extend the graph to now
+  temp.push({ timestamp: new Date().getTime() });
+
+  return temp
     .map((current) => {
       const out = { ...previous, ...current };
       return (previous = out);
