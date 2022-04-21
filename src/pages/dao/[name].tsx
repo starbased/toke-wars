@@ -9,6 +9,8 @@ import { Divider } from "@chakra-ui/react";
 import { getData } from "../index";
 import { updateAll } from "../../tokeTokenAmounts";
 import { addDays } from "date-fns";
+import { ResourcesCard } from "../../components/ResourcesCard";
+import { CoinInfo, getGeckoData } from "../../util/api/coinGecko";
 
 type Props = {
   dao: Dao;
@@ -19,6 +21,7 @@ type Props = {
     tToke?: number;
     newStake?: number;
   }[];
+  geckoData: CoinInfo;
 };
 
 type LocalRecord = {
@@ -36,7 +39,7 @@ function getTotal(obj?: { timestamp: number } & Record<string, number>) {
   return Object.values(lastValues).reduce((a, b) => a + b);
 }
 
-export default function Index({ dao, data, address }: Props) {
+export default function Index({ dao, data, address, geckoData }: Props) {
   if (isEmpty(data)) {
     return <div>Nothing here</div>;
   }
@@ -59,9 +62,9 @@ export default function Index({ dao, data, address }: Props) {
         total={total}
         changePercent={changePercent}
       />
-      <Divider />
-      {/*<ResourcesCard token={dao.coingecko} />*/}
       <TokeGraph data={data} />
+      <Divider />
+      <ResourcesCard geckoData={geckoData} />
     </Page>
   );
 }
@@ -99,7 +102,9 @@ export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
     })
   ).address;
 
-  return { props: { dao, data, address }, revalidate: 60 * 5 };
+  const geckoData = await getGeckoData(dao.geckoId);
+
+  return { props: { dao, data, address, geckoData }, revalidate: 60 * 5 };
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {

@@ -5,12 +5,19 @@ import { prisma } from "../util/db";
 import { isEqual } from "date-fns";
 import { TokeGraph } from "../components/TokeGraph";
 import { DAOS, REACTORS } from "../constants";
-import { SimpleGrid, Stat, StatHelpText, StatNumber } from "@chakra-ui/react";
+import {
+  Divider,
+  SimpleGrid,
+  Stat,
+  StatHelpText,
+  StatNumber,
+} from "@chakra-ui/react";
 import { BaseCard } from "../components/DaoDetailsCard";
 import { formatMoney, formatNumber } from "../util/maths";
 import { CoinInfo, getGeckoData } from "../util/api/coinGecko";
 import { DaosGraph } from "../components/DaosGraph";
 import { updateAll } from "../tokeTokenAmounts";
+import { ResourcesCard } from "../components/ResourcesCard";
 
 type Props = {
   data: {
@@ -73,6 +80,8 @@ export default function Home({ dao_data, data, geckoData }: Props) {
       </SimpleGrid>
       <DaosGraph data={dao_data} />
       <TokeGraph data={data} />
+      <Divider />
+      <ResourcesCard geckoData={geckoData} />
     </Page>
   );
 }

@@ -36,6 +36,7 @@ model Dao {
   name         String       @id(map: "daos_pk") @unique(map: "daos_name_uindex") @db.VarChar
   stage        Int
   coin         String       @default("TBD") @db.VarChar
+  geckoId      String       @default("something") @map("gecko_id") @db.VarChar
   daoAddresses DaoAddress[] @relation("dao_addressesTodaos")
 
   @@map("daos")
