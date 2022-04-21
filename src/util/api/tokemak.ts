@@ -9,9 +9,10 @@ export async function tokePrice() {
 }
 
 export function useTokePrice(cachedTokePrice?: number) {
-  return useQuery(["tokePrice"], tokePrice, {
+  const { data } = useQuery(["tokePrice"], tokePrice, {
     placeholderData: cachedTokePrice,
     refetchInterval: 1000 * 60,
     staleTime: 1000 * 60,
   });
+  return data || 0;
 }

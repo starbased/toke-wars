@@ -7,6 +7,7 @@ import { isEqual } from "date-fns";
 import { TokeGraph } from "../../components/TokeGraph";
 import { DaoDetailsCard } from "../../components/DaoDetailsCard";
 import { Divider } from "@chakra-ui/react";
+import { getData } from "../index";
 
 type Props = {
   dao: Dao;
@@ -70,20 +71,7 @@ export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
       order by block_number
 `;
 
-  let previous = { block_number: records[0].block_number };
-  const data = records
-    .map(({ type, total, block_number }) => ({
-      [type]: total,
-      block_number,
-    }))
-    .map((current) => {
-      const out = { ...previous, ...current };
-      return (previous = out);
-    })
-    .filter(
-      ({ block_number }, i, array) =>
-        !isEqual(block_number, array[i + 1]?.block_number)
-    );
+  const data = await getData(records);
 
   const address = (
     await prisma.daoAddress.findFirst({

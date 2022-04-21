@@ -16,7 +16,6 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
-import { DaoInformation } from "../constants";
 import { formatMoney, formatNumber, shortenAddress } from "../util/maths";
 import { stageMap } from "../pages/stages";
 import { useTokePrice } from "../util/api/tokemak";
@@ -62,8 +61,7 @@ interface StatsCardProps {
   /* icon: ReactNode; */
 }
 function StatsCard({ title, total, changePercent }: StatsCardProps) {
-  const { data } = useTokePrice();
-  const toke_price = data || 0;
+  const toke_price = useTokePrice();
 
   return (
     <BaseCard title={title}>

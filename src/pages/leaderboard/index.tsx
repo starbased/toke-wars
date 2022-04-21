@@ -38,8 +38,7 @@ export default function Leaderboard({
 }: Props) {
   const total = daos.reduce((acc, { toke }) => acc + toke, 0);
 
-  const { data } = useTokePrice(cachedTokePrice);
-  const toke_price = data || 0;
+  const toke_price = useTokePrice(cachedTokePrice);
 
   return (
     <Page header="Leaderboard">

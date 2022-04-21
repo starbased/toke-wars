@@ -8,7 +8,7 @@ export const geckoAPI = axios.create({
   },
 });
 
-type CoinInfo = {
+export type CoinInfo = {
   id: string;
   symbol: string;
   name: string;
