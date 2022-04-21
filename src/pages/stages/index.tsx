@@ -73,6 +73,7 @@ type StageInfo = {
   title: string;
   description: string;
 };
+
 export const stageMap: Record<number, StageInfo> = {
   1: {
     title: "Incentivized Liquidity via Emissions",

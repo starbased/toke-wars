@@ -93,7 +93,7 @@ export function Header() {
               {sortBy(DAOS, "name").map(({ name }) => (
                 <MenuItem
                   key={name}
-                  onClick={() => router.push(`daos/${name}`)}
+                  onClick={() => router.push(`/dao/${name}`)}
                 >
                   {name}
                 </MenuItem>
@@ -112,9 +112,9 @@ export function Header() {
                 DAOs
               </MenuButton>
               <MenuList>
-                {sortBy(DAOS, "name").map(({ name }) => (
+                {sortBy(DAOS, "nam").map(({ name }) => (
                   <MenuItem key={name}>
-                    <Link href={`daos/${name}`}> {name}</Link>
+                    <Link href={`/daos/${name}`}> {name}</Link>
                   </MenuItem>
                 ))}
               </MenuList>
