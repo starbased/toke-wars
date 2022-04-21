@@ -1,82 +1,39 @@
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { formatNumber } from "../util/maths";
+import { Area } from "recharts";
 import { orderBy } from "lodash";
+import { BaseAreaGraph } from "./TokeGraph";
 
 type Props = {
   data: {
-    block_number: number;
+    timestamp: number;
   }[];
 };
 
 export function DaosGraph({ data }: Props) {
-  const foo = orderBy(
+  const orderedDaos = orderBy(
     Object.entries(data[data.length - 1])
       .map(([name, total]) => ({
         name,
         total,
       }))
-      .filter(({ name }) => name !== "block_number"),
+      .filter(({ name }) => name !== "timestamp"),
     "total",
     "desc"
   );
 
   return (
-    <div style={{ width: "100%", height: "400px" }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart
-          data={data}
-          margin={{
-            top: 0,
-            right: 75,
-            left: 75,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="block_number"
-            // scale="time"
-            type="number"
-            // tickFormatter={dateFormatter}
-            domain={[13401006, "dataMax"]}
-            // @ts-ignore
-            // ticks={ticks}
-          />
-          <YAxis
-            tickFormatter={(value) => formatNumber(value)}
-            // domain={[0, (max: number) => max * 1.1]}
-          />
-          <Tooltip
-            // labelFormatter={labelFunction}
-            labelStyle={{ color: "black" }}
-            formatter={(value: any) => {
-              return formatNumber(Number(value));
-            }}
-          />
-          <Legend />
-          {foo.map(({ name }, i) => (
-            <Area
-              key={name}
-              dataKey={name}
-              type="stepAfter"
-              name={name}
-              stackId="1"
-              fill={graphColors[i]}
-              stroke={graphColors[i]}
-            />
-          ))}
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
+    <BaseAreaGraph data={data}>
+      {orderedDaos.map(({ name }, i) => (
+        <Area
+          key={name}
+          dataKey={name}
+          type="stepAfter"
+          name={name}
+          stackId="1"
+          fill={graphColors[i]}
+          stroke={graphColors[i]}
+        />
+      ))}
+    </BaseAreaGraph>
   );
 }
 

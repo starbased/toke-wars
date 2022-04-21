@@ -9,14 +9,32 @@ import {
   YAxis,
 } from "recharts";
 import { formatNumber } from "../util/maths";
+import { intlFormat } from "date-fns";
+import { BigNumber } from "bignumber.js";
+import { ReactNode } from "react";
+import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
 type Props = {
   data: {
-    block_number: number;
+    timestamp: number;
   }[];
 };
 
-export function TokeGraph({ data }: Props) {
+export const dateFormatter = (date: number) => intlFormat(new Date(date));
+
+export const labelFunction = (
+  label: number,
+  payload: Array<Payload<number, string>>
+) => {
+  const total = payload.map((obj) => obj.value || 0).reduce((a, b) => a + b, 0);
+
+  return dateFormatter(label) + ` (${formatNumber(total)})`;
+};
+
+export function BaseAreaGraph({
+  data,
+  children,
+}: Props & { children: ReactNode }) {
   return (
     <div style={{ width: "100%", height: "400px" }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -31,50 +49,56 @@ export function TokeGraph({ data }: Props) {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
-            dataKey="block_number"
-            // scale="time"
+            dataKey="timestamp"
+            scale="time"
             type="number"
-            // tickFormatter={dateFormatter}
-            domain={[13401006, "dataMax"]}
-            // @ts-ignore
-            // ticks={ticks}
+            tickFormatter={dateFormatter}
+            domain={["dataMin", "dataMax"]}
           />
           <YAxis
             tickFormatter={(value) => formatNumber(value)}
             // domain={[0, (max: number) => max * 1.1]}
           />
           <Tooltip
-            // labelFormatter={labelFunction}
+            labelFormatter={labelFunction}
             labelStyle={{ color: "black" }}
             formatter={(value: any) => {
               return formatNumber(Number(value));
             }}
           />
           <Legend />
-          <Area
-            type="stepAfter"
-            dataKey="newStake"
-            name="TOKE (Migrated)"
-            stackId="1"
-          />
-          <Area
-            type="stepAfter"
-            dataKey="tToke"
-            name="tTOKE"
-            stroke="#8884d8"
-            fill="#8884d8"
-            stackId="1"
-          />
-          <Area
-            type="stepAfter"
-            dataKey="toke"
-            name="TOKE"
-            stroke="#82ca9d"
-            fill="#82ca9d"
-            stackId="1"
-          />
+          {children}
         </AreaChart>
       </ResponsiveContainer>
     </div>
+  );
+}
+
+export function TokeGraph({ data }: Props) {
+  return (
+    <BaseAreaGraph data={data}>
+      <Area
+        type="stepAfter"
+        dataKey="newStake"
+        name="TOKE (Migrated)"
+        stackId="1"
+      />
+      <Area
+        type="stepAfter"
+        dataKey="tToke"
+        name="tTOKE"
+        stroke="#8884d8"
+        fill="#8884d8"
+        stackId="1"
+      />
+      <Area
+        type="stepAfter"
+        dataKey="toke"
+        name="TOKE"
+        stroke="#82ca9d"
+        fill="#82ca9d"
+        stackId="1"
+      />
+    </BaseAreaGraph>
   );
 }

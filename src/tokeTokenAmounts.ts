@@ -5,7 +5,7 @@ import {
   TOKE_CONTRACT,
   TOKE_STAKING_CONTRACT,
 } from "./constants";
-import { getProvider } from "./util";
+import { getBlocks, getProvider } from "./util";
 import { ERC20__factory, TokeStaking__factory } from "./typechain";
 import { TypedEvent } from "./typechain/common";
 import {
@@ -13,14 +13,33 @@ import {
   WithdrawCompletedEvent,
 } from "./typechain/TokeStaking";
 import { TransferEvent } from "./typechain/ERC20";
+import { isEmpty } from "lodash";
 
+/**
+ * Updates toke, tToke and staked toke amounts
+ */
 export async function updateAll() {
-  await updateErc20("toke");
-  await updateErc20("tToke");
-  await updateNewStaking();
+  const newEntries = (
+    await Promise.all([
+      updateErc20("toke"),
+      updateErc20("tToke"),
+      updateNewStaking(),
+    ])
+  ).flatMap((obj) => obj);
+
+  await getBlocks(newEntries.map((obj) => obj.blockNumber));
+
+  return newEntries;
 }
 
-async function getBlocks(
+/**
+ * Finds the start and end block for a given set of addresses
+ * @param forceRefresh Forces refresh from the blockchain ignoring values in the database
+ *
+ * @param type the type of toke
+ * @param addresses addresses to update, If excluded then all dao addresses will be updated
+ */
+async function getStartEndBlocks(
   forceRefresh: boolean,
   type: string,
   addresses?: string[]
@@ -58,6 +77,11 @@ async function getBlocks(
   return { fromBlock, toBlock, addresses };
 }
 
+/**
+ * Updates staked toke
+ * @param forceRefresh Forces refresh from the blockchain
+ * @param inAddresses addresses to update, If excluded all dao addresses will be updated
+ */
 export async function updateNewStaking(
   forceRefresh = false,
   inAddresses?: string[]
@@ -69,7 +93,7 @@ export async function updateNewStaking(
   );
   const type = "newStake";
 
-  const { fromBlock, toBlock, addresses } = await getBlocks(
+  const { fromBlock, toBlock, addresses } = await getStartEndBlocks(
     forceRefresh,
     type,
     inAddresses
@@ -97,25 +121,34 @@ export async function updateNewStaking(
   const filter = (obj: DepositedEvent | WithdrawCompletedEvent) =>
     addressSet.has(obj.args.account);
 
-  await prisma.$transaction([
-    prisma.daoTransaction.createMany({
-      data: deposit.filter(filter).map((obj) => ({
-        ...commonTransform(obj),
-        value: obj.args.amount.toString(),
-        daoAddress: obj.args.account,
-      })),
-    }),
+  const toSave = [
+    ...deposit.filter(filter).map((obj) => ({
+      ...commonTransform(obj),
+      value: obj.args.amount.toString(),
+      daoAddress: obj.args.account,
+    })),
+    ...withdrawal.filter(filter).map((obj) => ({
+      ...commonTransform(obj),
+      value: "-" + obj.args.amount.toString(),
+      daoAddress: obj.args.account,
+    })),
+  ];
 
-    prisma.daoTransaction.createMany({
-      data: withdrawal.filter(filter).map((obj) => ({
-        ...commonTransform(obj),
-        value: "-" + obj.args.amount.toString(),
-        daoAddress: obj.args.account,
-      })),
-    }),
-  ]);
+  if (!isEmpty(toSave)) {
+    await prisma.daoTransaction.createMany({
+      data: toSave,
+    });
+  }
+
+  return toSave;
 }
 
+/**
+ * Updates ERC20 based toke
+ * @param type type to update
+ * @param forceRefresh Forces refresh from the blockchain
+ * @param inAddresses addresses to update, If excluded all dao addresses will be updated
+ */
 export async function updateErc20(
   type: "tToke" | "toke",
   forceRefresh = false,
@@ -134,7 +167,7 @@ export async function updateErc20(
   const provider = getProvider();
   const contract = ERC20__factory.connect(contract_address, provider);
 
-  const { fromBlock, toBlock, addresses } = await getBlocks(
+  const { fromBlock, toBlock, addresses } = await getStartEndBlocks(
     forceRefresh,
     type,
     inAddresses
@@ -165,21 +198,24 @@ export async function updateErc20(
     type,
   });
 
-  await prisma.$transaction([
-    prisma.daoTransaction.createMany({
-      data: fromEvents.map((obj) => ({
-        ...commonTransform(obj),
-        value: "-" + obj.args.value.toString(),
-        daoAddress: obj.args.from,
-      })),
-    }),
+  const toSave = [
+    ...fromEvents.map((obj) => ({
+      ...commonTransform(obj),
+      value: "-" + obj.args.value.toString(),
+      daoAddress: obj.args.from,
+    })),
+    ...toEvents.map((obj) => ({
+      ...commonTransform(obj),
+      value: obj.args.value.toString(),
+      daoAddress: obj.args.to,
+    })),
+  ];
 
-    prisma.daoTransaction.createMany({
-      data: toEvents.map((obj) => ({
-        ...commonTransform(obj),
-        value: obj.args.value.toString(),
-        daoAddress: obj.args.to,
-      })),
-    }),
-  ]);
+  if (!isEmpty(toSave)) {
+    await prisma.daoTransaction.createMany({
+      data: toSave,
+    });
+  }
+
+  return toSave;
 }

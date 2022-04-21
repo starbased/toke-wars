@@ -10,30 +10,31 @@ import { BaseCard } from "../components/DaoDetailsCard";
 import { formatMoney, formatNumber } from "../util/maths";
 import { CoinInfo, getGeckoData } from "../util/api/coinGecko";
 import { DaosGraph } from "../components/DaosGraph";
+import { updateAll } from "../tokeTokenAmounts";
 
 type Props = {
   data: {
-    block_number: number;
+    timestamp: number;
     toke?: number;
     tToke?: number;
     newStake?: number;
   }[];
   dao_data: {
-    block_number: number;
+    timestamp: number;
   }[];
   geckoData: CoinInfo;
 };
 
 type Record = {
   type: string;
-  block_number: number;
   total: number;
+  timestamp: number;
 };
 
 export default function Home({ dao_data, data, geckoData }: Props) {
   const toke_price = useTokePrice();
 
-  const { block_number, ...lastValues } = data[data.length - 1];
+  const { timestamp, ...lastValues } = data[data.length - 1];
 
   const total = Object.values(lastValues).reduce((a, b) => a + b);
 
@@ -77,24 +78,28 @@ export default function Home({ dao_data, data, geckoData }: Props) {
 }
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
+  await updateAll();
+
   const records = await prisma.$queryRaw<Record[]>`
       select type,
-             block_number,
-             round(sum(value) over (PARTITION BY type order by block_number) / 10 ^ 18::numeric, 0)::bigint as total
+             round(sum(value) over (PARTITION BY type order by block_number) / 10 ^ 18::numeric, 0)::bigint as total,
+             timestamp
       from daos
                inner join dao_addresses da on daos.name = da.dao_name
                inner join dao_transactions dt on da.address = dt.dao_address
+               inner join blocks on block_number = number
       order by block_number
   `;
   const data = await getData(records);
 
   const dao_records = await prisma.$queryRaw<Record[]>`
       select name as type,
-             block_number,
-             round(sum(value) over (PARTITION BY name order by block_number) / 10 ^ 18::numeric, 0)::bigint as total
+             round(sum(value) over (PARTITION BY name order by block_number) / 10 ^ 18::numeric, 0)::bigint as total,
+             timestamp
       from daos
                inner join dao_addresses da on daos.name = da.dao_name
                inner join dao_transactions dt on da.address = dt.dao_address
+               inner join blocks on block_number = number
       order by block_number
       `;
 
@@ -106,20 +111,19 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 };
 
 export async function getData(records: Record[]) {
-  let previous = { block_number: records[0].block_number };
+  let previous = { timestamp: new Date(records[0].timestamp).getTime() };
   return records
     .map<{
-      block_number: number;
-    }>(({ type, total, block_number }) => ({
+      timestamp: number;
+    }>(({ type, total, timestamp }) => ({
       [type]: total,
-      block_number,
+      timestamp: new Date(timestamp).getTime(),
     }))
     .map((current) => {
       const out = { ...previous, ...current };
       return (previous = out);
     })
     .filter(
-      ({ block_number }, i, array) =>
-        !isEqual(block_number, array[i + 1]?.block_number)
+      ({ timestamp }, i, array) => !isEqual(timestamp, array[i + 1]?.timestamp)
     );
 }

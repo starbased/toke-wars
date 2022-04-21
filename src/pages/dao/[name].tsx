@@ -8,12 +8,13 @@ import { TokeGraph } from "../../components/TokeGraph";
 import { DaoDetailsCard } from "../../components/DaoDetailsCard";
 import { Divider } from "@chakra-ui/react";
 import { getData } from "../index";
+import { updateAll } from "../../tokeTokenAmounts";
 
 type Props = {
   dao: Dao;
   address: string;
   data: {
-    block_number: number;
+    timestamp: number;
     toke?: number;
     tToke?: number;
     newStake?: number;
@@ -22,7 +23,7 @@ type Props = {
 
 type Record = {
   type: string;
-  block_number: number;
+  timestamp: number;
   total: number;
 };
 
@@ -31,7 +32,7 @@ export default function Index({ dao, data, address }: Props) {
     return <div>Nothing here</div>;
   }
 
-  const { block_number, ...lastValues } = data[data.length - 1];
+  const { timestamp, ...lastValues } = data[data.length - 1];
 
   const total = Object.values(lastValues).reduce((a, b) => a + b);
 
@@ -53,6 +54,8 @@ export default function Index({ dao, data, address }: Props) {
 export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
   params,
 }) => {
+  await updateAll();
+
   const name = params!.name;
 
   const dao = await prisma.dao.findUnique({
@@ -62,11 +65,12 @@ export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
 
   const records = await prisma.$queryRaw<Record[]>`
       select type,
-             block_number,
+             timestamp,
              round(sum(value) over (PARTITION BY type order by block_number) / 10 ^ 18::numeric, 0)::bigint as total
       from daos
                inner join dao_addresses da on daos.name = da.dao_name
                inner join dao_transactions dt on da.address = dt.dao_address
+               inner join blocks on block_number = number
       where name = ${name}
       order by block_number
 `;

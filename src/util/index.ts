@@ -1,16 +1,26 @@
 import { providers } from "ethers";
 import { prisma } from "./db";
 import { Block } from "@prisma/client";
+import { chunk } from "lodash";
 
 export function getProvider() {
   return new providers.InfuraProvider(1, "c226490be8074be596c1106d790aa6a3");
 }
 
-export async function getBlocks(numbers: number[]) {
-  const provider = getProvider();
-
+export async function getBlocks(rawNumbers: number[]) {
   //dedup
-  numbers = Array.from(new Set(numbers));
+  const numbers = Array.from(new Set(rawNumbers));
+
+  const output = [];
+  for (let numberChunk of chunk(numbers, 100)) {
+    output.push(...(await getBlocksChunk(numberChunk)));
+  }
+
+  return output;
+}
+
+async function getBlocksChunk(numbers: number[]) {
+  const provider = getProvider();
 
   const known = await prisma.block.findMany({
     where: { number: { in: numbers } },
@@ -23,6 +33,7 @@ export async function getBlocks(numbers: number[]) {
   let toSave: Block[] = [];
   for (let number of needed) {
     const block = await provider.getBlock(number);
+    console.log("Adding new block:", number);
     toSave.push({ number, timestamp: new Date(block.timestamp * 1000) });
   }
 
