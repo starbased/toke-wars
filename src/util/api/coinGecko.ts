@@ -48,7 +48,7 @@ export async function getHistoricalPrice(coin: string) {
   );
 }
 
-export async function useGeckoData(coin?: string) {
+export async function getGeckoData(coin?: string) {
   const { data } = await geckoAPI.get<CoinInfo>(`coins/${coin}`, {
     params: {
       localization: "en",

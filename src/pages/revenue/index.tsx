@@ -22,7 +22,7 @@ import { formatEther } from "ethers/lib/utils";
 import { GetStaticProps } from "next";
 import { faTerminal } from "@fortawesome/free-solid-svg-icons";
 import { getProvider } from "../../util";
-import { useGeckoData } from "../../util/api/coinGecko";
+import { getGeckoData } from "../../util/api/coinGecko";
 import { BigNumber } from "bignumber.js";
 
 type Props = {
@@ -219,7 +219,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
         value: value.toString(),
       }));
 
-      const gecko_data = await useGeckoData(gecko_id);
+      const gecko_data = await getGeckoData(gecko_id);
 
       return {
         coin: name,

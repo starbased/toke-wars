@@ -8,7 +8,7 @@ import { DAOS, REACTORS } from "../constants";
 import { SimpleGrid, Stat, StatHelpText, StatNumber } from "@chakra-ui/react";
 import { BaseCard } from "../components/DaoDetailsCard";
 import { formatMoney, formatNumber } from "../util/maths";
-import { CoinInfo, useGeckoData } from "../util/api/coinGecko";
+import { CoinInfo, getGeckoData } from "../util/api/coinGecko";
 import { DaosGraph } from "../components/DaosGraph";
 
 type Props = {
@@ -100,7 +100,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 
   const dao_data = await getData(dao_records);
 
-  const geckoData = await useGeckoData("tokemak");
+  const geckoData = await getGeckoData("tokemak");
 
   return { props: { dao_data, data, geckoData }, revalidate: 60 * 5 };
 };
