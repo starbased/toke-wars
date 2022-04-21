@@ -40,7 +40,13 @@ type Props = {
 function Coin({ coin }: { coin: string }) {
   return (
     <div style={{ display: "flex", gap: "5px" }}>
-      {coin} <Image height={20} width={20} src={`/images/coins/${coin}.png`} />
+      {coin}{" "}
+      <Image
+        height={20}
+        width={20}
+        src={`/images/coins/${coin}.png`}
+        alt={""}
+      />
     </div>
   );
 }
