@@ -51,7 +51,7 @@ export default function Revenue({ values }: Props) {
     };
   });
 
-  const data = sortBy(
+  const data = orderBy(
     values.flatMap(({ coin, transactions, price }) =>
       transactions.map((tx) => {
         const amount = new BigNumber(tx.value).div(10 ** 18);
@@ -63,7 +63,8 @@ export default function Revenue({ values }: Props) {
         };
       })
     ),
-    "blockNumber"
+    "blockNumber",
+    "desc"
   );
 
   return (
