@@ -76,7 +76,11 @@ function StatsCard({ title, total, changePercent }: StatsCardProps) {
         </Skeleton>
         <Skeleton isLoaded={total > 0}>
           <StatHelpText>
-            <StatArrow type="increase" />
+            {changePercent < 0 ? (
+              <StatArrow type="decrease" />
+            ) : (
+              <StatArrow type="increase" />
+            )}
             {/* 
                 get percent increase
                 if newStaking contains sum totals,

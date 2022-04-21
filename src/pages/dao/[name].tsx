@@ -8,6 +8,7 @@ import { DaoDetailsCard } from "../../components/DaoDetailsCard";
 import { Divider } from "@chakra-ui/react";
 import { getData } from "../index";
 import { updateAll } from "../../tokeTokenAmounts";
+import { addDays } from "date-fns";
 
 type Props = {
   dao: Dao;
@@ -20,20 +21,35 @@ type Props = {
   }[];
 };
 
-type Record = {
+type LocalRecord = {
   type: string;
   timestamp: number;
   total: number;
 };
+
+function getTotal(obj?: { timestamp: number } & Record<string, number>) {
+  if (!obj) {
+    return 0;
+  }
+  const { timestamp, ...lastValues } = obj;
+
+  return Object.values(lastValues).reduce((a, b) => a + b);
+}
 
 export default function Index({ dao, data, address }: Props) {
   if (isEmpty(data)) {
     return <div>Nothing here</div>;
   }
 
-  const { timestamp, ...lastValues } = data[data.length - 1];
+  const total = getTotal(data[data.length - 1]);
 
-  const total = Object.values(lastValues).reduce((a, b) => a + b);
+  const daysAgo = addDays(new Date(), -30).getTime();
+
+  const pastTotal = getTotal(
+    [...data].reverse().find((event) => event.timestamp < daysAgo)
+  );
+
+  const changePercent = (total / pastTotal - 1) * 100;
 
   return (
     <Page header={dao.name}>
@@ -41,7 +57,7 @@ export default function Index({ dao, data, address }: Props) {
         stage={dao.stage}
         address={address}
         total={total}
-        changePercent={1}
+        changePercent={changePercent}
       />
       <Divider />
       {/*<ResourcesCard token={dao.coingecko} />*/}
@@ -62,7 +78,7 @@ export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
     rejectOnNotFound: true,
   });
 
-  const records = await prisma.$queryRaw<Record[]>`
+  const records = await prisma.$queryRaw<LocalRecord[]>`
       select type,
              timestamp,
              round(sum(value) over (PARTITION BY type order by block_number) / 10 ^ 18::numeric, 0)::bigint as total
