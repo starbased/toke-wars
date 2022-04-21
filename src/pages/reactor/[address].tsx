@@ -1,12 +1,7 @@
 import { TAsset__factory, TokemakManager__factory } from "../../typechain";
 import { getProvider } from "../../util";
 import { GetStaticPaths, GetStaticProps } from "next";
-import {
-  BURN,
-  REACTORS,
-  T_TOKE_CONTRACT,
-  TOKEMAK_MANAGER,
-} from "../../util/constants";
+import { BURN, T_TOKE_CONTRACT, TOKEMAK_MANAGER } from "../../constants";
 import { prisma } from "../../util/db";
 import { eachMonthOfInterval, parseISO } from "date-fns";
 import { Block, Provider } from "@ethersproject/providers";
@@ -352,9 +347,7 @@ export const getStaticProps: GetStaticProps<
   return {
     props: {
       address,
-      symbol:
-        REACTORS.find(([reactorAddress]) => reactorAddress === address)?.[1] ||
-        "",
+      symbol: reactor.symbol,
       events,
       reactors: await prisma.reactor.findMany(),
     },

@@ -1,7 +1,9 @@
 import type { NextPage } from "next";
+import { useTokePrice } from "../util/api/tokemak";
 
 const Home: NextPage = () => {
-  return <div>update later</div>;
+  const { data } = useTokePrice();
+  return <div>Toke price {data}</div>;
 };
 
 export default Home;

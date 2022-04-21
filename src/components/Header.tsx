@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { sortBy } from "lodash";
-import { DAOS } from "../util/constants";
+import { DAOS } from "../constants";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";

@@ -78,11 +78,6 @@ export const DAOS: DaoInformation[] = [
     coingecko: "havven",
     discord: "invite/AEdUHzt",
   },
-  // {
-  //   addresses: ["0x42e61987a5cba002880b3cc5c800952a5804a1c5"],
-  //   name: "SquidDAO",
-  // },
-  // { addresses: ["0xf2c58cca8ce82df7a2A4f7F936608d61f45a9a47"], name: "Gamma" },
   {
     addresses: [
       "0x086C98855dF3C78C6b481b6e1D47BeF42E9aC36B",

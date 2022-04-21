@@ -6,6 +6,8 @@ import { Footer } from "../components/Footer";
 import { ChakraProvider } from "@chakra-ui/react";
 import { extendTheme } from "@chakra-ui/react";
 import Head from "next/head";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { useState } from "react";
 
 const config = {
   initialColorMode: "dark",
@@ -15,6 +17,8 @@ const config = {
 const theme = extendTheme({ config });
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
     <>
       <Head>
@@ -22,13 +26,15 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/favicon.png" />
       </Head>
       <ChakraProvider theme={theme}>
-        <Header />
-        <main>
-          <Container maxW="container.xl" my="10">
-            <Component {...pageProps} />
-          </Container>
-        </main>
-        <Footer />
+        <QueryClientProvider client={queryClient}>
+          <Header />
+          <main>
+            <Container maxW="container.xl" my="10">
+              <Component {...pageProps} />
+            </Container>
+          </main>
+          <Footer />
+        </QueryClientProvider>
       </ChakraProvider>
     </>
   );
