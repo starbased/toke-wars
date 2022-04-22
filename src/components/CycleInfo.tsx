@@ -3,14 +3,15 @@ import { Stat, StatHelpText, StatNumber } from "@chakra-ui/react";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
 import { BaseCard } from "./DaoDetailsCard";
-import { getProvider } from "../util";
 import { ManagerContract__factory } from "../typechain";
+import { providers } from "ethers";
 
 export function CycleInfo() {
   const { data } = useQuery("managerContract", async () => {
     const contract = ManagerContract__factory.connect(
       "0xA86e412109f77c45a3BC1c5870b880492Fb86A14",
-      getProvider()
+      //TODO: move this call elsewhere
+      new providers.InfuraProvider(1, "c226490be8074be596c1106d790aa6a3")
     );
 
     const cycleIndex = (await contract.getCurrentCycleIndex()).toNumber();

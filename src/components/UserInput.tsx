@@ -26,7 +26,9 @@ export function UserInput({ address }: Props) {
   } = useForm<{ address: string }>();
 
   const onSubmit = handleSubmit((data) =>
-    router.replace(`/rewards/${getAddress(data.address)}`)
+    router.push(`/rewards?address=${getAddress(data.address)}`, undefined, {
+      shallow: true,
+    })
   );
 
   return (

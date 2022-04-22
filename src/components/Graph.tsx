@@ -22,10 +22,10 @@ import {
   Spacer,
   Switch,
 } from "@chakra-ui/react";
-import { CycleInfo } from "./Totals";
+import { CycleInfoType } from "./Totals";
 
 type Props = {
-  rewards: (CycleInfo | undefined)[];
+  rewards: (CycleInfoType | undefined)[];
 };
 
 export const graphColors = [

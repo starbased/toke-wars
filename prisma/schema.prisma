@@ -72,3 +72,10 @@ model Block {
 
   @@map("blocks")
 }
+
+model CycleHash {
+  cycle Int    @id(map: "cycle_hashes_pk") @unique(map: "cycle_hashes_cycle_uindex")
+  hash  String @db.VarChar
+
+  @@map("cycle_hashes")
+}

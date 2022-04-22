@@ -20,18 +20,14 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { Graph } from "./Graph";
 import { CycleInfo } from "./CycleInfo";
-import knownCycleHashes from "../cache/cycleHashes.json";
 import axios from "axios";
 import { useTokePrice } from "../util/api/tokemak";
 import { BaseCard } from "./DaoDetailsCard";
-import { getProvider } from "../util";
 import { formatMoney, formatNumber } from "../util/maths";
-import { REWARDS_CONTRACT } from "../constants";
-import { RewardsHash__factory } from "../typechain";
+import { Graph } from "./Graph";
 
-export type CycleInfo = {
+export type CycleInfoType = {
   payload: {
     cycle: number;
     amount: string;
@@ -45,37 +41,13 @@ export type CycleInfo = {
   };
 };
 
-export function getCycleHash(cycle: number, enabled = true) {
-  return {
-    queryKey: ["cycleHash", cycle],
-    queryFn: () => {
-      const contract = RewardsHash__factory.connect(
-        REWARDS_CONTRACT,
-        getProvider()
-      );
-
-      return contract.cycleHashes(cycle);
-    },
-    enabled,
-    initialData: knownCycleHashes[cycle],
-  };
-}
-
-export function getCycleInfo(
-  address: string,
-  cycle: number,
-  cycleHash?: string[]
-) {
+function getCycleInfo(address: string, cycle: number, cycleHash: string) {
   return {
     queryKey: ["cycleInfo", cycleHash, address],
     queryFn: async () => {
-      if (!cycleHash) throw Error();
-
       try {
-        const { data } = await axios.get<CycleInfo>(
-          `https://ipfs.tokemaklabs.xyz/ipfs/${
-            cycleHash[1]
-          }/${address.toLowerCase()}.json`
+        const { data } = await axios.get<CycleInfoType>(
+          `https://ipfs.tokemaklabs.xyz/ipfs/${cycleHash}/${address.toLowerCase()}.json`
         );
 
         if (cycle === 0) {
@@ -108,40 +80,36 @@ export function getCycleInfo(
         throw error;
       }
     },
-    enabled: !!cycleHash && address !== "",
+    staleTime: Infinity,
   };
 }
 
 type Props = {
-  latestCycle: number;
+  cycleHashes: {
+    cycle: number;
+    hash: string;
+  }[];
   address: string;
 };
 
-export function Totals({ latestCycle, address }: Props) {
+export function Totals({ cycleHashes, address }: Props) {
   const toke_price = useTokePrice();
-  const cycleArray = Array.from(Array((latestCycle || -1) + 1).keys());
-
-  const cycleHashes = useQueries(
-    cycleArray.map((cycle) => getCycleHash(cycle, !!latestCycle))
-  );
 
   const rewards = useQueries(
-    cycleHashes.map(({ data: cycleHash }, i) =>
-      getCycleInfo(address, i, cycleHash)
-    )
+    cycleHashes.map(({ hash }, i) => getCycleInfo(address, i, hash))
   );
 
   //Not returning on loading or idle looks interesting to see the data populating
   //but is pretty bad for performance so just show nothing or loading till done
   const idleFn = ({ isIdle }: { isIdle: boolean }) => isIdle;
-  const idle = cycleHashes.some(idleFn) || rewards.some(idleFn);
+  const idle = rewards.some(idleFn);
 
   if (idle) {
     return null;
   }
 
   const loadingFn = ({ isLoading }: { isLoading: boolean }) => isLoading;
-  const loading = cycleHashes.some(loadingFn) || rewards.some(loadingFn);
+  const loading = rewards.some(loadingFn);
 
   if (loading) {
     return (
@@ -185,7 +153,6 @@ export function Totals({ latestCycle, address }: Props) {
       ? formatEther(lastRewards.data.summary.cycleTotal)
       : "0";
   }
-
   return (
     <>
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
@@ -201,7 +168,7 @@ export function Totals({ latestCycle, address }: Props) {
           </Stat>
         </BaseCard>
 
-        <BaseCard title="Index This Cycle">
+        <BaseCard title="Rewards This Cycle">
           <Stat>
             <StatNumber>
               {formatNumber(parseFloat(rewardsThisCycle), 3)}
