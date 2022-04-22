@@ -4,7 +4,8 @@ import { Block } from "@prisma/client";
 import { chunk } from "lodash";
 
 export function getProvider() {
-  return new providers.InfuraProvider(1, "c226490be8074be596c1106d790aa6a3");
+  console.log(process.env.NEXT_PUBLIC_INFURA_KEY);
+  return new providers.InfuraProvider(1, process.env.NEXT_PUBLIC_INFURA_KEY);
 }
 
 export async function getBlocks(rawNumbers: number[]) {

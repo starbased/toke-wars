@@ -11,7 +11,7 @@ export function CycleInfo() {
     const contract = ManagerContract__factory.connect(
       "0xA86e412109f77c45a3BC1c5870b880492Fb86A14",
       //TODO: move this call elsewhere
-      new providers.InfuraProvider(1, "c226490be8074be596c1106d790aa6a3")
+      new providers.InfuraProvider(1, process.env.NEXT_PUBLIC_INFURA_KEY)
     );
 
     const cycleIndex = (await contract.getCurrentCycleIndex()).toNumber();
