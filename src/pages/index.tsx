@@ -2,7 +2,7 @@ import { useTokePrice } from "../util/api/tokemak";
 import { Page } from "../components/Page";
 import { GetStaticProps } from "next";
 import { prisma } from "../util/db";
-import { isEqual } from "date-fns";
+import { isEqual, startOfDay } from "date-fns";
 import { TokeGraph } from "../components/TokeGraph";
 import { DAOS, REACTORS } from "../constants";
 import {
@@ -138,6 +138,7 @@ export async function getData(records: Record[]) {
       return (previous = out);
     })
     .filter(
-      ({ timestamp }, i, array) => !isEqual(timestamp, array[i + 1]?.timestamp)
+      ({ timestamp }, i, array) =>
+        !isEqual(startOfDay(timestamp), startOfDay(array[i + 1]?.timestamp))
     );
 }

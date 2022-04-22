@@ -1,16 +1,17 @@
 import { TAsset__factory, TokemakManager__factory } from "../../typechain";
-import { getProvider } from "../../util";
+import { getBlocks, getProvider } from "../../util";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { BURN, T_TOKE_CONTRACT, TOKEMAK_MANAGER } from "../../constants";
 import { prisma } from "../../util/db";
-import { eachMonthOfInterval, parseISO } from "date-fns";
-import { Block, Provider } from "@ethersproject/providers";
-import { formatEther, getAddress } from "ethers/lib/utils";
-import { sortBy } from "lodash";
+import { eachMonthOfInterval, isEqual, startOfDay } from "date-fns";
+import { Provider } from "@ethersproject/providers";
+import { getAddress } from "ethers/lib/utils";
+import { isEmpty, sortBy } from "lodash";
 import { useRouter } from "next/router";
 import {
   Area,
   CartesianGrid,
+  ComposedChart,
   Label,
   Legend,
   Line,
@@ -18,7 +19,6 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  ComposedChart,
 } from "recharts";
 import { Box, Divider, HStack, Select } from "@chakra-ui/react";
 import { FaRadiationAlt } from "react-icons/fa/index"; //Don't use all next.js doesn't like it
@@ -28,6 +28,7 @@ import { getHistoricalPrice, search } from "../../util/api/coinGecko";
 import { BigNumber } from "bignumber.js";
 import { formatNumber } from "../../util/maths";
 import { Reactor } from "@prisma/client";
+import { TransferEvent } from "../../typechain/ERC20";
 
 type Props = {
   reactors: Reactor[];
@@ -55,9 +56,16 @@ function Graph({ events }: { events: Event[] }) {
   const ticks = eachMonthOfInterval({
     start: new Date(formattedEvents[0].date),
     end: new Date(),
-  });
+  }).map((obj) => obj.getTime());
 
   let formatter = Intl.NumberFormat("en", { notation: "compact" });
+
+  const yTickFormatter = (tick: number) => {
+    if (tick === 0) {
+      return "";
+    }
+    return formatter.format(tick);
+  };
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -75,21 +83,12 @@ function Graph({ events }: { events: Event[] }) {
           dataKey="date"
           scale="time"
           type="number"
-          domain={[
-            () => ticks[0].getTime(),
-            () => formattedEvents[formattedEvents.length - 1].date,
-          ]}
+          domain={["dataMin", "dataMax"]}
           tickFormatter={dateFormatter}
           tickCount={5}
-          // @ts-ignore
           ticks={ticks}
         />
-        <YAxis
-          tickFormatter={(tick) => {
-            return formatter.format(tick.toFixed());
-          }}
-          unit="$"
-        >
+        <YAxis tickFormatter={yTickFormatter} unit="$">
           <Label
             style={{ fill: "ghostwhite" }}
             value="USD Value"
@@ -101,9 +100,7 @@ function Graph({ events }: { events: Event[] }) {
         <YAxis
           yAxisId="right"
           orientation="right"
-          tickFormatter={(tick) => {
-            return formatter.format(tick);
-          }}
+          tickFormatter={yTickFormatter}
         >
           <Label
             style={{ fill: "ghostwhite" }}
@@ -268,52 +265,20 @@ export const getStaticProps: GetStaticProps<
     throw Error("Unknown tAsset");
   }
 
-  const lastBlock = await prisma.reactorValue.aggregate({
-    _max: {
-      blockNumber: true,
-    },
-    where: { contractAddress: address },
-  });
-
-  const contract = TAsset__factory.connect(address, provider);
-
-  let newEvents = (
-    await Promise.all([
-      contract.queryFilter(
-        contract.filters.Transfer(BURN),
-        (lastBlock._max.blockNumber || 100000) + 1
-      ),
-      await contract.queryFilter(
-        contract.filters.Transfer(undefined, BURN),
-        (lastBlock._max.blockNumber || 100000) + 1
-      ),
-    ])
-  )
-    .flatMap((obj) => obj)
-    .map(({ blockNumber, transactionHash, args: { to, from, value } }) => ({
-      contractAddress: address,
-      blockNumber,
-      transactionHash,
-      to,
-      from,
-      value: (to === BURN ? "-" : "") + value.toString(),
-    }));
-
-  if (newEvents.length > 0) {
-    await prisma.reactorValue.createMany({ data: newEvents });
-  }
+  await updateReactor(address);
 
   const rawEvents = await prisma.$queryRaw<
     {
-      block_number: number;
+      timestamp: string;
       total: string;
     }[]
-  >`select block_number, sum(value) over (order by block_number)::varchar as total
+  >`
+      select timestamp,
+             round(sum(value) over (order by block_number) / 10 ^ 18::numeric, 0)::bigint as total
       from reactor_values
+               inner join blocks on block_number = number
       where contract_address = ${address}
       order by block_number`;
-
-  const currentBlock = await getCurrentBlock();
 
   let historicalPrices: Record<string, number> = { "1": 0 };
 
@@ -325,24 +290,28 @@ export const getStaticProps: GetStaticProps<
 
   let days = Object.keys(historicalPrices);
 
-  const events = rawEvents.map(({ total, block_number }) => {
-    const date = estimateTime(currentBlock, block_number).getTime();
-    total = formatEther(total);
+  const events = rawEvents
+    .map(({ total, timestamp }) => {
+      const date = new Date(timestamp).getTime();
 
-    const value = new BigNumber(total)
-      .times(
-        historicalPrices[
-          days.find((s) => date < parseInt(s)) || days[days.length - 1]
-        ]
-      )
-      .toString();
+      const value = new BigNumber(total)
+        .times(
+          historicalPrices[
+            days.find((s) => date < parseInt(s)) || days[days.length - 1]
+          ]
+        )
+        .toString();
 
-    return {
-      total,
-      date,
-      value,
-    };
-  });
+      return {
+        total,
+        date,
+        value,
+      };
+    })
+    .filter(
+      ({ date }, i, array) =>
+        !isEqual(startOfDay(date), startOfDay(array[i + 1]?.date))
+    );
 
   return {
     props: {
@@ -355,27 +324,55 @@ export const getStaticProps: GetStaticProps<
   };
 };
 
-function estimateTime(
-  currentBlock: Block,
-  block: number,
-  startBlock = 13331168,
-  startTime = parseISO("2021-10-01T04:00:00.000Z")
-) {
-  const totalBlocks = startBlock - currentBlock.number;
+async function updateReactor(address: string) {
+  const lastDBblock =
+    (
+      await prisma.reactorValue.aggregate({
+        _max: {
+          blockNumber: true,
+        },
+        where: { contractAddress: address },
+      })
+    )._max.blockNumber || 100000;
 
-  const totalMs = startTime.getTime() - currentBlock.timestamp * 1000;
+  const contract = TAsset__factory.connect(address, getProvider());
 
-  const msPerBlock = totalMs / totalBlocks;
-  const blocksFromStart = block - startBlock;
+  const commonMap = ({
+    blockNumber,
+    transactionHash,
+    args: { to, from },
+  }: TransferEvent) => ({
+    contractAddress: address,
+    blockNumber,
+    transactionHash,
+    to,
+    from,
+  });
 
-  return new Date(
-    Math.floor(blocksFromStart * msPerBlock) + startTime.getTime()
-  );
-}
+  const createdTokens = (
+    await contract.queryFilter(contract.filters.Transfer(BURN), lastDBblock + 1)
+  ).map((obj) => ({
+    ...commonMap(obj),
+    value: obj.args.value.toString(),
+  }));
 
-async function getCurrentBlock() {
-  const provider = getProvider();
-  const currentBlockNumber = await provider.getBlockNumber();
+  const destroyedTokens = (
+    await contract.queryFilter(
+      contract.filters.Transfer(undefined, BURN),
+      lastDBblock + 1
+    )
+  ).map((obj) => ({
+    ...commonMap(obj),
+    value: "-" + obj.args.value.toString(),
+  }));
 
-  return provider.getBlock(currentBlockNumber);
+  const newEvents = [...createdTokens, ...destroyedTokens];
+
+  if (!isEmpty(newEvents)) {
+    await prisma.reactorValue.createMany({ data: newEvents });
+  }
+
+  await getBlocks(newEvents.map((obj) => obj.blockNumber));
+
+  return newEvents;
 }
