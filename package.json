@@ -9,7 +9,8 @@
     "lint": "next lint",
     "analyze": "cross-env ANALYZE=true next build",
     "typechain:build": "typechain --target ethers-v5 --out-dir src/typechain src/abi/*.json src/abi/**/*.json",
-    "postinstall": "yarn typechain:build"
+    "postinstall": "yarn typechain:build",
+    "vercel-build": "prisma generate && next build"
   },
   "dependencies": {
     "@chakra-ui/icons": "^1.1.7",
