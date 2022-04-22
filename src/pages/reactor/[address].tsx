@@ -24,17 +24,24 @@ import { Box, Divider, HStack, Select } from "@chakra-ui/react";
 import { FaRadiationAlt } from "react-icons/fa/index"; //Don't use all next.js doesn't like it
 import { Page } from "../../components/Page";
 import { LinkCard } from "../../components/LinkCard";
-import { getHistoricalPrice, search } from "../../util/api/coinGecko";
+import {
+  CoinInfo,
+  getGeckoData,
+  getHistoricalPrice,
+  search,
+} from "../../util/api/coinGecko";
 import { BigNumber } from "bignumber.js";
 import { formatNumber } from "../../util/maths";
 import { Reactor } from "@prisma/client";
 import { TransferEvent } from "../../typechain/ERC20";
+import { ResourcesCard } from "../../components/ResourcesCard";
 
 type Props = {
   reactors: Reactor[];
   symbol: string;
   address: string;
   events: Event[];
+  geckoData: CoinInfo | null;
 };
 
 type Event = {
@@ -130,7 +137,7 @@ function Graph({ events }: { events: Event[] }) {
   );
 }
 
-export default function Index({ address, events, reactors }: Props) {
+export default function Index({ address, events, reactors, geckoData }: Props) {
   const router = useRouter();
 
   if (!events) {
@@ -170,15 +177,14 @@ export default function Index({ address, events, reactors }: Props) {
       <div style={{ width: "100%", height: "400px" }}>
         <Graph events={events} />
       </div>
-      <Divider />
-      {/*<ResourcesCard token={token} />*/}
-
       <div style={{ alignSelf: "flex-end", color: "gray" }}>
         Price data from{" "}
         <a href="https://www.coingecko.com" target="_blank" rel="noreferrer">
           CoinGecko
         </a>
       </div>
+      <Divider />
+      {geckoData ? <ResourcesCard geckoData={geckoData} /> : null}
     </Page>
   );
 }
@@ -261,7 +267,7 @@ export const getStaticProps: GetStaticProps<
     (await prisma.reactor.findUnique({ where: { address } })) ||
     (await savePossibleReactor(address, provider));
 
-  if (!reactor.symbol) {
+  if (!reactor || !reactor.symbol) {
     throw Error("Unknown tAsset");
   }
 
@@ -313,12 +319,17 @@ export const getStaticProps: GetStaticProps<
         !isEqual(startOfDay(date), startOfDay(array[i + 1]?.date))
     );
 
+  const geckoData = reactor.coingeckoId
+    ? await getGeckoData(reactor.coingeckoId)
+    : null;
+
   return {
     props: {
       address,
       symbol: reactor.symbol,
       events,
       reactors: await prisma.reactor.findMany(),
+      geckoData,
     },
     revalidate: 60 * 5,
   };
