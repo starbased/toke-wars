@@ -119,7 +119,7 @@ export default function Revenue({ values }: Props) {
             </StatNumber>
           </Stat>
         </BaseCard>
-        <BaseCard title="Projected Yearly Revenue">
+        <BaseCard title="Estimated Yearly Revenue">
           <Stat>
             <StatNumber>
               <Formatter
