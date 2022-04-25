@@ -1,5 +1,5 @@
 function format(number: number | bigint, options: Intl.NumberFormatOptions) {
-  if (!number) {
+  if (number === null || number === undefined) {
     return "";
   }
   return Intl.NumberFormat("en-US", options).format(number);

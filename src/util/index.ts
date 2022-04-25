@@ -4,7 +4,6 @@ import { Block } from "@prisma/client";
 import { chunk } from "lodash";
 
 export function getProvider() {
-  console.log(process.env.NEXT_PUBLIC_INFURA_KEY);
   return new providers.InfuraProvider(1, process.env.NEXT_PUBLIC_INFURA_KEY);
 }
 

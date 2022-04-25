@@ -66,7 +66,7 @@ function StatsCard({ title, total, changePercent }: StatsCardProps) {
   return (
     <BaseCard title={title}>
       <Stat>
-        <Skeleton isLoaded={total > 0}>
+        <Skeleton isLoaded={total >= 0}>
           <StatNumber>
             {formatNumber(total)}
             <Badge ml="2" variant="subtle">
@@ -74,7 +74,7 @@ function StatsCard({ title, total, changePercent }: StatsCardProps) {
             </Badge>
           </StatNumber>
         </Skeleton>
-        <Skeleton isLoaded={total > 0}>
+        <Skeleton isLoaded={total >= 0}>
           <StatHelpText>
             {changePercent < 0 ? (
               <StatArrow type="decrease" />
