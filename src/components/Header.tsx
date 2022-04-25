@@ -112,9 +112,9 @@ export function Header() {
                 DAOs
               </MenuButton>
               <MenuList>
-                {sortBy(DAOS, "nam").map(({ name }) => (
+                {sortBy(DAOS, "name").map(({ name }) => (
                   <MenuItem key={name}>
-                    <Link href={`/daos/${name}`}> {name}</Link>
+                    <Link href={`/dao/${name}`}>{name}</Link>
                   </MenuItem>
                 ))}
               </MenuList>
