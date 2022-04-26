@@ -16,10 +16,9 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
-import { DaoInformation } from "../constants";
-import { stageMap } from "./LiquidityStages";
 import { formatMoney, formatNumber, shortenAddress } from "../util/maths";
-import { useTokePrice } from "../api/coinGecko";
+import { stageMap } from "../pages/stages";
+import { useTokePrice } from "../util/api/tokemak";
 
 type BaseCardProps = {
   title: string;
@@ -62,12 +61,12 @@ interface StatsCardProps {
   /* icon: ReactNode; */
 }
 function StatsCard({ title, total, changePercent }: StatsCardProps) {
-  const { data: toke_price } = useTokePrice();
+  const toke_price = useTokePrice();
 
   return (
     <BaseCard title={title}>
       <Stat>
-        <Skeleton isLoaded={total > 0}>
+        <Skeleton isLoaded={total >= 0}>
           <StatNumber>
             {formatNumber(total)}
             <Badge ml="2" variant="subtle">
@@ -75,9 +74,13 @@ function StatsCard({ title, total, changePercent }: StatsCardProps) {
             </Badge>
           </StatNumber>
         </Skeleton>
-        <Skeleton isLoaded={total > 0}>
+        <Skeleton isLoaded={total >= 0}>
           <StatHelpText>
-            <StatArrow type="increase" />
+            {changePercent < 0 ? (
+              <StatArrow type="decrease" />
+            ) : (
+              <StatArrow type="increase" />
+            )}
             {/* 
                 get percent increase
                 if newStaking contains sum totals,
@@ -111,19 +114,19 @@ function StageCard({ title, stage }: StageCardProps) {
 
 interface StatsLinkCardProps {
   title: string;
-  addresses: string[];
+  address: string;
   /* icon: ReactNode; */
 }
-function StatsLinkCard({ title, addresses }: StatsLinkCardProps) {
+function StatsLinkCard({ title, address }: StatsLinkCardProps) {
   return (
     <BaseCard title={title}>
       <Stat>
         <StatNumber>
-          <Link href={"https://zapper.fi/account/" + addresses[0]} isExternal>
+          <Link href={"https://zapper.fi/account/" + address} isExternal>
             Current Treasury <ExternalLinkIcon mx="2px" />
           </Link>
         </StatNumber>
-        <StatHelpText>{shortenAddress(addresses[0])}</StatHelpText>
+        <StatHelpText>{shortenAddress(address)}</StatHelpText>
       </Stat>
     </BaseCard>
   );
@@ -146,14 +149,18 @@ function SkeletonCard({}: SkeletonCardProps) {
 }
 
 type Props = {
-  dao: DaoInformation;
+  address: string;
+  stage: number;
   total: number;
   changePercent: number;
 };
 
-export function DaoDetailsCard({ dao, total, changePercent }: Props) {
-  const { addresses, stage } = dao;
-
+export function DaoDetailsCard({
+  address,
+  stage,
+  total,
+  changePercent,
+}: Props) {
   if (total < 0) {
     return (
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
@@ -179,7 +186,7 @@ export function DaoDetailsCard({ dao, total, changePercent }: Props) {
       />
       <StatsLinkCard
         title="Zapper"
-        addresses={addresses}
+        address={address}
         /* icon={<GoLocation size={'3em'} />} */
       />
     </SimpleGrid>

@@ -78,11 +78,6 @@ export const DAOS: DaoInformation[] = [
     coingecko: "havven",
     discord: "invite/AEdUHzt",
   },
-  // {
-  //   addresses: ["0x42e61987a5cba002880b3cc5c800952a5804a1c5"],
-  //   name: "SquidDAO",
-  // },
-  // { addresses: ["0xf2c58cca8ce82df7a2A4f7F936608d61f45a9a47"], name: "Gamma" },
   {
     addresses: [
       "0x086C98855dF3C78C6b481b6e1D47BeF42E9aC36B",
@@ -113,7 +108,7 @@ export const DAOS: DaoInformation[] = [
 ];
 
 export const REACTORS = [
-  ["0xd3b5d9a561c293fb42b446fe7e237daa9bf9aa84", "ALCX", "alchemix"],
+  ["0xD3B5D9a561c293Fb42b446FE7e237DaA9BF9AA84", "ALCX", "alchemix"],
   ["0xe7a7D17e2177f66D035d9D50A7f48d8D8E31532D", "OHM", "olympus"],
   ["0xD3D13a578a53685B4ac36A1Bab31912D2B2A2F36", "WETH", "weth"],
   ["0x15A629f0665A3Eb97D7aE9A7ce7ABF73AeB79415", "TCR", "tracer-dao"],
@@ -142,4 +137,8 @@ export const T_TOKE_CONTRACT = "0xa760e26aA76747020171fCF8BdA108dFdE8Eb930";
 export const TOKE_STAKING_CONTRACT =
   "0x96F98Ed74639689C3A11daf38ef86E59F43417D3";
 
+export const TOKEMAK_MANAGER = "0xA86e412109f77c45a3BC1c5870b880492Fb86A14";
+
 export const BURN = "0x0000000000000000000000000000000000000000";
+
+export const REWARDS_CONTRACT = "0x5ec3EC6A8aC774c7d53665ebc5DDf89145d02fB6";

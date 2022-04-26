@@ -1,15 +1,19 @@
 import { Box, chakra, SimpleGrid } from "@chakra-ui/react";
 import { FaBitcoin, FaDiscord, FaTwitter } from "react-icons/fa";
 import { LinkCard } from "./LinkCard";
-import { useGeckoData } from "../api/coinGecko";
 
 type Props = {
-  token: string;
+  geckoData: {
+    id: string;
+    name: string;
+    links: {
+      chat_url: string[];
+      twitter_screen_name: string;
+    };
+  };
 };
 
-export function ResourcesCard({ token }: Props) {
-  const { data: tokenInfo } = useGeckoData(token);
-
+export function ResourcesCard({ geckoData: tokenInfo }: Props) {
   return (
     <Box maxW="7xl" mx="auto" pt={5} px={{ base: 2, sm: 12, md: 17 }}>
       <chakra.h2 textAlign="center" fontSize="xl" pb={8} fontWeight="bold">
