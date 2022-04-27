@@ -270,6 +270,18 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       name: "CRV",
       gecko_id: "curve-dao-token",
     },
+    "0x6c3f90f043a72fa612cbac8115ee7e52bde6e490": {
+      name: "3CRV",
+      gecko_id: "lp-3pool-curve",
+    },
+    "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32": {
+      name: "LDO",
+      gecko_id: "lido-dao",
+    },
+    "0x62B9c7356A2Dc64a1969e19C23e4f579F9810Aa7": {
+      name: "cvxCRV",
+      gecko_id: "convex-crv",
+    },
   };
 
   const provider = getProvider();
