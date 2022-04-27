@@ -1,10 +1,37 @@
 import { providers } from "ethers";
 import { prisma } from "./db";
 import { Block } from "@prisma/client";
-import { chunk } from "lodash";
+import { chunk, isEmpty } from "lodash";
 
 export function getProvider() {
   return new providers.InfuraProvider(1, process.env.NEXT_PUBLIC_INFURA_KEY);
+}
+
+export async function updateDbBlocks() {
+  const numbers = await prisma.$queryRaw<{ block_number: number }[]>`
+      select distinct block_number
+      from (select block_number
+            from reactor_values
+            union all
+            select block_number
+            from dao_transactions) b
+      where not exists(select 1 from blocks where number = block_number)
+  `;
+  const provider = getProvider();
+
+  let toSave: Block[] = [];
+
+  for (let { block_number: number } of numbers) {
+    const block = await provider.getBlock(number);
+    console.log("Adding new block:", number);
+    toSave.push({ number, timestamp: new Date(block.timestamp * 1000) });
+  }
+
+  if (!isEmpty(toSave)) {
+    await prisma.block.createMany({ data: toSave });
+  }
+
+  return toSave;
 }
 
 export async function getBlocks(rawNumbers: number[]) {
@@ -37,7 +64,9 @@ async function getBlocksChunk(numbers: number[]) {
     toSave.push({ number, timestamp: new Date(block.timestamp * 1000) });
   }
 
-  await prisma.block.createMany({ data: toSave });
+  if (!isEmpty(toSave)) {
+    await prisma.block.createMany({ data: toSave });
+  }
 
   return [...known, ...toSave];
 }
