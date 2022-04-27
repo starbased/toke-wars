@@ -72,5 +72,6 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       lastCycle,
       cycleHashes: await getAllCycles(),
     },
+    revalidate: 60 * 5,
   };
 };

@@ -23,6 +23,7 @@ import {
   Switch,
 } from "@chakra-ui/react";
 import { CycleInfoType } from "./Totals";
+import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
 type Props = {
   rewards: (CycleInfoType | undefined)[];
@@ -60,7 +61,7 @@ export function Graph({ rewards }: Props) {
     let last: Record<string, string> = {};
 
     for (let i in rewards) {
-      const nameObj = { name: i.toString() };
+      const nameObj = { name: (parseInt(i) + 1).toString() };
       const data = rewards[i];
 
       if (!data) {
@@ -137,7 +138,16 @@ export function Graph({ rewards }: Props) {
           </YAxis>
           <Tooltip
             contentStyle={{ color: "black" }}
-            labelFormatter={(value) => "Cycle " + value}
+            labelFormatter={(
+              value: string,
+              payload: Payload<string, string>[]
+            ) => {
+              const total = payload
+                .map((obj) => (obj.value ? parseFloat(obj.value) || 0 : 0))
+                .reduce((a, b) => a + b, 0);
+
+              return `Cycle ${value} (${total})`;
+            }}
           />
           <Legend
             wrapperStyle={{ bottom: -5 }}
