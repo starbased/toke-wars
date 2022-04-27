@@ -273,6 +273,8 @@ export const getStaticProps: GetStaticProps<
 
   await updateReactor(address);
 
+  const contract = TAsset__factory.connect(address, getProvider());
+
   const rawEvents = await prisma.$queryRaw<
     {
       timestamp: string;
@@ -280,7 +282,7 @@ export const getStaticProps: GetStaticProps<
     }[]
   >`
       select timestamp,
-             round(sum(value) over (order by block_number) / 10 ^ 18::numeric, 0)::bigint as total
+             round(sum(value) over (order by block_number) / 10 ^ ${await contract.decimals()}::numeric, 0)::bigint as total
       from reactor_values
                inner join blocks on block_number = number
       where contract_address = ${address}
