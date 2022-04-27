@@ -16,6 +16,7 @@ export async function updateDbBlocks() {
             select block_number
             from dao_transactions) b
       where not exists(select 1 from blocks where number = block_number)
+order by block_number
   `;
   const provider = getProvider();
 
@@ -24,11 +25,11 @@ export async function updateDbBlocks() {
   for (let { block_number: number } of numbers) {
     const block = await provider.getBlock(number);
     console.log("Adding new block:", number);
-    toSave.push({ number, timestamp: new Date(block.timestamp * 1000) });
-  }
-
-  if (!isEmpty(toSave)) {
-    await prisma.block.createMany({ data: toSave });
+    const output = { number, timestamp: new Date(block.timestamp * 1000) };
+    toSave.push(output);
+    await prisma.block.createMany({
+      data: [output],
+    });
   }
 
   return toSave;

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "blocks" ALTER COLUMN "timestamp" SET DATA TYPE TIMESTAMPTZ(6);

@@ -69,7 +69,7 @@ model Reactor {
 
 model Block {
   number    Int      @id(map: "blocks_pk")
-  timestamp DateTime @db.Timestamp(6)
+  timestamp DateTime @db.Timestamptz(6)
 
   @@map("blocks")
 }
