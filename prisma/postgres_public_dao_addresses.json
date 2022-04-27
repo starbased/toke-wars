@@ -1,0 +1,58 @@
+[
+  {
+    "address": "0x086C98855dF3C78C6b481b6e1D47BeF42E9aC36B",
+    "daoName": "Redacted"
+  },
+  {
+    "address": "0xA52Fd396891E7A74b641a2Cb1A6999Fcf56B077e",
+    "daoName": "Redacted"
+  },
+  {
+    "address": "0x9e2b6378ee8ad2A4A95Fe481d63CAba8FB0EBBF9",
+    "daoName": "Alchemix"
+  },
+  {
+    "address": "0x245cc372C84B3645Bf0Ffe6538620B04a217988B",
+    "daoName": "Olympus"
+  },
+  {
+    "address": "0x5180db0237291A6449DdA9ed33aD90a38787621c",
+    "daoName": "Frax"
+  },
+  {
+    "address": "0x90A48D5CF7343B08dA12E067680B4C6dbfE551Be",
+    "daoName": "ShapeShift"
+  },
+  {
+    "address": "0x873ad91fA4F2aA0d557C0919eC3F6c9D240cDd05",
+    "daoName": "Lobis"
+  },
+  {
+    "address": "0xDe50fb295549EdA934D222e7a24d5A8dd132444F",
+    "daoName": "Lobis"
+  },
+  {
+    "address": "0xe94B5EEC1fA96CEecbD33EF5Baa8d00E4493F4f3",
+    "daoName": "Sushi"
+  },
+  {
+    "address": "0xA84918F3280d488EB3369Cb713Ec53cE386b6cBa",
+    "daoName": "Tracer"
+  },
+  {
+    "address": "0x95E8C5a56ACc8064311d79946c7Be87a1e90d17f",
+    "daoName": "Tracer"
+  },
+  {
+    "address": "0xDbbfc051D200438dd5847b093B22484B842de9E7",
+    "daoName": "APWine"
+  },
+  {
+    "address": "0x99F4176EE457afedFfCB1839c7aB7A030a5e4A92",
+    "daoName": "Synthetix"
+  },
+  {
+    "address": "0x73141D278a9c71d2ef2A0B83565E9d5728FA15Cb",
+    "daoName": "Congruent"
+  }
+]

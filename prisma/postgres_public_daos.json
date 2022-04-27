@@ -1,0 +1,68 @@
+[
+  {
+    "name": "Frax",
+    "stage": 2,
+    "coin": "FRAX",
+    "geckoId": "frax"
+  },
+  {
+    "name": "ShapeShift",
+    "stage": 5,
+    "coin": "FOX",
+    "geckoId": "shapeshift-fox-token"
+  },
+  {
+    "name": "Lobis",
+    "stage": 4,
+    "coin": "LOBI",
+    "geckoId": "lobis"
+  },
+  {
+    "name": "Olympus",
+    "stage": 2,
+    "coin": "OHM",
+    "geckoId": "olympus"
+  },
+  {
+    "name": "Synthetix",
+    "stage": 2,
+    "coin": "SNX",
+    "geckoId": "havven"
+  },
+  {
+    "name": "Redacted",
+    "stage": 2,
+    "coin": "BTRFLY",
+    "geckoId": "butterflydao"
+  },
+  {
+    "name": "Alchemix",
+    "stage": 4,
+    "coin": "ALCX",
+    "geckoId": "alchemix"
+  },
+  {
+    "name": "Tracer",
+    "stage": 2,
+    "coin": "TCR",
+    "geckoId": "tracer-dao"
+  },
+  {
+    "name": "APWine",
+    "stage": 2,
+    "coin": "APW",
+    "geckoId": "apwine"
+  },
+  {
+    "name": "Sushi",
+    "stage": 2,
+    "coin": "SUSHI",
+    "geckoId": "sushi"
+  },
+  {
+    "name": "Congruent",
+    "stage": 1,
+    "coin": "GAAS",
+    "geckoId": "congruent-dao-token"
+  }
+]

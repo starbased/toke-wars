@@ -8,7 +8,7 @@ datasource db {
 }
 
 model DaoAddress {
-  address         String           @id(map: "dao_addresses_pk") @unique(map: "dao_addresses_address_uindex") @db.VarChar
+  address         String           @id(map: "dao_addresses_pk") @db.VarChar
   daoName         String           @map("dao_name") @db.VarChar
   daos            Dao              @relation("dao_addressesTodaos", fields: [daoName], references: [name], onDelete: Cascade, onUpdate: NoAction, map: "dao_addresses_daos_name_fk")
   daoTransactions DaoTransaction[] @relation("dao_addressesTodao_transactions")
@@ -18,7 +18,7 @@ model DaoAddress {
 }
 
 model DaoTransaction {
-  id              Int        @id(map: "dao_transactions_pk") @unique(map: "dao_transactions_id_uindex") @default(autoincrement())
+  id              Int        @id(map: "dao_transactions_pk") @default(autoincrement())
   daoAddress      String     @map("dao_address") @db.VarChar
   value           Decimal    @db.Decimal
   transactionHash String     @map("transaction_hash") @db.VarChar
@@ -28,12 +28,13 @@ model DaoTransaction {
   blockNumber     Int        @map("block_number")
   address         DaoAddress @relation("dao_addressesTodao_transactions", fields: [daoAddress], references: [address], onDelete: NoAction, onUpdate: NoAction, map: "dao_transactions_dao_addresses_address_fk")
 
+  @@unique([type, blockNumber, transactionHash, value], map: "dao_transactions_type_block_number_transaction_hash_value_uinde")
   @@index([daoAddress], map: "dao_transactions_dao_address_index")
   @@map("dao_transactions")
 }
 
 model Dao {
-  name         String       @id(map: "daos_pk") @unique(map: "daos_name_uindex") @db.VarChar
+  name         String       @id(map: "daos_pk") @db.VarChar
   stage        Int
   coin         String       @default("TBD") @db.VarChar
   geckoId      String       @default("something") @map("gecko_id") @db.VarChar
@@ -57,7 +58,7 @@ model ReactorValue {
 }
 
 model Reactor {
-  address       String         @id(map: "reactors_pk") @unique(map: "reactors_address_uindex") @db.VarChar
+  address       String         @id(map: "reactors_pk") @db.VarChar
   symbol        String         @db.VarChar
   coingeckoId   String?        @map("coingecko_id") @db.VarChar
   isStablecoin  Boolean?       @default(false) @map("is_stablecoin")
@@ -67,14 +68,14 @@ model Reactor {
 }
 
 model Block {
-  number    Int      @id(map: "blocks_pk") @unique(map: "blocks_block_number_uindex")
+  number    Int      @id(map: "blocks_pk")
   timestamp DateTime @db.Timestamp(6)
 
   @@map("blocks")
 }
 
 model CycleHash {
-  cycle Int    @id(map: "cycle_hashes_pk") @unique(map: "cycle_hashes_cycle_uindex")
+  cycle Int    @id(map: "cycle_hashes_pk")
   hash  String @db.VarChar
 
   @@map("cycle_hashes")

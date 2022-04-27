@@ -1,6 +1,22 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Development with a local db
+
+
+### Setup
+
+- `docker-compose up -d`
+- `prisma migrate reset`
+- `yarn build`
+
+The db should be in sync with production 
+
+### Teardown
+
+- `docker-compose down`
+
 
 ## Getting Started
+
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 First, run the development server:
 

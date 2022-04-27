@@ -48,6 +48,9 @@ async function getStartEndBlocks(
   if (!addresses) {
     //if no addresses are provided update everything
     addresses = (await prisma.daoAddress.findMany()).map((obj) => obj.address);
+    if (isEmpty(addresses)) {
+      throw new Error("no daos in db");
+    }
   } else {
     // never update past the last block in the database, or it might skip some transactions
     // on different addresses

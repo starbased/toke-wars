@@ -1,0 +1,134 @@
+[
+  {
+    "address": "0x0CE34F4c26bA69158BC2eB8Bf513221e44FDfB75",
+    "symbol": "DAI",
+    "coingeckoId": "dai",
+    "isStablecoin": true
+  },
+  {
+    "address": "0x9eEe9eE0CBD35014e12E1283d9388a40f69797A3",
+    "symbol": "LUSD",
+    "coingeckoId": "liquity-usd",
+    "isStablecoin": true
+  },
+  {
+    "address": "0x7211508D283353e77b9A7ed2f22334C219AD4b4C",
+    "symbol": "alUSD",
+    "coingeckoId": "alchemix-usd",
+    "isStablecoin": true
+  },
+  {
+    "address": "0x04bDA0CF6Ad025948Af830E75228ED420b0e860d",
+    "symbol": "USDC",
+    "coingeckoId": "usd-coin",
+    "isStablecoin": true
+  },
+  {
+    "address": "0x94671A3ceE8C7A12Ea72602978D1Bb84E920eFB2",
+    "symbol": "FRAX",
+    "coingeckoId": "frax",
+    "isStablecoin": true
+  },
+  {
+    "address": "0x2e9F9bECF5229379825D0D3C1299759943BD4fED",
+    "symbol": "MIM",
+    "coingeckoId": "magic-internet-money",
+    "isStablecoin": true
+  },
+  {
+    "address": "0x03DccCd17CC36eE61f9004BCfD7a85F58B2D360D",
+    "symbol": "FEI",
+    "coingeckoId": "fei-usd",
+    "isStablecoin": true
+  },
+  {
+    "address": "0xD3D13a578a53685B4ac36A1Bab31912D2B2A2F36",
+    "symbol": "WETH",
+    "coingeckoId": "weth",
+    "isStablecoin": false
+  },
+  {
+    "address": "0x1b429e75369EA5cD84421C1cc182cee5f3192fd3",
+    "symbol": "UniLP",
+    "coingeckoId": null,
+    "isStablecoin": false
+  },
+  {
+    "address": "0x8858A739eA1dd3D80FE577EF4e0D03E88561FaA3",
+    "symbol": "SushiLP",
+    "coingeckoId": null,
+    "isStablecoin": false
+  },
+  {
+    "address": "0xD3B5D9a561c293Fb42b446FE7e237DaA9BF9AA84",
+    "symbol": "ALCX",
+    "coingeckoId": "alchemix",
+    "isStablecoin": false
+  },
+  {
+    "address": "0xDc0b02849Bb8E0F126a216A2840275Da829709B0",
+    "symbol": "APW",
+    "coingeckoId": "apwine",
+    "isStablecoin": false
+  },
+  {
+    "address": "0x8d2254f3AE37201EFe9Dfd9131924FE0bDd97832",
+    "symbol": "sUSD",
+    "coingeckoId": null,
+    "isStablecoin": false
+  },
+  {
+    "address": "0xADF15Ec41689fc5b6DcA0db7c53c9bFE7981E655",
+    "symbol": "FXS",
+    "coingeckoId": "frax-share",
+    "isStablecoin": false
+  },
+  {
+    "address": "0xf49764c9C5d644ece6aE2d18Ffd9F1E902629777",
+    "symbol": "SUSHI",
+    "coingeckoId": "sushi",
+    "isStablecoin": false
+  },
+  {
+    "address": "0xe7a7D17e2177f66D035d9D50A7f48d8D8E31532D",
+    "symbol": "OHM",
+    "coingeckoId": "olympus",
+    "isStablecoin": false
+  },
+  {
+    "address": "0x482258099De8De2d0bda84215864800EA7e6B03D",
+    "symbol": "wormUST",
+    "coingeckoId": "terrausd-wormhole",
+    "isStablecoin": false
+  },
+  {
+    "address": "0x15A629f0665A3Eb97D7aE9A7ce7ABF73AeB79415",
+    "symbol": "TCR",
+    "coingeckoId": "tracer-dao",
+    "isStablecoin": false
+  },
+  {
+    "address": "0x41f6a95Bacf9bC43704c4A4902BA5473A8B00263",
+    "symbol": "gOHM",
+    "coingeckoId": "governance-ohm",
+    "isStablecoin": false
+  },
+  {
+    "address": "0xeff721Eae19885e17f5B80187d6527aad3fFc8DE",
+    "symbol": "SNX",
+    "coingeckoId": "havven",
+    "isStablecoin": false
+  },
+  {
+    "address": "0x808D3E6b23516967ceAE4f17a5F9038383ED5311",
+    "symbol": "FOX",
+    "coingeckoId": "shapeshift-fox-token",
+    "isStablecoin": false
+  },
+  {
+    "address": "0x2Fc6e9c1b2C07E18632eFE51879415a580AD22E1",
+    "symbol": "GAMMA",
+    "coingeckoId": "gamma-strategies",
+    "isStablecoin": false
+  }
+]
