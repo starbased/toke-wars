@@ -63,7 +63,7 @@ function usdValueOverRange(
 export default function Revenue({ values }: Props) {
   const [totalDuration, setTotalDuration] = useState<Duration | null>(null);
 
-  const totals = values.map(({ coin, transactions, price }) => {
+  let totals = values.map(({ coin, transactions, price }) => {
     let filteredTransactions = transactions;
 
     if (totalDuration) {
@@ -83,6 +83,8 @@ export default function Revenue({ values }: Props) {
       usdValue: amount.times(price).toNumber(),
     };
   });
+
+  totals = orderBy(totals, "usdValue", "desc");
 
   const data = orderBy(
     values.flatMap(({ coin, transactions, price }) =>
