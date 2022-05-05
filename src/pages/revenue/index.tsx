@@ -61,9 +61,7 @@ function usdValueOverRange(
 }
 
 export default function Revenue({ values }: Props) {
-  const [totalDuration, setTotalDuration] = useState<Duration | null>({
-    weeks: 1,
-  });
+  const [totalDuration, setTotalDuration] = useState<Duration | null>(null);
 
   const totals = values.map(({ coin, transactions, price }) => {
     let filteredTransactions = transactions;
