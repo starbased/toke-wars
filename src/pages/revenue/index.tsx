@@ -27,8 +27,9 @@ import { getBlocks, getProvider } from "../../util";
 import { getGeckoData } from "../../util/api/coinGecko";
 import { BigNumber } from "bignumber.js";
 import { Coin } from "../../components/coin";
-import { intlFormat, isAfter, sub } from "date-fns";
+import { formatISO, intlFormat, isAfter, isBefore, sub } from "date-fns";
 import { BaseCard } from "../../components/DaoDetailsCard";
+import { useState } from "react";
 
 type Props = {
   values: {
@@ -60,8 +61,20 @@ function usdValueOverRange(
 }
 
 export default function Revenue({ values }: Props) {
+  const [totalDuration, setTotalDuration] = useState<Duration | null>({
+    weeks: 1,
+  });
+
   const totals = values.map(({ coin, transactions, price }) => {
-    const amount = transactions
+    let filteredTransactions = transactions;
+
+    if (totalDuration) {
+      filteredTransactions = filteredTransactions.filter(({ timestamp }) =>
+        isBefore(sub(new Date(), totalDuration), new Date(timestamp))
+      );
+    }
+
+    const amount = filteredTransactions
       .map(({ value }) => new BigNumber(value))
       .reduce((a, b) => a.plus(b), new BigNumber(0))
       .div(10 ** 18);
@@ -97,28 +110,39 @@ export default function Revenue({ values }: Props) {
         style={{ alignSelf: "stretch" }}
         px={5}
       >
-        <BaseCard title="Total Weekly Revenue">
-          <Stat>
-            <StatNumber>
-              {" "}
-              <Formatter
-                currency
-                value={usdValueOverRange(data, { weeks: 1 })}
-              />
-            </StatNumber>
-          </Stat>
-        </BaseCard>
+        <span
+          onClick={() => setTotalDuration({ weeks: 1 })}
+          style={{ cursor: "pointer" }}
+        >
+          <BaseCard title="Total Weekly Revenue">
+            <Stat>
+              <StatNumber>
+                {" "}
+                <Formatter
+                  currency
+                  value={usdValueOverRange(data, { weeks: 1 })}
+                />
+              </StatNumber>
+            </Stat>
+          </BaseCard>
+        </span>
 
-        <BaseCard title="Total Monthly Revenue">
-          <Stat>
-            <StatNumber>
-              <Formatter
-                currency
-                value={usdValueOverRange(data, { months: 1 })}
-              />
-            </StatNumber>
-          </Stat>
-        </BaseCard>
+        <span
+          onClick={() => setTotalDuration({ months: 1 })}
+          style={{ cursor: "pointer" }}
+        >
+          <BaseCard title="Total Monthly Revenue">
+            <Stat>
+              <StatNumber>
+                <Formatter
+                  currency
+                  value={usdValueOverRange(data, { months: 1 })}
+                />
+              </StatNumber>
+            </Stat>
+          </BaseCard>
+        </span>
+
         <BaseCard title="Estimated Yearly Revenue">
           <Stat>
             <StatNumber>
@@ -139,6 +163,24 @@ export default function Revenue({ values }: Props) {
       >
         <chakra.h2 textAlign="center" fontSize="xl" pb={8} fontWeight="bold">
           Totals
+          {totalDuration ? (
+            <>
+              {" "}
+              since{" "}
+              {formatISO(sub(new Date(), totalDuration), {
+                representation: "date",
+              })}{" "}
+              <Button
+                size="xs"
+                title="clear"
+                onClick={() => setTotalDuration(null)}
+              >
+                X
+              </Button>
+            </>
+          ) : (
+            ""
+          )}
         </chakra.h2>
         <Table>
           <Thead>
