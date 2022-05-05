@@ -290,44 +290,43 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 
   const provider = getProvider();
 
-  const values = await Promise.all(
-    Object.entries(tokens).map(async ([tokenContract, { gecko_id, name }]) => {
-      const contract = ERC20__factory.connect(tokenContract, provider);
+  const values = [];
 
-      const transactions = (
-        await contract.queryFilter(
-          contract.filters.Transfer(
-            // "0xA86e412109f77c45a3BC1c5870b880492Fb86A14",
-            null,
-            "0x8b4334d4812C530574Bd4F2763FcD22dE94A969B"
-          ),
-          14489954
-        )
-      ).map(({ transactionHash, blockNumber, args: { value } }) => ({
-        transactionHash,
-        blockNumber,
-        value: value.toString(),
-      }));
+  for (let [tokenContract, { gecko_id, name }] of Object.entries(tokens)) {
+    const contract = ERC20__factory.connect(tokenContract, provider);
 
-      const timestamps = (
-        await getBlocks(transactions.map((obj) => obj.blockNumber))
-      ).reduce<Record<number, Date>>(
-        (acc, obj) => ({ ...acc, [obj.number]: obj.timestamp }),
-        {}
-      );
+    const transactions = (
+      await contract.queryFilter(
+        contract.filters.Transfer(
+          null,
+          "0x8b4334d4812C530574Bd4F2763FcD22dE94A969B"
+        ),
+        14489954
+      )
+    ).map(({ transactionHash, blockNumber, args: { value } }) => ({
+      transactionHash,
+      blockNumber,
+      value: value.toString(),
+    }));
 
-      const gecko_data = await getGeckoData(gecko_id);
+    const timestamps = (
+      await getBlocks(transactions.map((obj) => obj.blockNumber))
+    ).reduce<Record<number, Date>>(
+      (acc, obj) => ({ ...acc, [obj.number]: obj.timestamp }),
+      {}
+    );
 
-      return {
-        coin: name,
-        transactions: transactions.map((obj) => ({
-          ...obj,
-          timestamp: timestamps[obj.blockNumber].getTime(),
-        })),
-        price: gecko_data.market_data.current_price.usd,
-      };
-    })
-  );
+    const gecko_data = await getGeckoData(gecko_id);
+
+    values.push({
+      coin: name,
+      transactions: transactions.map((obj) => ({
+        ...obj,
+        timestamp: timestamps[obj.blockNumber].getTime(),
+      })),
+      price: gecko_data.market_data.current_price.usd,
+    });
+  }
 
   return {
     props: { values },
