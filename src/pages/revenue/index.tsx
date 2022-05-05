@@ -282,6 +282,10 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       name: "cvxCRV",
       gecko_id: "convex-crv",
     },
+    "0xdBdb4d16EdA451D0503b854CF79D55697F90c8DF": {
+      name: "ALCX",
+      gecko_id: "alchemix",
+    },
   };
 
   const provider = getProvider();
