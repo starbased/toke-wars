@@ -17,7 +17,10 @@ export const DAOS: DaoInformation[] = [
     discord: "bzFn5nstFB",
   },
   {
-    addresses: ["0x5180db0237291a6449dda9ed33ad90a38787621c"],
+    addresses: [
+      "0x5180db0237291a6449dda9ed33ad90a38787621c",
+      "0xB1748C79709f4Ba2Dd82834B8c82D4a505003f27"
+    ],
     name: "Frax",
     stage: 2,
     twitter: "fraxfinance",
