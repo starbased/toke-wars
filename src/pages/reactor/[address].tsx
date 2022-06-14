@@ -1,12 +1,10 @@
-import { TAsset__factory, TokemakManager__factory } from "../../typechain";
-import { getBlocks, getProvider } from "../../util";
+import { ManagerContract__factory, TAsset__factory } from "../../typechain";
+import { getProvider } from "../../util";
 import { GetStaticPaths, GetStaticProps } from "next";
-import { BURN, T_TOKE_CONTRACT, TOKEMAK_MANAGER } from "../../constants";
+import { T_TOKE_CONTRACT, TOKEMAK_MANAGER } from "../../constants";
 import { prisma } from "../../util/db";
 import { eachMonthOfInterval, isEqual, startOfDay } from "date-fns";
-import { Provider } from "@ethersproject/providers";
-import { getAddress } from "ethers/lib/utils";
-import { isEmpty, sortBy } from "lodash";
+import { sortBy } from "lodash";
 import { useRouter } from "next/router";
 import {
   Area,
@@ -28,16 +26,15 @@ import {
   CoinInfo,
   getGeckoData,
   getHistoricalPrice,
-  search,
 } from "../../util/api/coinGecko";
 import { BigNumber } from "bignumber.js";
 import { formatNumber } from "../../util/maths";
 import { Reactor } from "@prisma/client";
-import { TransferEvent } from "../../typechain/ERC20";
 import { ResourcesCard } from "../../components/ResourcesCard";
+import { toBuffer } from "../api/updateEvents";
 
 type Props = {
-  reactors: Reactor[];
+  reactors: (Omit<Reactor, "address"> & { address: string })[];
   symbol: string;
   address: string;
   events: Event[];
@@ -191,87 +188,34 @@ export default function Index({ address, events, reactors, geckoData }: Props) {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const provider = getProvider();
-  const contract = TokemakManager__factory.connect(TOKEMAK_MANAGER, provider);
+  const contract = ManagerContract__factory.connect(TOKEMAK_MANAGER, provider);
 
   let pools = await contract.getPools();
 
-  pools = pools.filter((pool) => pool !== T_TOKE_CONTRACT);
-
-  const knownPools = await prisma.reactor.findMany({
-    where: {
-      address: { in: pools },
-    },
-  });
-
-  const knownAddressSet = new Set(knownPools.map((pool) => pool.address));
-  const unknownPools = pools.filter((pool) => !knownAddressSet.has(pool));
-
-  for (let address of unknownPools) {
-    await savePossibleReactor(address, provider);
-  }
+  pools = pools
+    .filter((pool) => pool !== T_TOKE_CONTRACT)
+    .map((pool) => pool.toLowerCase());
 
   return {
     paths: pools.map((address) => ({ params: { address } })),
-    fallback: true,
+    fallback: false,
   };
 };
-
-/**
- * Tries to save unknown tAsset to the database
- * Will set coingeckoId if there is a single match
- * @param address address of possible tAsset
- * @param provider
- */
-async function savePossibleReactor(
-  address: string,
-  provider: Provider
-): Promise<Reactor> {
-  address = getAddress(address);
-  if (address === T_TOKE_CONTRACT) {
-    throw Error("won't save tToke asset to database");
-  }
-  const contract = TAsset__factory.connect(address, provider);
-  const symbol = (await contract.symbol()).substring(1);
-
-  let searchResults = await search(symbol);
-
-  searchResults = searchResults.filter(
-    (coin) => coin.symbol.toLowerCase() === symbol.toLowerCase()
-  );
-
-  let coingeckoId: string | null = null;
-
-  if (searchResults.length === 1) {
-    coingeckoId = searchResults[0].id;
-  } else {
-    console.warn(
-      `found multiple possibilities for ${symbol}: ${searchResults.map(
-        ({ name }) => name
-      )}`
-    );
-  }
-  const data = { symbol, address, coingeckoId, isStablecoin: false };
-  await prisma.reactor.create({ data });
-  return data;
-}
 
 export const getStaticProps: GetStaticProps<
   Props,
   { address: string }
 > = async ({ params }) => {
-  const provider = getProvider();
   let address = params?.address!;
-  address = getAddress(address);
+  address = address.toLowerCase();
 
-  const reactor =
-    (await prisma.reactor.findUnique({ where: { address } })) ||
-    (await savePossibleReactor(address, provider));
+  const reactor = await prisma.reactor.findUnique({
+    where: { address: toBuffer(address) },
+  });
 
   if (!reactor || !reactor.symbol) {
     throw Error("Unknown tAsset");
   }
-
-  await updateReactor(address);
 
   const contract = TAsset__factory.connect(address, getProvider());
 
@@ -282,11 +226,22 @@ export const getStaticProps: GetStaticProps<
     }[]
   >`
       select timestamp,
-             round(sum(value) over (order by block_number) / 10 ^ ${await contract.decimals()}::numeric, 0)::bigint as total
-      from reactor_values
+             round(sum(adjusted_value) over (order by block_number) / 10 ^ ${await contract.decimals()}::numeric, 0)::integer as total
+      from (
+               select "transactionHash" as transaction_hash,
+                      "blockNumber"     as block_number,
+                      address,
+                      "to"              as account,
+                      value   * -1          as adjusted_value
+               from erc20_transfers
+               union all
+               select "transactionHash", "blockNumber", address, "from" as account,  value
+               from erc20_transfers
+           )erc20_transfers
                inner join blocks on block_number = number
-      where contract_address = ${address}
-      order by block_number`;
+      where address = ${toBuffer(address)}
+        and account = '\\x0000000000000000000000000000000000000000'
+      order by number`;
 
   let historicalPrices: Record<string, number> = { "1": 0 };
 
@@ -325,67 +280,19 @@ export const getStaticProps: GetStaticProps<
     ? await getGeckoData(reactor.coingeckoId)
     : null;
 
+  const reactors = (await prisma.reactor.findMany()).map((reactor) => ({
+    ...reactor,
+    address: "0x" + reactor.address.toString("hex"),
+  }));
+
   return {
     props: {
       address,
       symbol: reactor.symbol,
       events,
-      reactors: await prisma.reactor.findMany(),
+      reactors,
       geckoData,
     },
     revalidate: 60 * 5,
   };
 };
-
-async function updateReactor(address: string) {
-  const lastDBblock =
-    (
-      await prisma.reactorValue.aggregate({
-        _max: {
-          blockNumber: true,
-        },
-        where: { contractAddress: address },
-      })
-    )._max.blockNumber || 100000;
-
-  const contract = TAsset__factory.connect(address, getProvider());
-
-  const commonMap = ({
-    blockNumber,
-    transactionHash,
-    args: { to, from },
-  }: TransferEvent) => ({
-    contractAddress: address,
-    blockNumber,
-    transactionHash,
-    to,
-    from,
-  });
-
-  const createdTokens = (
-    await contract.queryFilter(contract.filters.Transfer(BURN), lastDBblock + 1)
-  ).map((obj) => ({
-    ...commonMap(obj),
-    value: obj.args.value.toString(),
-  }));
-
-  const destroyedTokens = (
-    await contract.queryFilter(
-      contract.filters.Transfer(undefined, BURN),
-      lastDBblock + 1
-    )
-  ).map((obj) => ({
-    ...commonMap(obj),
-    value: "-" + obj.args.value.toString(),
-  }));
-
-  const newEvents = [...createdTokens, ...destroyedTokens];
-
-  if (!isEmpty(newEvents)) {
-    await prisma.reactorValue.createMany({ data: newEvents });
-  }
-
-  await getBlocks(newEvents.map((obj) => obj.blockNumber));
-
-  return newEvents;
-}

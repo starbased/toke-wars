@@ -6,11 +6,10 @@ import { isEmpty } from "lodash";
 import { TokeGraph } from "../../components/TokeGraph";
 import { DaoDetailsCard } from "../../components/DaoDetailsCard";
 import { Divider } from "@chakra-ui/react";
-import { getData } from "../index";
-import { updateAll } from "../../tokeTokenAmounts";
 import { addDays } from "date-fns";
 import { ResourcesCard } from "../../components/ResourcesCard";
 import { CoinInfo, getGeckoData } from "../../util/api/coinGecko";
+import { groupByTokeType } from "../../queries";
 
 type Props = {
   dao: Dao;
@@ -72,8 +71,6 @@ export default function Index({ dao, data, address, geckoData }: Props) {
 export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
   params,
 }) => {
-  await updateAll();
-
   const name = params!.name;
 
   const dao = await prisma.dao.findUnique({
@@ -81,26 +78,16 @@ export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
     rejectOnNotFound: true,
   });
 
-  const records = await prisma.$queryRaw<LocalRecord[]>`
-      select type,
-             timestamp,
-             round(sum(value) over (PARTITION BY type order by block_number) / 10 ^ 18::numeric, 0)::bigint as total
-      from daos
-               inner join dao_addresses da on daos.name = da.dao_name
-               inner join dao_transactions dt on da.address = dt.dao_address
-               inner join blocks on block_number = number
-      where name = ${name}
-      order by block_number
-`;
+  const data = await groupByTokeType(name);
 
-  const data = await getData(records);
-
-  const address = (
-    await prisma.daoAddress.findFirst({
-      where: { daos: dao },
-      rejectOnNotFound: true,
-    })
-  ).address;
+  const address =
+    "0x" +
+    (
+      await prisma.daoAddress.findFirst({
+        where: { daos: dao },
+        rejectOnNotFound: true,
+      })
+    ).address.toString("hex");
 
   const geckoData = await getGeckoData(dao.geckoId);
 

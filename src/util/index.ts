@@ -11,24 +11,35 @@ export async function updateDbBlocks() {
   const numbers = await prisma.$queryRaw<{ block_number: number }[]>`
       select distinct block_number
       from (select block_number
-            from reactor_values
-            union all
-            select block_number
-            from dao_transactions) b
+            from dao_transactions_v
+            inner join dao_addresses da on dao_transactions_v.account = da.address
+            union all 
+            select "blockNumber"
+            from erc20_transfers
+            inner join reactors on reactors.address = erc20_transfers.address
+            ) b
       where not exists(select 1 from blocks where number = block_number)
 order by block_number
   `;
   const provider = getProvider();
+  // if running a local node this will speed up block imports
+  // const provider = new providers.StaticJsonRpcProvider();
 
   let toSave: Block[] = [];
 
-  for (let { block_number: number } of numbers) {
-    const block = await provider.getBlock(number);
-    console.log("Adding new block:", number);
-    const output = { number, timestamp: new Date(block.timestamp * 1000) };
-    toSave.push(output);
+  for (let number_chunk of chunk(
+    numbers.map(({ block_number }) => block_number),
+    4
+  )) {
+    const numbers = await Promise.all(
+      number_chunk.map((number) => provider.getBlock(number))
+    );
+    console.log(`adding blocks ${number_chunk}`);
     await prisma.block.createMany({
-      data: [output],
+      data: numbers.map((block) => ({
+        number: block.number,
+        timestamp: new Date(block.timestamp * 1000),
+      })),
     });
   }
 

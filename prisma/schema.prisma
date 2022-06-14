@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["improvedQueryRaw"]
 }
 
 datasource db {
@@ -8,29 +9,11 @@ datasource db {
 }
 
 model DaoAddress {
-  address         String           @id(map: "dao_addresses_pk") @db.VarChar
-  daoName         String           @map("dao_name") @db.VarChar
-  daos            Dao              @relation("dao_addressesTodaos", fields: [daoName], references: [name], onDelete: Cascade, onUpdate: NoAction, map: "dao_addresses_daos_name_fk")
-  daoTransactions DaoTransaction[] @relation("dao_addressesTodao_transactions")
+  daoName String @map("dao_name") @db.VarChar
+  address Bytes  @id(map: "dao_addresses_pk") @unique(map: "dao_addresses_address_uindex")
+  daos    Dao    @relation("dao_addressesTodaos", fields: [daoName], references: [name], onDelete: Cascade, onUpdate: NoAction, map: "dao_addresses_daos_name_fk")
 
-  @@unique([daoName, address], map: "dao_addresses_dao_name_address_uindex")
   @@map("dao_addresses")
-}
-
-model DaoTransaction {
-  id              Int        @id(map: "dao_transactions_pk") @default(autoincrement())
-  daoAddress      String     @map("dao_address") @db.VarChar
-  value           Decimal    @db.Decimal
-  transactionHash String     @map("transaction_hash") @db.VarChar
-  type            String     @db.VarChar
-  from            String?    @db.VarChar
-  to              String?    @db.VarChar
-  blockNumber     Int        @map("block_number")
-  address         DaoAddress @relation("dao_addressesTodao_transactions", fields: [daoAddress], references: [address], onDelete: NoAction, onUpdate: NoAction, map: "dao_transactions_dao_addresses_address_fk")
-
-  @@unique([type, blockNumber, transactionHash, value], map: "dao_transactions_type_block_number_transaction_hash_value_uinde")
-  @@index([daoAddress], map: "dao_transactions_dao_address_index")
-  @@map("dao_transactions")
 }
 
 model Dao {
@@ -43,26 +26,11 @@ model Dao {
   @@map("daos")
 }
 
-model ReactorValue {
-  transactionHash String  @map("transaction_hash") @db.VarChar
-  contractAddress String  @map("contract_address") @db.VarChar
-  to              String  @db.VarChar
-  from            String  @db.VarChar
-  value           Decimal @db.Decimal
-  blockNumber     Int     @map("block_number")
-  id              Int     @id(map: "reactor_values_pk") @default(autoincrement())
-  reactors        Reactor @relation("reactor_valuesToreactors", fields: [contractAddress], references: [address], onDelete: NoAction, onUpdate: NoAction, map: "reactor_values_reactors_address_fk")
-
-  @@index([contractAddress], map: "reactor_values_contract_address_index")
-  @@map("reactor_values")
-}
-
 model Reactor {
-  address       String         @id(map: "reactors_pk") @db.VarChar
-  symbol        String         @db.VarChar
-  coingeckoId   String?        @map("coingecko_id") @db.VarChar
-  isStablecoin  Boolean?       @default(false) @map("is_stablecoin")
-  reactorValues ReactorValue[] @relation("reactor_valuesToreactors")
+  symbol       String   @db.VarChar
+  coingeckoId  String?  @map("coingecko_id") @db.VarChar
+  isStablecoin Boolean? @default(false) @map("is_stablecoin")
+  address      Bytes    @id(map: "reactors_pk") @unique(map: "reactors_address_b_uindex")
 
   @@map("reactors")
 }
@@ -79,4 +47,51 @@ model CycleHash {
   hash  String @db.VarChar
 
   @@map("cycle_hashes")
+}
+
+model Erc20Transfer {
+  blockNumber      Int
+  transactionHash  Bytes
+  transactionIndex Int
+  address          Bytes
+  to               Bytes
+  from             Bytes
+  value            Decimal @db.Decimal
+  logIndex         Int
+  data             Bytes
+
+  @@id([transactionHash, logIndex], map: "erc20_transfers_pk")
+  @@index([address], map: "erc20_transfers_address_index")
+  @@index([address], map: "toke_staking_deposit_address_index")
+  @@map("erc20_transfers")
+}
+
+model TokeStakingDeposit {
+  blockNumber      Int
+  transactionHash  Bytes
+  transactionIndex Int
+  address          Bytes
+  logIndex         Int
+  data             Bytes
+  account          Bytes
+  scheduleIx       Decimal @db.Decimal
+  amount           Decimal @db.Decimal
+
+  @@id([transactionHash, logIndex], map: "toke_staking_deposit_pk")
+  @@map("toke_staking_deposits")
+}
+
+model TokeStakingWithdrawCompleted {
+  blockNumber      Int
+  transactionHash  Bytes
+  transactionIndex Int
+  address          Bytes
+  logIndex         Int
+  data             Bytes
+  account          Bytes
+  scheduleIdx      Decimal @db.Decimal
+  amount           Decimal @db.Decimal
+
+  @@id([transactionHash, logIndex], map: "toke_staking_withdraw_completed_pk")
+  @@map("toke_staking_withdraw_completed")
 }

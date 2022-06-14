@@ -20,7 +20,6 @@ import Link from "next/link";
 import { prisma } from "../../util/db";
 import { Dao } from "@prisma/client";
 import { tokePrice, useTokePrice } from "../../util/api/tokemak";
-import { updateAll } from "../../tokeTokenAmounts";
 import { Coin } from "../../components/coin";
 
 type Props = {
@@ -99,13 +98,11 @@ export default function Leaderboard({
 }
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  await updateAll();
-
   const daos = await prisma.$queryRaw<(Dao & { toke: number })[]>`
-    select daos.*, round((sum(dt.value )/10^18)::numeric,2) as toke 
+    select daos.*, round((sum(dt.adjusted_value )/10^18)::numeric,2)::integer as toke 
     from daos
     inner join dao_addresses da on daos.name = da.dao_name
-    inner join dao_transactions dt on da.address = dt.dao_address
+    inner join dao_transactions_v dt on da.address = dt.account
     group by daos.name
     order by toke desc
 `;

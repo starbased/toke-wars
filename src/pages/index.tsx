@@ -2,7 +2,6 @@ import { useTokePrice } from "../util/api/tokemak";
 import { Page } from "../components/Page";
 import { GetStaticProps } from "next";
 import { prisma } from "../util/db";
-import { isEqual, startOfDay } from "date-fns";
 import { TokeGraph } from "../components/TokeGraph";
 import { DAOS, REACTORS } from "../constants";
 import {
@@ -16,8 +15,8 @@ import { BaseCard } from "../components/DaoDetailsCard";
 import { formatMoney, formatNumber } from "../util/maths";
 import { CoinInfo, getGeckoData } from "../util/api/coinGecko";
 import { DaosGraph } from "../components/DaosGraph";
-import { updateAll } from "../tokeTokenAmounts";
 import { ResourcesCard } from "../components/ResourcesCard";
+import { getData, GraphRecord, groupByTokeType } from "../queries";
 
 type Props = {
   data: {
@@ -30,12 +29,6 @@ type Props = {
     timestamp: number;
   }[];
   geckoData: CoinInfo;
-};
-
-type Record = {
-  type: string;
-  total: number;
-  timestamp: number;
 };
 
 export default function Home({ dao_data, data, geckoData }: Props) {
@@ -87,27 +80,16 @@ export default function Home({ dao_data, data, geckoData }: Props) {
 }
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  await updateAll();
+  const data = await groupByTokeType();
 
-  const records = await prisma.$queryRaw<Record[]>`
-      select type,
-             round(sum(value) over (PARTITION BY type order by block_number) / 10 ^ 18::numeric, 0)::bigint as total,
+  const dao_records = await prisma.$queryRaw<GraphRecord[]>`
+      select daos.name        as type,
+             round(sum(adjusted_value) over (PARTITION BY daos.name order by block_number) / 10 ^ 18::numeric,
+                   0)::integer as total,
              timestamp
       from daos
                inner join dao_addresses da on daos.name = da.dao_name
-               inner join dao_transactions dt on da.address = dt.dao_address
-               inner join blocks on block_number = number
-      order by block_number
-  `;
-  const data = await getData(records);
-
-  const dao_records = await prisma.$queryRaw<Record[]>`
-      select name as type,
-             round(sum(value) over (PARTITION BY name order by block_number) / 10 ^ 18::numeric, 0)::bigint as total,
-             timestamp
-      from daos
-               inner join dao_addresses da on daos.name = da.dao_name
-               inner join dao_transactions dt on da.address = dt.dao_address
+               inner join dao_transactions_v dt on da.address = dt.account
                inner join blocks on block_number = number
       order by block_number
       `;
@@ -118,27 +100,3 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 
   return { props: { dao_data, data, geckoData }, revalidate: 60 * 5 };
 };
-
-export async function getData(records: Record[]) {
-  let previous = { timestamp: new Date(records[0].timestamp).getTime() };
-
-  let temp = records.map<{
-    timestamp: number;
-  }>(({ type, total, timestamp }) => ({
-    [type]: total,
-    timestamp: new Date(timestamp).getTime(),
-  }));
-
-  //add a value for now at the end to extend the graph to now
-  temp.push({ timestamp: new Date().getTime() });
-
-  return temp
-    .map((current) => {
-      const out = { ...previous, ...current };
-      return (previous = out);
-    })
-    .filter(
-      ({ timestamp }, i, array) =>
-        !isEqual(startOfDay(timestamp), startOfDay(array[i + 1]?.timestamp))
-    );
-}

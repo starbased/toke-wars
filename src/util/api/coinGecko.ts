@@ -1,11 +1,18 @@
 import axios from "axios";
 import { addDays, getUnixTime } from "date-fns";
+import axiosRetry from "axios-retry";
 
-export const geckoAPI = axios.create({
+const geckoAPI = axios.create({
   baseURL: "https://api.coingecko.com/api/v3/",
   headers: {
     accept: "application/json",
   },
+});
+
+axiosRetry(geckoAPI, {
+  retries: 10,
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: (error) => error.response?.status === 429,
 });
 
 export type CoinInfo = {
@@ -61,17 +68,8 @@ export async function getGeckoData(geckoId?: string) {
   return data;
 }
 
-export async function search(query: string) {
-  const { data } = await geckoAPI.get<{
-    coins: {
-      id: string;
-      name: string;
-      symbol: string;
-    }[];
-  }>(`search`, {
-    params: {
-      query,
-    },
+function sleep(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
   });
-  return data.coins;
 }
