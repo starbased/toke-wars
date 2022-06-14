@@ -9,4 +9,4 @@ jobs:
       - name: Call our API route
         run: |
           curl --request POST \
-          --url 'https://yoursite.com/api/updateEvents' 
+          --url 'https://wars.tokebase.org/api/updateEvents' 
