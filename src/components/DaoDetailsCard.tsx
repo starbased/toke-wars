@@ -63,6 +63,15 @@ interface StatsCardProps {
 function StatsCard({ title, total, changePercent }: StatsCardProps) {
   const toke_price = useTokePrice();
 
+  let arrow = null;
+  if (total && total >= 0) {
+    if (changePercent < 0) {
+      arrow = <StatArrow type="decrease" />;
+    } else if (changePercent > 0) {
+      arrow = <StatArrow type="increase" />;
+    }
+  }
+
   return (
     <BaseCard title={title}>
       <Stat>
@@ -76,17 +85,8 @@ function StatsCard({ title, total, changePercent }: StatsCardProps) {
         </Skeleton>
         <Skeleton isLoaded={total >= 0}>
           <StatHelpText>
-            {changePercent < 0 ? (
-              <StatArrow type="decrease" />
-            ) : (
-              <StatArrow type="increase" />
-            )}
-            {/* 
-                get percent increase
-                if newStaking contains sum totals,
-                can compare latest to previous
-                */}
-            {changePercent.toFixed(2)}% over 30 days
+            {arrow}
+            {arrow ? changePercent.toFixed(2) + "%" : "No change"} over 30 days
           </StatHelpText>
         </Skeleton>
       </Stat>
@@ -114,19 +114,20 @@ function StageCard({ title, stage }: StageCardProps) {
 
 interface StatsLinkCardProps {
   title: string;
-  address: string;
+  addresses: string[];
   /* icon: ReactNode; */
 }
-function StatsLinkCard({ title, address }: StatsLinkCardProps) {
+function StatsLinkCard({ title, addresses }: StatsLinkCardProps) {
   return (
     <BaseCard title={title}>
       <Stat>
-        <StatNumber>
-          <Link href={"https://zapper.fi/account/" + address} isExternal>
-            Current Treasury <ExternalLinkIcon mx="2px" />
-          </Link>
-        </StatNumber>
-        <StatHelpText>{shortenAddress(address)}</StatHelpText>
+        {addresses.map((address) => (
+          <StatNumber fontSize={20} key={address}>
+            <Link href={"https://zapper.fi/account/" + address} isExternal>
+              {shortenAddress(address, 7)} <ExternalLinkIcon mx="2px" />
+            </Link>
+          </StatNumber>
+        ))}
       </Stat>
     </BaseCard>
   );
@@ -149,14 +150,14 @@ function SkeletonCard({}: SkeletonCardProps) {
 }
 
 type Props = {
-  address: string;
+  addresses: string[];
   stage: number;
   total: number;
   changePercent: number;
 };
 
 export function DaoDetailsCard({
-  address,
+  addresses,
   stage,
   total,
   changePercent,
@@ -185,8 +186,8 @@ export function DaoDetailsCard({
         /* icon={<FiServer size={'3em'} />} */
       />
       <StatsLinkCard
-        title="Zapper"
-        address={address}
+        title={`Tracked address${addresses.length > 1 ? "es" : ""}`}
+        addresses={addresses}
         /* icon={<GoLocation size={'3em'} />} */
       />
     </SimpleGrid>

@@ -13,7 +13,7 @@ import { groupByTokeType } from "../../queries";
 
 type Props = {
   dao: Dao;
-  address: string;
+  addresses: string[];
   data: {
     timestamp: number;
     toke?: number;
@@ -38,7 +38,7 @@ function getTotal(obj?: { timestamp: number } & Record<string, number>) {
   return Object.values(lastValues).reduce((a, b) => a + b);
 }
 
-export default function Index({ dao, data, address, geckoData }: Props) {
+export default function Index({ dao, data, addresses, geckoData }: Props) {
   if (isEmpty(data)) {
     return <div>Nothing here</div>;
   }
@@ -57,7 +57,7 @@ export default function Index({ dao, data, address, geckoData }: Props) {
     <Page header={dao.name}>
       <DaoDetailsCard
         stage={dao.stage}
-        address={address}
+        addresses={addresses}
         total={total}
         changePercent={changePercent}
       />
@@ -80,18 +80,15 @@ export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
 
   const data = await groupByTokeType(name);
 
-  const address =
-    "0x" +
-    (
-      await prisma.daoAddress.findFirst({
-        where: { daos: dao },
-        rejectOnNotFound: true,
-      })
-    ).address.toString("hex");
+  const addresses = (
+    await prisma.daoAddress.findMany({
+      where: { daos: dao },
+    })
+  ).map(({ address }) => "0x" + address.toString("hex"));
 
   const geckoData = await getGeckoData(dao.geckoId);
 
-  return { props: { dao, data, address, geckoData }, revalidate: 60 * 5 };
+  return { props: { dao, data, addresses, geckoData }, revalidate: 60 * 5 };
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
