@@ -37,9 +37,7 @@ export function BaseCard({ title, children }: BaseCardProps) {
     >
       <Flex justifyContent="space-between">
         <Box pl={{ base: 2, md: 4 }}>
-          <StatLabel fontWeight="medium" isTruncated>
-            {title}
-          </StatLabel>
+          <StatLabel fontWeight="medium">{title}</StatLabel>
           <StatGroup>{children}</StatGroup>
         </Box>
         <Box
