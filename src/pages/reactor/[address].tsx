@@ -32,6 +32,7 @@ import { formatNumber } from "../../util/maths";
 import { Reactor } from "@prisma/client";
 import { ResourcesCard } from "../../components/ResourcesCard";
 import { toBuffer } from "../api/updateEvents";
+import { formatUnits } from "ethers/lib/utils";
 
 type Props = {
   reactors: (Omit<Reactor, "address"> & { address: string })[];
@@ -39,6 +40,7 @@ type Props = {
   address: string;
   events: Event[];
   geckoData: CoinInfo | null;
+  withheldLiquidity: string;
 };
 
 type Event = {
@@ -134,7 +136,13 @@ function Graph({ events }: { events: Event[] }) {
   );
 }
 
-export default function Index({ address, events, reactors, geckoData }: Props) {
+export default function Index({
+  address,
+  events,
+  reactors,
+  geckoData,
+  withheldLiquidity,
+}: Props) {
   const router = useRouter();
 
   if (!events) {
@@ -170,6 +178,17 @@ export default function Index({ address, events, reactors, geckoData }: Props) {
           />
         </Box>
       </HStack>
+
+      <div>
+        {formatNumber(
+          (parseFloat(withheldLiquidity) /
+            parseInt(events[events.length - 1].total)) *
+            100,
+          2
+        )}
+        % ({formatNumber(parseFloat(withheldLiquidity), 2)}) Available for
+        withdrawal
+      </div>
 
       <div style={{ width: "100%", height: "400px" }}>
         <Graph events={events} />
@@ -218,6 +237,7 @@ export const getStaticProps: GetStaticProps<
   }
 
   const contract = TAsset__factory.connect(address, getProvider());
+  const decimals = await contract.decimals();
 
   const rawEvents = await prisma.$queryRaw<
     {
@@ -226,7 +246,7 @@ export const getStaticProps: GetStaticProps<
     }[]
   >`
       select timestamp,
-             round(sum(adjusted_value) over (order by block_number) / 10 ^ ${await contract.decimals()}::numeric, 0)::integer as total
+             round(sum(adjusted_value) over (order by block_number) / 10 ^ ${decimals}::numeric, 0)::integer as total
       from (
                select "transactionHash" as transaction_hash,
                       "blockNumber"     as block_number,
@@ -285,6 +305,11 @@ export const getStaticProps: GetStaticProps<
     address: "0x" + reactor.address.toString("hex"),
   }));
 
+  const withheldLiquidity = formatUnits(
+    await contract.withheldLiquidity(),
+    decimals
+  );
+
   return {
     props: {
       address,
@@ -292,6 +317,7 @@ export const getStaticProps: GetStaticProps<
       events,
       reactors,
       geckoData,
+      withheldLiquidity,
     },
     revalidate: 60 * 5,
   };
