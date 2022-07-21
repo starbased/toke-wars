@@ -18,7 +18,19 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Box, Divider, HStack, Select } from "@chakra-ui/react";
+import {
+  Box,
+  chakra,
+  Divider,
+  HStack,
+  Select,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import { FaRadiationAlt } from "react-icons/fa/index"; //Don't use all next.js doesn't like it
 import { Page } from "../../components/Page";
 import { LinkCard } from "../../components/LinkCard";
@@ -39,6 +51,11 @@ type Props = {
   symbol: string;
   address: string;
   events: Event[];
+  holders: {
+    total: number;
+    account: string;
+    named_account: string;
+  }[];
   geckoData: CoinInfo | null;
   withheldLiquidity: string;
 };
@@ -142,12 +159,15 @@ export default function Index({
   reactors,
   geckoData,
   withheldLiquidity,
+  holders,
 }: Props) {
   const router = useRouter();
 
   if (!events) {
     return <div>loading</div>;
   }
+
+  const totalHeld = holders.reduce((acc, { total }) => acc + total, 0);
 
   return (
     <Page header="Reactor Value Locked">
@@ -200,6 +220,31 @@ export default function Index({
         </a>
       </div>
       <Divider />
+
+      <div>
+        <chakra.h2 fontSize="xl" fontWeight="bold">
+          Top Holders
+        </chakra.h2>
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th>Account</Th>
+              <Th>Amount</Th>
+              <Th>Percent</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {holders.slice(0, 10).map(({ named_account, account, total }) => (
+              <Tr key={account}>
+                <Td>{named_account || account.replace("\\", "0")}</Td>
+                <Td>{formatNumber(total, 2)}</Td>
+                <Td>{formatNumber((total / totalHeld) * 100, 2)}%</Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </div>
+
       {geckoData ? <ResourcesCard geckoData={geckoData} /> : null}
     </Page>
   );
@@ -247,17 +292,15 @@ export const getStaticProps: GetStaticProps<
   >`
       select timestamp,
              round(sum(adjusted_value) over (order by block_number) / 10 ^ ${decimals}::numeric, 0)::integer as total
-      from (
-               select "transactionHash" as transaction_hash,
-                      "blockNumber"     as block_number,
-                      address,
-                      "to"              as account,
-                      value   * -1          as adjusted_value
-               from erc20_transfers
-               union all
-               select "transactionHash", "blockNumber", address, "from" as account,  value
-               from erc20_transfers
-           )erc20_transfers
+      from (select "transactionHash" as transaction_hash,
+                   "blockNumber"     as block_number,
+                   address,
+                   "to"              as account,
+                   value * -1        as adjusted_value
+            from erc20_transfers
+            union all
+            select "transactionHash", "blockNumber", address, "from" as account, value
+            from erc20_transfers) erc20_transfers
                inner join blocks on block_number = number
       where address = ${toBuffer(address)}
         and account = '\\x0000000000000000000000000000000000000000'
@@ -318,7 +361,47 @@ export const getStaticProps: GetStaticProps<
       reactors,
       geckoData,
       withheldLiquidity,
+      holders: await getHolders(address, decimals),
     },
     revalidate: 60 * 5,
   };
 };
+
+async function getHolders(address: string, decimal: number) {
+  const holders = await prisma.$queryRaw<
+    {
+      account: string;
+      total: number;
+      named_account: string;
+    }[]
+  >`
+      select account::varchar,
+             total,
+             dao_name as named_account
+      from (select account,
+                   sum(adjusted_value) / 10^${decimal} as total
+            from (select "transactionHash" as transaction_hash,
+                         "blockNumber"     as block_number,
+                         address,
+                         "to"              as account,
+                         value             as adjusted_value,
+                         value
+                  from erc20_transfers
+                  union all
+                  select "transactionHash" as transaction_hash,
+                         "blockNumber"     as block_number,
+                         address,
+                         "from"            as account,
+                         value * -1        as adjusted_value,
+                         value
+                  from erc20_transfers) foo
+            where address = ${toBuffer(address)}
+              and account != '\\x0000000000000000000000000000000000000000'
+            group by account) totals
+               left outer join dao_addresses da on da.address = totals.account
+      where totals.total > 0
+      order by total desc
+  `;
+
+  return holders;
+}
