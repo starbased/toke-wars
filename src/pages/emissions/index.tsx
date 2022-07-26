@@ -27,51 +27,11 @@ type Total = {
 };
 
 type Props = {
-  totals: Total[];
+  data: { cycle: number }[];
 };
 
-export default function Leaderboard({ totals }: Props) {
+export default function Leaderboard({ data }: Props) {
   const { onClick, shouldHide } = useHiddenLabels();
-
-  const byCycle = totals.reduce<Record<string, Record<string, number>>>(
-    (acc, obj) => {
-      let description = "Reactor";
-
-      if (obj.description.includes("-")) {
-        description = "LD";
-      } else if (obj.description.includes("_LP")) {
-        description = "LP";
-      } else if (
-        [
-          "MIM",
-          "USDC",
-          "FRAX",
-          "gOHM",
-          "alUSD",
-          "WETH",
-          "LUSD",
-          "FEI",
-          "DAI",
-        ].includes(obj.description)
-      ) {
-        description = "Pair Reactor";
-      }
-
-      let previousCycle = acc[obj.cycle];
-
-      return {
-        ...acc,
-        [obj.cycle]: {
-          ...previousCycle,
-          [description]:
-            parseFloat(formatEther(obj.rewards)) +
-            (previousCycle?.[description] || 0),
-        },
-      };
-    },
-    {}
-  );
-  const data = Object.entries(byCycle).map(([k, v]) => ({ cycle: k, ...v }));
 
   const orderedEmissions = orderBy(
     Object.entries(data[data.length - 1])
@@ -105,7 +65,7 @@ export default function Leaderboard({ totals }: Props) {
               type="number"
               domain={["dataMin", "dataMax"]}
               ticks={Array.from(
-                { length: Object.keys(byCycle).length / 2 },
+                { length: data.length / 2 },
                 (v, i) => i * 2 + 201
               )}
             />
@@ -153,15 +113,66 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       from (select address,
                    cycle,
                    data -> 'summary' -> 'breakdown' as breakdown
-            from ipfs_rewards) totals,
+            from ipfs_rewards
+            where cycle > 200
+            ) totals,
            jsonb_to_recordset(totals.breakdown) as breakdown(amount decimal, description varchar)
       group by cycle, description
       order by rewards
   `;
 
+  const byCycle = totals.reduce<Record<string, Record<string, number>>>(
+    (acc, obj) => {
+      let description = "Reactor";
+
+      if (obj.description.includes("-")) {
+        description = "LD";
+      } else if (obj.description.includes("_LP")) {
+        description = "LP";
+      } else if (
+        [
+          "MIM",
+          "USDC",
+          "FRAX",
+          "gOHM",
+          "alUSD",
+          "WETH",
+          "LUSD",
+          "FEI",
+          "DAI",
+        ].includes(obj.description)
+      ) {
+        description = "Pair Reactor";
+      }
+
+      let modifiedCycle = obj.cycle;
+
+      if (obj.cycle < 201) {
+        modifiedCycle = Math.floor((modifiedCycle - 5) / 7) * 7 + 5;
+      }
+      let previousCycle = acc[modifiedCycle];
+
+      return {
+        ...acc,
+        [modifiedCycle]: {
+          ...previousCycle,
+          [description]:
+            parseFloat(formatEther(obj.rewards)) +
+            (previousCycle?.[description] || 0),
+        },
+      };
+    },
+    {}
+  );
+
+  const data = Object.entries(byCycle).map(([k, v]) => ({
+    cycle: parseInt(k),
+    ...v,
+  }));
+
   return {
     props: {
-      totals,
+      data,
     },
   };
 };

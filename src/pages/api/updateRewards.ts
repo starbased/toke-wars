@@ -20,7 +20,7 @@ export default async function handler(
       await prisma.ipfsReward.aggregate({
         _max: { cycle: true },
       })
-    )._max.cycle || 200;
+    )._max.cycle || -1;
 
   const latestCycleIndex = await contract.latestCycleIndex();
 
@@ -31,22 +31,30 @@ export default async function handler(
     cycle <= latestCycleIndex.toNumber();
     cycle++
   ) {
-    const cycleHash = (await contract.cycleHashes(cycle)).latestClaimable;
+    const cycleHash = (await contract.cycleHashes(cycle)).cycle;
 
     let { data: responseData } = await axios.get<
       { payload: { wallet: string }; summary: { cycleTotal: string } }[]
     >(`https://ipfs.tokemaklabs.xyz/ipfs/${cycleHash}/all.json`);
 
     const data = responseData
-      .filter((obj) => parseInt(obj.summary.cycleTotal) > 0)
+      .filter(
+        (obj) =>
+          obj.summary === undefined || parseInt(obj.summary.cycleTotal) > 0
+      )
       .map((obj) => {
         const address = toBuffer(obj.payload.wallet);
         return { address, cycle, data: obj };
       });
 
     await prisma.ipfsReward.createMany({ data, skipDuplicates: true });
+    console.log(`Added cycle ${cycle}`);
     cyclesLoaded.push(cycle);
   }
-  await res.revalidate("/emissions");
+
+  if (cyclesLoaded.length !== 0) {
+    await res.revalidate("/emissions");
+  }
+
   res.status(200).json({ cyclesLoaded, done: true });
 }
