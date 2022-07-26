@@ -5,6 +5,7 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
+  Label,
   Legend,
   ResponsiveContainer,
   Tooltip,
@@ -17,6 +18,7 @@ import { graphColors } from "../../components/DaosGraph";
 import { formatEther } from "ethers/lib/utils";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
 import { formatNumber } from "../../util/maths";
+import { useHiddenLabels } from "../../hooks/useHiddenLabel";
 
 type Total = {
   cycle: number;
@@ -29,8 +31,10 @@ type Props = {
 };
 
 export default function Leaderboard({ totals }: Props) {
-  const data = Object.entries(
-    totals.reduce<Record<string, Record<string, number>>>((acc, obj) => {
+  const { onClick, shouldHide } = useHiddenLabels();
+
+  const byCycle = totals.reduce<Record<string, Record<string, number>>>(
+    (acc, obj) => {
       let description = "Reactor";
 
       if (obj.description.includes("-")) {
@@ -64,9 +68,10 @@ export default function Leaderboard({ totals }: Props) {
             (previousCycle?.[description] || 0),
         },
       };
-    }, {})
-  ).map(([k, v]) => ({ cycle: k, ...v }));
-  console.log(data);
+    },
+    {}
+  );
+  const data = Object.entries(byCycle).map(([k, v]) => ({ cycle: k, ...v }));
 
   const orderedEmissions = orderBy(
     Object.entries(data[data.length - 1])
@@ -78,6 +83,8 @@ export default function Leaderboard({ totals }: Props) {
     "total",
     "desc"
   );
+
+  let yformatter = Intl.NumberFormat("en", { notation: "compact" });
 
   return (
     <Page header="Reward Emissions">
@@ -97,8 +104,20 @@ export default function Leaderboard({ totals }: Props) {
               dataKey="cycle"
               type="number"
               domain={["dataMin", "dataMax"]}
+              ticks={Array.from(
+                { length: Object.keys(byCycle).length / 2 },
+                (v, i) => i * 2 + 201
+              )}
             />
-            <YAxis />
+            <YAxis tickFormatter={(tick) => yformatter.format(tick)}>
+              <Label
+                style={{ fill: "ghostwhite" }}
+                value="Toke"
+                angle={-90}
+                offset={10}
+                position="left"
+              />
+            </YAxis>
             <Tooltip
               labelStyle={{ color: "black" }}
               labelFormatter={(label, payload: Payload<number, string>[]) => {
@@ -107,10 +126,12 @@ export default function Leaderboard({ totals }: Props) {
                   .reduce((a, b) => a + b, 0);
                 return `Cycle ${label} (${formatNumber(total, 2)})`;
               }}
+              formatter={(amount: number) => formatNumber(amount, 2)}
             />
-            <Legend />
+            <Legend onClick={onClick} />
             {orderedEmissions.map(({ name }, i) => (
               <Area
+                hide={shouldHide(name)}
                 key={name}
                 dataKey={name}
                 type="stepAfter"
@@ -142,6 +163,5 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     props: {
       totals,
     },
-    revalidate: 60 * 5,
   };
 };

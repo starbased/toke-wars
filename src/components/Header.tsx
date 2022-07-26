@@ -46,11 +46,13 @@ export function Header() {
       <NavLink to="/reactor/0xd3b5d9a561c293fb42b446fe7e237daa9bf9aa84">
         Reactors
       </NavLink>
-      {["Leaderboard", "Revenue", "Stages", "Rewards"].map((link) => (
-        <NavLink to={"/" + link.toLowerCase()} key={link}>
-          {link}
-        </NavLink>
-      ))}
+      {["Leaderboard", "Revenue", "Emissions", "Stages", "Rewards"].map(
+        (link) => (
+          <NavLink to={"/" + link.toLowerCase()} key={link}>
+            {link}
+          </NavLink>
+        )
+      )}
     </>
   );
 
