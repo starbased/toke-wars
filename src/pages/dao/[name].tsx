@@ -10,6 +10,7 @@ import { addDays } from "date-fns";
 import { ResourcesCard } from "../../components/ResourcesCard";
 import { CoinInfo, getGeckoData } from "../../util/api/coinGecko";
 import { groupByTokeType } from "../../queries";
+import axios from "axios";
 
 type Props = {
   dao: Dao;
@@ -20,7 +21,7 @@ type Props = {
     tToke?: number;
     newStake?: number;
   }[];
-  geckoData: CoinInfo;
+  geckoData: CoinInfo | null;
 };
 
 type LocalRecord = {
@@ -63,7 +64,7 @@ export default function Index({ dao, data, addresses, geckoData }: Props) {
       />
       <TokeGraph data={data} />
       <Divider />
-      <ResourcesCard geckoData={geckoData} />
+      {geckoData ? <ResourcesCard geckoData={geckoData} /> : null}
     </Page>
   );
 }
@@ -86,7 +87,16 @@ export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
     })
   ).map(({ address }) => "0x" + address.toString("hex"));
 
-  const geckoData = await getGeckoData(dao.geckoId);
+  let geckoData = null;
+  try {
+    geckoData = await getGeckoData(dao.geckoId);
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      if (e.response?.status !== 404) {
+        throw e;
+      }
+    }
+  }
 
   return { props: { dao, data, addresses, geckoData }, revalidate: 60 * 5 };
 };
