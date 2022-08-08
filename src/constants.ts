@@ -19,7 +19,7 @@ export const DAOS: DaoInformation[] = [
   {
     addresses: [
       "0x5180db0237291a6449dda9ed33ad90a38787621c",
-      "0xB1748C79709f4Ba2Dd82834B8c82D4a505003f27"
+      "0xB1748C79709f4Ba2Dd82834B8c82D4a505003f27",
     ],
     name: "Frax",
     stage: 2,
@@ -34,17 +34,6 @@ export const DAOS: DaoInformation[] = [
     twitter: "ShapeShift_io",
     coingecko: "shapeshift-fox-token",
     discord: "shapeshift",
-  },
-  {
-    addresses: [
-      "0x873ad91fA4F2aA0d557C0919eC3F6c9D240cDd05",
-      "0xde50fb295549eda934d222e7a24d5a8dd132444f",
-    ],
-    name: "Lobis",
-    stage: 4,
-    twitter: "LobisHQ",
-    coingecko: "lobis",
-    discord: "lobishq",
   },
   {
     addresses: ["0xe94B5EEC1fA96CEecbD33EF5Baa8d00E4493F4f3"],
@@ -99,14 +88,6 @@ export const DAOS: DaoInformation[] = [
     twitter: "AlchemixFi",
     coingecko: "alchemix",
     discord: "zAd6dzgwaj",
-  },
-  {
-    addresses: ["0x73141d278a9c71d2ef2a0b83565e9d5728fa15cb"],
-    name: "Congruent",
-    stage: 1,
-    twitter: "CongruentFi",
-    coingecko: "congruent-dao-token",
-    discord: "tsepr8rndw",
   },
 ];
 
