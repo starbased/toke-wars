@@ -328,6 +328,10 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       name: "ALCX",
       gecko_id: "alchemix",
     },
+    "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2": {
+      name: "SUSHI",
+      gecko_id: "sushi",
+    },
   };
 
   const provider = getProvider();
