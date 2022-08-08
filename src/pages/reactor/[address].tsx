@@ -3,7 +3,12 @@ import { getProvider } from "../../util";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { T_TOKE_CONTRACT, TOKEMAK_MANAGER } from "../../constants";
 import { prisma } from "../../util/db";
-import { eachMonthOfInterval, isEqual, startOfDay } from "date-fns";
+import {
+  eachMonthOfInterval,
+  getUnixTime,
+  isEqual,
+  startOfDay,
+} from "date-fns";
 import { sortBy } from "lodash";
 import { useRouter } from "next/router";
 import {
@@ -311,7 +316,10 @@ export const getStaticProps: GetStaticProps<
   if (reactor.isStablecoin) {
     historicalPrices = { "1": 1 };
   } else if (reactor.coingeckoId) {
-    historicalPrices = await getHistoricalPrice(reactor.coingeckoId);
+    historicalPrices = await getHistoricalPrice(
+      reactor.coingeckoId,
+      getUnixTime(new Date(rawEvents[0].timestamp).getTime())
+    );
   }
 
   let days = Object.keys(historicalPrices);

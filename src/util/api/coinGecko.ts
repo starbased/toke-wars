@@ -35,15 +35,14 @@ export type CoinInfo = {
   };
 };
 
-export async function getHistoricalPrice(coin: string) {
+export async function getHistoricalPrice(coin: string, from: number) {
   const { data } = await geckoAPI.get<{ prices: [number, number][] }>(
     `coins/${coin}/market_chart/range`,
     {
       params: {
         vs_currency: "usd",
         //has to be at least 90 days to get in a daily scale
-        //TODO: make sure to go back far enough fetch transactions first
-        from: getUnixTime(addDays(new Date(), -91)),
+        from: from,
         to: getUnixTime(new Date()),
       },
     }
