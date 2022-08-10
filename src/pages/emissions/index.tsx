@@ -112,7 +112,6 @@ export default function Leaderboard({ data }: Props) {
                 hide={shouldHide(name)}
                 key={name}
                 dataKey={name}
-                type="stepAfter"
                 stackId="1"
                 fill={graphColors[i % graphColors.length]}
                 stroke={graphColors[i % graphColors.length]}
