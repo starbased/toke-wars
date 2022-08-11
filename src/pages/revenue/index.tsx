@@ -63,26 +63,28 @@ function usdValueOverRange(
 export default function Revenue({ values }: Props) {
   const [totalDuration, setTotalDuration] = useState<Duration | null>(null);
 
-  let totals = values.map(({ coin, transactions, price }) => {
-    let filteredTransactions = transactions;
+  let totals = values
+    .map(({ coin, transactions, price }) => {
+      let filteredTransactions = transactions;
 
-    if (totalDuration) {
-      filteredTransactions = filteredTransactions.filter(({ timestamp }) =>
-        isBefore(sub(new Date(), totalDuration), new Date(timestamp))
-      );
-    }
+      if (totalDuration) {
+        filteredTransactions = filteredTransactions.filter(({ timestamp }) =>
+          isBefore(sub(new Date(), totalDuration), new Date(timestamp))
+        );
+      }
 
-    const amount = filteredTransactions
-      .map(({ value }) => new BigNumber(value))
-      .reduce((a, b) => a.plus(b), new BigNumber(0))
-      .div(10 ** 18);
+      const amount = filteredTransactions
+        .map(({ value }) => new BigNumber(value))
+        .reduce((a, b) => a.plus(b), new BigNumber(0))
+        .div(10 ** 18);
 
-    return {
-      coin,
-      amount,
-      usdValue: amount.times(price).toNumber(),
-    };
-  });
+      return {
+        coin,
+        amount,
+        usdValue: amount.times(price).toNumber(),
+      };
+    })
+    .filter(({ usdValue }) => usdValue > 0);
 
   totals = orderBy(totals, "usdValue", "desc");
 
@@ -101,6 +103,14 @@ export default function Revenue({ values }: Props) {
     "blockNumber",
     "desc"
   );
+
+  let filteredData = data;
+
+  if (totalDuration) {
+    filteredData = filteredData.filter(({ timestamp }) =>
+      isBefore(sub(new Date(), totalDuration), new Date(timestamp))
+    );
+  }
 
   return (
     <Page header="Protocol Revenue">
@@ -258,7 +268,7 @@ export default function Revenue({ values }: Props) {
           </Thead>
 
           <Tbody>
-            {data?.map((tx) => (
+            {filteredData?.map((tx) => (
               <Tr key={tx.transactionHash + tx.coin + tx.amount}>
                 <Td>
                   {intlFormat(new Date(tx.timestamp), {
