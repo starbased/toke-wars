@@ -62,6 +62,7 @@ model Erc20Transfer {
 
   @@id([transactionHash, logIndex], map: "erc20_transfers_pk")
   @@index([address], map: "erc20_transfers_address_index")
+  @@index([address], map: "toke_staking_deposit_address_index")
   @@map("erc20_transfers")
 }
 
@@ -96,9 +97,11 @@ model TokeStakingWithdrawCompleted {
 }
 
 model IpfsReward {
-  address Bytes
-  cycle   Int
-  data    Json
+  address    Bytes
+  cycle      Int
+  data       Json     @db.Json
+  amount     Decimal @db.Decimal
+  cycleTotal Decimal @map("cycle_total") @db.Decimal
 
   @@id([cycle, address], map: "ipfs_rewards_pk")
   @@map("ipfs_rewards")

@@ -34,8 +34,15 @@ export default async function handler(
     const cycleHash = (await contract.cycleHashes(cycle)).cycle;
 
     let { data: responseData } = await axios.get<
-      { payload: { wallet: string }; summary: { cycleTotal: string } }[]
-    >(`https://ipfs.tokemaklabs.xyz/ipfs/${cycleHash}/all.json`);
+      {
+        payload: { wallet: string; amount: string };
+        summary?: { cycleTotal: string; breakdown: { amount: string }[] };
+      }[]
+    >(
+      `${
+        process.env.NEXT_PUBLIC_IPFS_PORTAL || "https://ipfs.tokemaklabs.xyz"
+      } /ipfs/${cycleHash}/all.json`
+    );
 
     const data = responseData
       .filter(
@@ -44,7 +51,14 @@ export default async function handler(
       )
       .map((obj) => {
         const address = toBuffer(obj.payload.wallet);
-        return { address, cycle, data: obj };
+        return {
+          address,
+          cycle,
+          amount: obj.payload.amount,
+          cycleTotal: obj.summary?.cycleTotal || "0",
+          data:
+            obj.summary?.breakdown?.filter((obj) => obj.amount !== "0") || [],
+        };
       });
 
     await prisma.ipfsReward.createMany({ data, skipDuplicates: true });

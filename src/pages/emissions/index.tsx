@@ -168,11 +168,11 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       select cycle, description, sum(amount)::varchar as rewards
       from (select address,
                    cycle,
-                   data -> 'summary' -> 'breakdown' as breakdown
+                   data as breakdown
             from ipfs_rewards
             where cycle > 200
             ) totals,
-           jsonb_to_recordset(totals.breakdown) as breakdown(amount decimal, description varchar)
+           json_to_recordset(totals.breakdown) as breakdown(amount decimal, description varchar)
       group by cycle, description
       order by rewards
   `;
