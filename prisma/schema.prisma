@@ -100,8 +100,8 @@ model IpfsReward {
   address    Bytes
   cycle      Int
   data       Json     @db.Json
-  amount     Decimal @db.Decimal
-  cycleTotal Decimal @map("cycle_total") @db.Decimal
+  amount     Decimal  @db.Decimal
+  cycleTotal Decimal  @map("cycle_total") @db.Decimal
 
   @@id([cycle, address], map: "ipfs_rewards_pk")
   @@map("ipfs_rewards")
