@@ -41,7 +41,7 @@ export default async function handler(
     >(
       `${
         process.env.NEXT_PUBLIC_IPFS_PORTAL || "https://ipfs.tokemaklabs.xyz"
-      } /ipfs/${cycleHash}/all.json`
+      }/ipfs/${cycleHash}/all.json`
     );
 
     const data = responseData
