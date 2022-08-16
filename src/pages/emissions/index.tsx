@@ -25,6 +25,7 @@ import { addDays } from "date-fns";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 import { Link } from "@chakra-ui/react";
+import { useTokePrice } from "../../util/api/tokemak";
 
 type Total = {
   cycle: number;
@@ -37,10 +38,17 @@ type Props = {
 };
 
 export default function Leaderboard({ data }: Props) {
+  const price = useTokePrice();
+  const lastRecord = data[data.length - 1];
+
+  if (price !== 0) {
+    lastRecord.usdValue = lastRecord.total * price;
+  }
+
   const { onClick, shouldHide } = useHiddenLabels();
 
   const orderedEmissions = orderBy(
-    Object.entries(data[data.length - 1])
+    Object.entries(lastRecord)
       .filter(([name]) => !["total", "usdValue"].includes(name))
       .map(([name, total]) => ({
         name,
