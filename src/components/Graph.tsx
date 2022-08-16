@@ -22,11 +22,11 @@ import {
   Spacer,
   Switch,
 } from "@chakra-ui/react";
-import { CycleInfoType } from "./Totals";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
+import { IpfsRewardsRecord } from "../pages/rewards/[address]";
 
 type Props = {
-  rewards: (CycleInfoType | undefined)[];
+  rewards: IpfsRewardsRecord[];
 };
 
 export const graphColors = [
@@ -61,7 +61,7 @@ export function Graph({ rewards }: Props) {
     let last: Record<string, string> = {};
 
     for (let i in rewards) {
-      const nameObj = { name: (parseInt(i) + 1).toString() };
+      const nameObj = { name: parseInt(i).toString() };
       const data = rewards[i];
 
       if (!data) {
@@ -71,7 +71,7 @@ export function Graph({ rewards }: Props) {
           ...nameObj,
         });
       } else {
-        let current = data?.summary?.breakdown.reduce((acc, obj) => {
+        let current = data.data.reduce((acc, obj) => {
           return { ...acc, [obj.description]: obj.amount };
         }, {});
 

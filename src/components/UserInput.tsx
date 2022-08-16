@@ -12,11 +12,7 @@ import { getAddress } from "ethers/lib/utils";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 
-type Props = {
-  address?: string;
-};
-
-export function UserInput({ address }: Props) {
+export function UserInput() {
   const router = useRouter();
 
   const {
@@ -26,7 +22,7 @@ export function UserInput({ address }: Props) {
   } = useForm<{ address: string }>();
 
   const onSubmit = handleSubmit((data) =>
-    router.push(`/rewards?address=${getAddress(data.address)}`, undefined, {
+    router.push(`/rewards/${getAddress(data.address)}`, undefined, {
       shallow: true,
     })
   );
@@ -37,7 +33,7 @@ export function UserInput({ address }: Props) {
         <Flex>
           <Box px="2" minW={425}>
             <Input
-              defaultValue={address}
+              defaultValue={router.query?.address}
               autoFocus
               id="address"
               placeholder="ETH Address"
