@@ -109,7 +109,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 
   return {
     props: {
-      toke_price: await tokePrice(),
+      toke_price: (await tokePrice()).prices.toke,
       daos: daos,
     },
     revalidate: 60 * 5,

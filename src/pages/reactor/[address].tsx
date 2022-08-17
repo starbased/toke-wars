@@ -266,7 +266,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     .map((pool) => pool.toLowerCase());
 
   return {
-    paths: pools.map((address) => ({ params: { address } })),
+    paths: [],
     fallback: false,
   };
 };
