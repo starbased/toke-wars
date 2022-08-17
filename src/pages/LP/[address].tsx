@@ -1,5 +1,9 @@
 import { Page } from "../../components/Page";
-import { ERC20__factory, UniswapV2__factory } from "../../typechain";
+import {
+  ERC20__factory,
+  SushiRewards__factory,
+  UniswapV2__factory,
+} from "../../typechain";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { getProvider } from "../../util";
 import { ethers } from "ethers";
@@ -33,8 +37,25 @@ const addresses = [
   ["0x470e8de2eBaef52014A47Cb5E6aF86884947F08c", "WETH", "FOX"],
   ["0xecBa967D84fCF0405F6b32Bc45F4d36BfDBB2E81", "FXS", "WETH"],
   ["0xe55c3e83852429334A986B265d03b879a3d188Ac", "TCR", "WETH"],
-  // ["0xC3f279090a47e80990Fe3a9c30d24Cb117EF91a8", "WETH", "ALCX"],
+  ["0xC3f279090a47e80990Fe3a9c30d24Cb117EF91a8", "WETH", "ALCX"],
+  ["0x795065dCc9f64b5614C407a6EFDC400DA6221FB0", "SUSHI", "WETH"],
+  ["0x53162D78dCa413d9e28cf62799D17a9E278B60E8", "APW", "WETH"],
 ];
+
+const stakedAddresses = {
+  "0xC3f279090a47e80990Fe3a9c30d24Cb117EF91a8": {
+    address: "0xEF0881eC094552b2e128Cf945EF17a6752B4Ec5d",
+    pid: 0,
+  },
+  "0x795065dCc9f64b5614C407a6EFDC400DA6221FB0": {
+    address: "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd",
+    pid: 12,
+  },
+  "0x53162D78dCa413d9e28cf62799D17a9E278B60E8": {
+    address: "0xef0881ec094552b2e128cf945ef17a6752b4ec5d",
+    pid: 20,
+  },
+} as Record<string, { address: string; pid: number }>;
 
 const transform = (token: Token, price: number) => {
   const difference = BigNumber.from(token.current).sub(token.input).toString();
@@ -62,8 +83,10 @@ export default function Uni({ token0, token1, transactions }: Props) {
       <ul>
         {addresses.map(([address, a, b]) => (
           <li key={address}>
-            <Link href={`/LP/${address}`}>
-              {a !== "" ? a + "/" + b : address}
+            <Link href={`/LP/${address}`} passHref>
+              <a style={{ textDecoration: "underline", color: "-webkit-link" }}>
+                {a !== "" ? a + "/" + b : address}
+              </a>
             </Link>
           </li>
         ))}
@@ -95,20 +118,22 @@ export default function Uni({ token0, token1, transactions }: Props) {
           </tr>
         </thead>
         <tbody>
-          {transactions?.map(({ transactionHash, amount0, amount1 }) => (
-            <tr key={transactionHash}>
-              <td>
-                <Link
-                  href={`https://etherscan.io/tx/${transactionHash}`}
-                  target="_blank"
-                >
-                  {shortenAddress(transactionHash)}
-                </Link>
-              </td>
-              <td>{formatNumber(parseFloat(formatEther(amount0)), 2)}</td>
-              <td>{formatNumber(parseFloat(formatEther(amount1)), 2)}</td>
-            </tr>
-          ))}
+          {transactions
+            ?.reverse()
+            ?.map(({ transactionHash, amount0, amount1 }) => (
+              <tr key={transactionHash}>
+                <td>
+                  <Link
+                    href={`https://etherscan.io/tx/${transactionHash}`}
+                    target="_blank"
+                  >
+                    {shortenAddress(transactionHash)}
+                  </Link>
+                </td>
+                <td>{formatNumber(parseFloat(formatEther(amount0)), 2)}</td>
+                <td>{formatNumber(parseFloat(formatEther(amount1)), 2)}</td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </Page>
@@ -153,6 +178,7 @@ export const getStaticProps: GetStaticProps<
   if (!params?.address) {
     throw Error("Unknown tAsset");
   }
+  const LpAddress = params?.address;
 
   let amount0 = BigNumber.from(0);
   let amount1 = BigNumber.from(0);
@@ -203,7 +229,20 @@ export const getStaticProps: GetStaticProps<
     });
   }
 
-  const balance = await uniswapContract.balanceOf(TOKEMAK_MANAGER);
+  let balance;
+  if (stakedAddresses.hasOwnProperty(LpAddress)) {
+    const { address: rewardsAddress, pid } = stakedAddresses[LpAddress];
+    const rewardsContract = SushiRewards__factory.connect(
+      rewardsAddress,
+      getProvider()
+    );
+
+    let [amount] = await rewardsContract.userInfo(pid, TOKEMAK_MANAGER);
+    balance = amount;
+  } else {
+    balance = await uniswapContract.balanceOf(TOKEMAK_MANAGER);
+  }
+
   const totalSupply = await uniswapContract.totalSupply();
 
   const [reserve0, reserve1] = await uniswapContract.getReserves();
