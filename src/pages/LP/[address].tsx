@@ -62,7 +62,7 @@ export default function Uni({ token0, token1, transactions }: Props) {
       <ul>
         {addresses.map(([address, a, b]) => (
           <li key={address}>
-            <Link href={`/uni/${address}`}>
+            <Link href={`/LP/${address}`}>
               {a !== "" ? a + "/" + b : address}
             </Link>
           </li>
@@ -98,7 +98,6 @@ export default function Uni({ token0, token1, transactions }: Props) {
           {transactions?.map(({ transactionHash, amount0, amount1 }) => (
             <tr key={transactionHash}>
               <td>
-                {" "}
                 <Link
                   href={`https://etherscan.io/tx/${transactionHash}`}
                   target="_blank"

@@ -14,7 +14,7 @@ module.exports = withBundleAnalyzer({
   async redirects() {
     return [
       {
-        source: "/LP",
+        source: "/lp",
         destination: "/LP/0xAd5B1a6ABc1C9598C044cea295488433a3499eFc",
         permanent: false,
       },
