@@ -375,8 +375,8 @@ export const getStaticProps: GetStaticProps<
   };
 };
 
-async function getHolders(address: string, decimal: number) {
-  const holders = await prisma.$queryRaw<
+function getHolders(address: string, decimal: number) {
+  return prisma.$queryRaw<
     {
       account: string;
       total: number;
@@ -410,6 +410,4 @@ async function getHolders(address: string, decimal: number) {
       where totals.total > 0
       order by total desc
   `;
-
-  return holders;
 }

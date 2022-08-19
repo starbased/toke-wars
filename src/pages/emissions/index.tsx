@@ -24,8 +24,26 @@ import { getHistoricalPrice } from "../../util/api/coinGecko";
 import { addDays } from "date-fns";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 
-import { Link } from "@chakra-ui/react";
+import {
+  chakra,
+  Link,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import { useTokePrice } from "../../util/api/tokemak";
+
+type Metric = {
+  cycle: number;
+  mean: number;
+  median: number;
+  max: number;
+  standard_deviation: number;
+  count: number;
+};
 
 type Total = {
   cycle: number;
@@ -35,9 +53,10 @@ type Total = {
 
 type Props = {
   data: { cycle: number; total: number; usdValue: number }[];
+  metrics: Metric[];
 };
 
-export default function Leaderboard({ data }: Props) {
+export default function Leaderboard({ data, metrics }: Props) {
   const price = useTokePrice();
   const lastRecord = data[data.length - 1];
 
@@ -163,10 +182,38 @@ export default function Leaderboard({ data }: Props) {
           it by the price of toke on the day of the cycle.
         </p>
         <p>
-          For cycles that have not occurred yet the last known price data is
-          used.
+          For cycles that have not ended yet the last known price data is used.
         </p>
       </div>
+
+      <chakra.h2 fontSize="xl" fontWeight="bold">
+        Stats
+      </chakra.h2>
+
+      <Table variant="simple">
+        <Thead>
+          <Tr>
+            <Th>Cycle</Th>
+            <Th>Mean</Th>
+            <Th>Median</Th>
+            <Th>Max</Th>
+            <Th>Standard Deviation</Th>
+            <Th>Wallets</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {metrics.map((metric) => (
+            <Tr key={metric.cycle}>
+              <Td>{metric.cycle}</Td>
+              <Td>{formatNumber(metric.mean, 2)}</Td>
+              <Td>{formatNumber(metric.median, 2)}</Td>
+              <Td>{formatNumber(metric.max, 2)}</Td>
+              <Td>{formatNumber(metric.standard_deviation, 2)}</Td>
+              <Td>{metric.count}</Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
     </Page>
   );
 }
@@ -178,8 +225,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
                    cycle,
                    data as breakdown
             from ipfs_rewards
-            where cycle > 200
-            ) totals,
+            where cycle > 200) totals,
            json_to_recordset(totals.breakdown) as breakdown(amount decimal, description varchar)
       group by cycle, description
       order by rewards
@@ -255,9 +301,24 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     };
   });
 
+  const metrics = await prisma.$queryRaw<Metric[]>`
+      select cycle,
+             avg(amount)                                         as mean,
+             PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY amount) AS median,
+             MAX(amount)                                         AS max,
+             STDDEV(amount)                                      AS standard_deviation,
+             count(*)::integer                                   as count
+      from (select cycle, cycle_total / 10 ^ 18 as amount
+            from ipfs_rewards
+            where cycle > 200) cycles
+      group by cycle
+      order by cycle desc
+  `;
+
   return {
     props: {
       data,
+      metrics,
     },
   };
 };
