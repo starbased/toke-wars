@@ -222,7 +222,7 @@ export const getServerSideProps: GetStaticProps<
         cycle: reward.cycle,
         data: reward.data as { amount: string; description: string }[],
         amount: reward.amount.toString(),
-        cycleTotal: reward.cycleTotal.toString(),
+        cycleTotal: reward.cycleTotal.toFixed(),
       })),
       latest_cycle,
     },
