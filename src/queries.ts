@@ -5,6 +5,7 @@ import {
   TOKE_CONTRACT,
   TOKE_STAKING_CONTRACT,
 } from "./constants";
+import { addressToHex } from "./util";
 
 export async function groupByTokeType(daoName?: string) {
   const records = await prisma.$queryRawUnsafe<
@@ -34,7 +35,7 @@ export async function groupByTokeType(daoName?: string) {
   return getData(
     records.map((record) => ({
       ...record,
-      type: typeMap["0x" + record.type.toString("hex")],
+      type: typeMap[addressToHex(record.type)],
     }))
   );
 }

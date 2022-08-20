@@ -1,5 +1,5 @@
 import { ManagerContract__factory, TAsset__factory } from "../../typechain";
-import { getProvider } from "../../util";
+import { addressToHex, getProvider } from "../../util";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { T_TOKE_CONTRACT, TOKEMAK_MANAGER } from "../../constants";
 import { prisma } from "../../util/db";
@@ -48,7 +48,7 @@ import { BigNumber } from "bignumber.js";
 import { formatNumber } from "../../util/maths";
 import { Reactor } from "@prisma/client";
 import { ResourcesCard } from "../../components/ResourcesCard";
-import { toBuffer } from "../api/updateEvents";
+import { getAllReactors, toBuffer } from "../api/updateEvents";
 import { formatUnits } from "ethers/lib/utils";
 
 type Props = {
@@ -256,10 +256,7 @@ export default function Index({
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const provider = getProvider();
-  const contract = ManagerContract__factory.connect(TOKEMAK_MANAGER, provider);
-
-  let pools = await contract.getPools();
+  let pools = await getAllReactors();
 
   pools = pools
     .filter((pool) => pool !== T_TOKE_CONTRACT)
@@ -353,7 +350,7 @@ export const getStaticProps: GetStaticProps<
 
   const reactors = (await prisma.reactor.findMany()).map((reactor) => ({
     ...reactor,
-    address: "0x" + reactor.address.toString("hex"),
+    address: addressToHex(reactor.address),
   }));
 
   const withheldLiquidity = formatUnits(

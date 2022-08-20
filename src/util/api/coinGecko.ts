@@ -11,7 +11,7 @@ const geckoAPI = axios.create({
 
 axiosRetry(geckoAPI, {
   retries: 10,
-  retryDelay: axiosRetry.exponentialDelay,
+  retryDelay: (retryCount) => 60 * 1000,
   retryCondition: (error) => error.response?.status === 429,
 });
 

@@ -3,6 +3,10 @@ import { prisma } from "./db";
 import { Block } from "@prisma/client";
 import { chunk, isEmpty } from "lodash";
 
+export function addressToHex(buffer: Buffer) {
+  return "0x" + buffer.toString("hex");
+}
+
 export function getProvider() {
   return new providers.InfuraProvider(1, process.env.NEXT_PUBLIC_INFURA_KEY);
 }

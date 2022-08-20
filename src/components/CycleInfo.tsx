@@ -5,11 +5,12 @@ import { useEffect, useState } from "react";
 import { BaseCard } from "./DaoDetailsCard";
 import { ManagerContract__factory } from "../typechain";
 import { providers } from "ethers";
+import { TOKEMAK_MANAGER } from "../constants";
 
 export function CycleInfo() {
   const { data } = useQuery("managerContract", async () => {
     const contract = ManagerContract__factory.connect(
-      "0xA86e412109f77c45a3BC1c5870b880492Fb86A14",
+      TOKEMAK_MANAGER,
       //TODO: move this call elsewhere
       new providers.InfuraProvider(1, process.env.NEXT_PUBLIC_INFURA_KEY)
     );

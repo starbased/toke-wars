@@ -11,6 +11,7 @@ import { ResourcesCard } from "../../components/ResourcesCard";
 import { CoinInfo, getGeckoData } from "../../util/api/coinGecko";
 import { groupByTokeType } from "../../queries";
 import axios from "axios";
+import { addressToHex } from "../../util";
 
 type Props = {
   dao: Dao;
@@ -85,7 +86,7 @@ export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
     await prisma.daoAddress.findMany({
       where: { daos: dao },
     })
-  ).map(({ address }) => "0x" + address.toString("hex"));
+  ).map(({ address }) => addressToHex(address));
 
   let geckoData = null;
   try {

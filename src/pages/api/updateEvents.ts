@@ -4,11 +4,16 @@ import { arrayify } from "ethers/lib/utils";
 import ERC20 from "../../abi/ERC20.json";
 import TokeStaking from "../../abi/TokeStaking.json";
 
-import { getProvider, updateDbBlocks } from "../../util";
+import { addressToHex, getProvider, updateDbBlocks } from "../../util";
 import { prisma } from "../../util/db";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ManagerContract__factory } from "../../typechain";
+import {
+  TOKE_CONTRACT,
+  TOKE_STAKING_CONTRACT,
+  TOKEMAK_MANAGER,
+} from "../../constants";
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,20 +30,30 @@ export async function loadAll() {
   await updateDbBlocks();
 }
 
+export async function getAllReactors() {
+  const managerContract = ManagerContract__factory.connect(
+    TOKEMAK_MANAGER,
+    getProvider()
+  );
+
+  const pools = [...(await managerContract.getPools())];
+
+  const reactors = await prisma.reactor.findMany({
+    where: { address: { notIn: pools.map(toBuffer) } },
+  });
+
+  pools.push(...reactors.map((reactor) => addressToHex(reactor.address)));
+  return pools;
+}
+
 export function toBuffer(hexString: string) {
   return Buffer.from(arrayify(hexString));
 }
 
 async function loadTAssets() {
-  const contract = ManagerContract__factory.connect(
-    "0xA86e412109f77c45a3BC1c5870b880492Fb86A14",
-    getProvider()
-  );
+  const pools = await getAllReactors();
 
-  const pools = [...(await contract.getPools())]; // tAsset tokens
-  // const pools: any = [];
-
-  pools.push("0x2e9d63788249371f1DFC918a52f8d799F4a38C94"); //toke token
+  pools.push(TOKE_CONTRACT); //toke token
 
   for (let pool of pools) {
     await load(pool, ERC20, "Transfer", prisma.erc20Transfer);
@@ -47,14 +62,14 @@ async function loadTAssets() {
 
 export async function loadTokeStaking() {
   await load(
-    "0x96F98Ed74639689C3A11daf38ef86E59F43417D3",
+    TOKE_STAKING_CONTRACT,
     TokeStaking,
     "Deposited",
     prisma.tokeStakingDeposit
   );
 
   await load(
-    "0x96F98Ed74639689C3A11daf38ef86E59F43417D3",
+    TOKE_STAKING_CONTRACT,
     TokeStaking,
     "WithdrawCompleted",
     prisma.tokeStakingWithdrawCompleted
