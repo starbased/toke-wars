@@ -70,18 +70,18 @@ export function Header() {
                 <div className="hidden md:block">
                   <div className="ml-5 flex items-baseline space-x-4">
                     {navigation.map((item) => (
-                      <a
-                        key={item.link}
-                        href={item.href}
-                        className={`px-2 py-2 rounded-md text-sm font-medium ${
-                          item.active
-                            ? "bg-gray-800 text-white"
-                            : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                        }`}
-                        aria-current={item.active ? "page" : undefined}
-                      >
-                        {item.link}
-                      </a>
+                      <Link key={item.link} href={item.href} passHref>
+                        <a
+                          className={`px-2 py-2 rounded-md text-sm font-medium ${
+                            item.active
+                              ? "bg-gray-800 text-white"
+                              : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                          }`}
+                          aria-current={item.active ? "page" : undefined}
+                        >
+                          {item.link}
+                        </a>
+                      </Link>
                     ))}
 
                     <Menu as="div" className="relative inline-block text-left">

@@ -12,6 +12,9 @@ import { Divider } from "components/Divider";
 import { Card } from "components/Card";
 import { StatCard } from "components/StatCard";
 import Head from "next/head";
+import { useEffect } from "react";
+import { event } from "utils/analytics";
+import { useRouter } from "next/router";
 
 export type IpfsRewardsRecord = {
   cycle: number;
@@ -27,6 +30,13 @@ type Props = {
 
 export default function Index({ rewards: known_rewards, latest_cycle }: Props) {
   const toke_price = useTokePrice();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof router.query.address === "string") {
+      event({ action: "View User Rewards", label: router.query.address });
+    }
+  }, [router.query]);
 
   const rewards = Array.from(Array(latest_cycle + 1)).map((_, i) => {
     let rewards = known_rewards.find(({ cycle }) => cycle === i);
