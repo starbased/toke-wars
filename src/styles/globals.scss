@@ -2,8 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+}
+
+html{
+  @apply h-full
+}
+
 body {
-  @apply bg-gray-800 text-white
+  @apply bg-gray-800 text-white h-full overscroll-contain
+}
+
+#__next {
+  @apply h-full flex flex-col
 }
 
 main {

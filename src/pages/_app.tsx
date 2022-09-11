@@ -21,10 +21,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="description" content="Informative tokemak dashboard" />
       </Head>
       <Header />
-      <QueryClientProvider client={queryClient}>
-        <Component {...pageProps} />
-      </QueryClientProvider>
 
+      <div className="overflow-y-auto flex-1">
+        <QueryClientProvider client={queryClient}>
+          <Component {...pageProps} />
+        </QueryClientProvider>
+      </div>
       <Footer />
     </>
   );

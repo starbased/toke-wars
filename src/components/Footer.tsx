@@ -15,7 +15,7 @@ const SocialButton = ({
     <a
       href={href}
       title={label}
-      className="bg-gray-800 p-2 rounded-full"
+      className="bg-gray-800 p-1 px-2 rounded-full"
       target="_blank"
       rel="noreferrer"
     >
@@ -26,8 +26,8 @@ const SocialButton = ({
 
 export function Footer() {
   return (
-    <footer className="sticky bottom-0 bg-gray-900 ">
-      <div className="p-4 container flex justify-between mx-auto">
+    <footer className="bg-gray-900 ">
+      <div className="p-3 container flex justify-between items-center mx-auto">
         <a href="https://www.tokebase.xyz/" target="_blank" rel="noreferrer">
           Tokebase
         </a>
