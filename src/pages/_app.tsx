@@ -24,6 +24,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>Toke Wars</title>
         <link rel="icon" href="/favicon.png" />
+        <meta name="description" content="Informative tokemak dashboard" />
       </Head>
       <ChakraProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
