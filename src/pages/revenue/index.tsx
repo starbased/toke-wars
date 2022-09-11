@@ -14,6 +14,7 @@ import { formatISO, intlFormat, isAfter, isBefore, sub } from "date-fns";
 import { useState } from "react";
 import { StatCard } from "components/StatCard";
 import { Card } from "components/Card";
+import Head from "next/head";
 
 type Props = {
   values: {
@@ -98,6 +99,13 @@ export default function Revenue({ values }: Props) {
 
   return (
     <Page header="Protocol Revenue" className="items-center">
+      <Head>
+        <title>Protocol Revenue</title>
+        <meta
+          name="description"
+          content="Find out how much Protocol Revenue Tokemak is bringing in"
+        />
+      </Head>
       <div className="grid md:grid-cols-3 w-full">
         <StatCard
           className="cursor-pointer"

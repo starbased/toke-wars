@@ -7,6 +7,7 @@ import { tokePrice, useTokePrice } from "utils/api/tokemak";
 import { Coin } from "components/coin";
 import { Card } from "components/Card";
 import { Page } from "components/Page";
+import Head from "next/head";
 
 type Props = {
   toke_price: number;
@@ -28,6 +29,13 @@ export default function Leaderboard({
 
   return (
     <Page header="Leaderboard" className="items-center">
+      <Head>
+        <title>Leaderboard</title>
+        <meta
+          name="description"
+          content="Track the Top DAOs accumulating Tokemak"
+        />
+      </Head>
       <Link href="/stages" passHref>
         <a className="p-2 border border-gray-500 rounded-md">
           Discover the Stages of Liquidity

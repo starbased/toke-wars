@@ -18,7 +18,10 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>Toke Wars</title>
         <link rel="icon" href="/favicon.png" />
-        <meta name="description" content="Informative tokemak dashboard" />
+        <meta
+          name="description"
+          content="Informative Tokemak dashboard centering around DAO accumulation"
+        />
       </Head>
       <Header />
 

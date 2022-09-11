@@ -38,6 +38,7 @@ import { ResourcesCard } from "components/ResourcesCard";
 import { getAllReactors, toBuffer } from "../api/updateEvents";
 import { formatUnits } from "ethers/lib/utils";
 import { Divider } from "components/Divider";
+import Head from "next/head";
 
 type Props = {
   reactors: (Omit<Reactor, "address"> & { address: string })[];
@@ -164,6 +165,18 @@ export default function Index({
 
   return (
     <Page header="Reactor Value Locked" className="items-center">
+      <Head>
+        <title>
+          {`${
+            reactors.find((reactor) => reactor.address === router.query.address)
+              ?.symbol
+          } Reactor`}
+        </title>
+        <meta
+          name="description"
+          content="View the history of deposits for Tokemak reactors"
+        />
+      </Head>
       <div className="flex flex-wrap gap-5">
         <select
           className="bg-gray-800 border-gray-600 border p-1  rounded-md"

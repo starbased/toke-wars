@@ -11,6 +11,7 @@ import { CoinInfo, getGeckoData } from "utils/api/coinGecko";
 import { groupByTokeType } from "@/queries";
 import axios from "axios";
 import { addressToHex } from "@/utils";
+import Head from "next/head";
 
 type Props = {
   dao: Dao;
@@ -50,6 +51,13 @@ export default function Index({ dao, data, addresses, geckoData }: Props) {
 
   return (
     <Page header={dao.name}>
+      <Head>
+        <title>{dao.name} Toke Accumulation</title>
+        <meta
+          name="description"
+          content={`Follow the Tokemak accumulation for ${dao.name}`}
+        />
+      </Head>
       <DaoDetailsCard
         stage={dao.stage}
         addresses={addresses}

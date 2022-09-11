@@ -11,6 +11,7 @@ import { UserInput } from "components/UserInput";
 import { Divider } from "components/Divider";
 import { Card } from "components/Card";
 import { StatCard } from "components/StatCard";
+import Head from "next/head";
 
 export type IpfsRewardsRecord = {
   cycle: number;
@@ -76,6 +77,9 @@ export default function Index({ rewards: known_rewards, latest_cycle }: Props) {
 
   return (
     <Page header="Rewards" className="items-center">
+      <Head>
+        <title>User Rewards</title>
+      </Head>
       <UserInput />
 
       <div className="grid md:grid-cols-3">

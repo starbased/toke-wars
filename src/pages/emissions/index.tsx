@@ -28,6 +28,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { faExternalLink } from "@fortawesome/free-solid-svg-icons";
 import { Divider } from "components/Divider";
+import Head from "next/head";
 
 type Metric = {
   cycle: number;
@@ -75,6 +76,13 @@ export default function Leaderboard({ data, metrics }: Props) {
 
   return (
     <Page header="Reward Emissions" className="items-center">
+      <Head>
+        <title>Rewards Emissions</title>
+        <meta
+          name="description"
+          content="See how Tokemak reward emissions are changing over time."
+        />
+      </Head>
       <div style={{ width: "100%", height: "500px" }}>
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
