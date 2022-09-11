@@ -214,7 +214,7 @@ export default function Revenue({ values }: Props) {
           </button>
         </a>
       </Card>
-      <Card>
+      <Card className="overflow-x-auto w-full md:w-auto">
         <h2 className="text-center text-xl">Events</h2>
 
         <table className="styledTable">

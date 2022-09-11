@@ -81,9 +81,9 @@ export default function Leaderboard({ data, metrics }: Props) {
             data={data}
             margin={{
               top: 0,
-              right: 75,
-              left: 75,
-              bottom: 5,
+              right: 0,
+              left: 0,
+              bottom: 0,
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
@@ -185,32 +185,34 @@ export default function Leaderboard({ data, metrics }: Props) {
 
       <Divider />
 
-      <h2 className="self-center text-2xl">Stats</h2>
+      <div className="overflow-x-auto w-full md:w-auto">
+        <h2 className="self-center text-2xl">Stats</h2>
 
-      <table className="styledTable">
-        <thead>
-          <tr>
-            <th>Cycle</th>
-            <th>Mean</th>
-            <th>Median</th>
-            <th>Max</th>
-            <th>Standard Deviation</th>
-            <th>Wallets</th>
-          </tr>
-        </thead>
-        <tbody>
-          {metrics.map((metric) => (
-            <tr key={metric.cycle}>
-              <td>{metric.cycle}</td>
-              <td>{formatNumber(metric.mean, 2)}</td>
-              <td>{formatNumber(metric.median, 2)}</td>
-              <td>{formatNumber(metric.max, 2)}</td>
-              <td>{formatNumber(metric.standard_deviation, 2)}</td>
-              <td>{metric.count}</td>
+        <table className="styledTable">
+          <thead>
+            <tr>
+              <th>Cycle</th>
+              <th>Mean</th>
+              <th>Median</th>
+              <th>Max</th>
+              <th>Standard Deviation</th>
+              <th>Wallets</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {metrics.map((metric) => (
+              <tr key={metric.cycle}>
+                <td>{metric.cycle}</td>
+                <td>{formatNumber(metric.mean, 2)}</td>
+                <td>{formatNumber(metric.median, 2)}</td>
+                <td>{formatNumber(metric.max, 2)}</td>
+                <td>{formatNumber(metric.standard_deviation, 2)}</td>
+                <td>{metric.count}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Page>
   );
 }

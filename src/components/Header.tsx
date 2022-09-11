@@ -1,9 +1,15 @@
 import Image from "next/future/image";
 import Link from "next/link";
-import { Menu, Transition } from "@headlessui/react";
+import { Menu, Transition, Disclosure } from "@headlessui/react";
 import { Fragment } from "react";
+import { useRouter } from "next/router";
+import { DAOS } from "@/constants";
+import { faBars, faClose } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export function Header() {
+  const router = useRouter();
+
   const links = [
     "Reactors",
     "Leaderboard",
@@ -12,6 +18,111 @@ export function Header() {
     "Stages",
     "Rewards",
   ];
+
+  const navigation = links.map((link) => {
+    const href = `/${link.toLowerCase()}`;
+    return {
+      link,
+      href,
+      active: href === router.pathname,
+    };
+  });
+
+  return (
+    <>
+      <div className="min-h-full">
+        <Disclosure as="nav" className="bg-gray-900">
+          {({ open }) => (
+            <>
+              <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6">
+                <div className="flex h-16 items-center justify-between">
+                  <div className="flex items-center">
+                    <Link href="/" passHref>
+                      <a>
+                        <Image
+                          className="cursor-pointer"
+                          src="/images/tokewars.png" // Route of the image file
+                          height={22} // Desired size with correct aspect ratio
+                          width={160} // Desired size with correct aspect ratio
+                          alt="Toke Wars Logo"
+                        />
+                      </a>
+                    </Link>
+
+                    <div className="hidden md:block">
+                      <div className="ml-5 flex items-baseline space-x-4">
+                        {navigation.map((item) => (
+                          <a
+                            key={item.link}
+                            href={item.href}
+                            className={`px-2 py-2 rounded-md text-sm font-medium ${
+                              item.active
+                                ? "bg-gray-800 text-white"
+                                : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            }`}
+                            aria-current={item.active ? "page" : undefined}
+                          >
+                            {item.link}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="-mr-2 flex md:hidden">
+                    {/* Mobile menu button */}
+                    <Disclosure.Button className="mr-2 inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                      <span className="sr-only">Open main menu</span>
+                      {open ? (
+                        <FontAwesomeIcon icon={faClose} width={15} />
+                      ) : (
+                        <FontAwesomeIcon icon={faBars} width={15} />
+                      )}
+                    </Disclosure.Button>
+                  </div>
+                </div>
+              </div>
+
+              <Disclosure.Panel className="md:hidden">
+                <div className="space-y-1 px-2 pt-2 pb-3 sm:px-3">
+                  {navigation.map((item) => (
+                    <Disclosure.Button
+                      as="a"
+                      key={item.link}
+                      href={item.href}
+                      className={`block px-3 py-2 rounded-md text-base font-medium ${
+                        item.active
+                          ? "bg-gray-800 text-white"
+                          : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                      }`}
+                      aria-current={item.active ? "page" : undefined}
+                    >
+                      {item.link}
+                    </Disclosure.Button>
+                  ))}
+                </div>
+                <div className="border-t border-gray-700 pt-4 pb-3">
+                  <div className="flex items-center px-5">DAOs</div>
+                  <div className="mt-3 space-y-1 px-2">
+                    {DAOS.map((item) => (
+                      <Disclosure.Button
+                        key={item.name}
+                        as="a"
+                        href={`/dao/${item.name}`}
+                        className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                      >
+                        {item.name}
+                      </Disclosure.Button>
+                    ))}
+                  </div>
+                </div>
+              </Disclosure.Panel>
+            </>
+          )}
+        </Disclosure>
+      </div>
+    </>
+  );
 
   return (
     <header className="sticky top-0 bg-gray-900 p-4 flex items-center gap-5 z-10">

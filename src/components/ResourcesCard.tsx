@@ -21,7 +21,7 @@ export function ResourcesCard({ geckoData: tokenInfo }: Props) {
 
       <h2 className="text-center text-xl"> Resources for {tokenInfo?.name} </h2>
 
-      <div className="gap-5 flex justify-center">
+      <div className="gap-5 flex flex-wrap justify-center">
         <LinkCard
           title="Follow on Twitter"
           url={"https://twitter.com/" + tokenInfo?.links.twitter_screen_name}

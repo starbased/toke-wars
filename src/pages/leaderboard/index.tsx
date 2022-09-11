@@ -34,7 +34,7 @@ export default function Leaderboard({
         </a>
       </Link>
 
-      <Card className="md:w-2/3 self-center">
+      <Card className="md:w-2/3 self-center overflow-x-auto w-full md:w-auto">
         <table className="styledTable">
           <thead>
             <tr>

@@ -89,9 +89,9 @@ function Graph({ events }: { events: Event[] }) {
         data={formattedEvents}
         margin={{
           top: 0,
-          right: 75,
-          left: 75,
-          bottom: 5,
+          right: 10,
+          left: 20,
+          bottom: 0,
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
@@ -164,7 +164,7 @@ export default function Index({
 
   return (
     <Page header="Reactor Value Locked" className="items-center">
-      <div className="flex gap-5">
+      <div className="flex flex-wrap gap-5">
         <select
           className="bg-gray-800 border-gray-600 border p-1  rounded-md"
           style={{ minWidth: "200px" }}
@@ -214,7 +214,7 @@ export default function Index({
 
       <Divider />
 
-      <div>
+      <div className="w-full overflow-x-auto">
         <h2>Top Holders</h2>
         <table className="styledTable">
           <thead>

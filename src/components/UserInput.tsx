@@ -25,7 +25,6 @@ export function UserInput() {
         id="address"
         placeholder="ETH Address"
         className="bg-gray-800 border-gray-600 border p-1 px-2 m-1 rounded-md"
-        style={{ minWidth: "410px" }}
         {...register("address", {
           required: "This is required",
           minLength: {

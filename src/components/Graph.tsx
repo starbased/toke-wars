@@ -106,8 +106,8 @@ export function Graph({ rewards }: Props) {
           data={showByCycle ? byCycle : aggregate}
           margin={{
             top: 0,
-            right: 25,
-            left: 25,
+            right: 0,
+            left: 20,
             bottom: 5,
           }}
         >

@@ -43,47 +43,45 @@ export function BaseAreaGraph({
   let formatter = Intl.NumberFormat("en", { notation: "compact" });
 
   return (
-    <div style={{ height: "400px" }}>
-      <ResponsiveContainer>
-        <AreaChart
-          data={data}
-          margin={{
-            top: 0,
-            right: 75,
-            left: 75,
-            bottom: 5,
+    <ResponsiveContainer height={400}>
+      <AreaChart
+        data={data}
+        margin={{
+          top: 0,
+          right: 0,
+          left: 0,
+          bottom: 0,
+        }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
+          dataKey="timestamp"
+          scale="time"
+          type="number"
+          tickFormatter={dateFormatter}
+          domain={[() => startDate.getTime(), "dataMax"]}
+          ticks={ticks}
+        />
+        <YAxis
+          tickFormatter={(tick) => {
+            if (tick === 0) {
+              return "";
+            }
+            return formatter.format(tick);
           }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="timestamp"
-            scale="time"
-            type="number"
-            tickFormatter={dateFormatter}
-            domain={[() => startDate.getTime(), "dataMax"]}
-            ticks={ticks}
-          />
-          <YAxis
-            tickFormatter={(tick) => {
-              if (tick === 0) {
-                return "";
-              }
-              return formatter.format(tick);
-            }}
-            // domain={[0, (max: number) => max * 1.1]}
-          />
-          <Tooltip
-            labelFormatter={labelFunction}
-            labelStyle={{ color: "black" }}
-            formatter={(value: any) => {
-              return formatNumber(Number(value));
-            }}
-          />
-          <Legend />
-          {children}
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
+          // domain={[0, (max: number) => max * 1.1]}
+        />
+        <Tooltip
+          labelFormatter={labelFunction}
+          labelStyle={{ color: "black" }}
+          formatter={(value: any) => {
+            return formatNumber(Number(value));
+          }}
+        />
+        <Legend />
+        {children}
+      </AreaChart>
+    </ResponsiveContainer>
   );
 }
 
