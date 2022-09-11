@@ -1,22 +1,15 @@
-import { useTokePrice } from "../util/api/tokemak";
-import { Page } from "../components/Page";
+import { useTokePrice } from "utils/api/tokemak";
+import { Page } from "components/Page";
 import { GetStaticProps } from "next";
-import { prisma } from "../util/db";
-import { TokeGraph } from "../components/TokeGraph";
-import { DAOS, REACTORS } from "../constants";
-import {
-  Divider,
-  SimpleGrid,
-  Stat,
-  StatHelpText,
-  StatNumber,
-} from "@chakra-ui/react";
-import { BaseCard } from "../components/DaoDetailsCard";
-import { formatMoney, formatNumber } from "../util/maths";
-import { CoinInfo, getGeckoData } from "../util/api/coinGecko";
-import { DaosGraph } from "../components/DaosGraph";
-import { ResourcesCard } from "../components/ResourcesCard";
-import { getData, GraphRecord, groupByTokeType } from "../queries";
+import { prisma } from "utils/db";
+import { TokeGraph } from "components/TokeGraph";
+import { DAOS, REACTORS } from "@/constants";
+import { formatMoney, formatNumber } from "utils/maths";
+import { CoinInfo, getGeckoData } from "utils/api/coinGecko";
+import { DaosGraph } from "components/DaosGraph";
+import { ResourcesCard } from "components/ResourcesCard";
+import { getData, GraphRecord, groupByTokeType } from "@/queries";
+import { StatCard } from "components/StatCard";
 
 type Props = {
   data: {
@@ -40,40 +33,27 @@ export default function Home({ dao_data, data, geckoData }: Props) {
 
   return (
     <Page header="Toke Wars Dashboard">
-      <SimpleGrid
-        columns={{ base: 1, md: 3 }}
-        spacing={{ base: 5, lg: 8 }}
-        style={{ alignSelf: "stretch" }}
-        px={5}
-      >
-        <BaseCard title="Total DAO Owned TOKE">
-          <Stat>
-            <StatNumber>{formatNumber(total)}</StatNumber>
-            <StatHelpText>{formatMoney(total * toke_price)}</StatHelpText>
-          </Stat>
-        </BaseCard>
+      <div className="grid md:grid-cols-3 gap-5">
+        <StatCard
+          top="Total DAO Owned TOKE"
+          middle={formatNumber(total)}
+          bottom={formatMoney(total * toke_price)}
+        />
+        <StatCard
+          top="Circulating Supply"
+          middle={formatNumber(geckoData?.market_data?.circulating_supply)}
+          bottom={formatMoney(geckoData?.market_data?.market_cap?.usd)}
+        />
+        <StatCard
+          top="DAOs Accumulating"
+          middle={DAOS.length}
+          bottom={<>Total Reactors: {REACTORS.length}</>}
+        />
+      </div>
 
-        <BaseCard title="Circulating Supply">
-          <Stat>
-            <StatNumber>
-              {formatNumber(geckoData?.market_data?.circulating_supply)}
-            </StatNumber>
-            <StatHelpText>
-              {formatMoney(geckoData?.market_data?.market_cap?.usd)}
-            </StatHelpText>
-          </Stat>
-        </BaseCard>
-
-        <BaseCard title="DAOs Accumulating">
-          <Stat>
-            <StatNumber>{DAOS.length}</StatNumber>
-            <StatHelpText>Total Reactors: {REACTORS.length}</StatHelpText>
-          </Stat>
-        </BaseCard>
-      </SimpleGrid>
       <DaosGraph data={dao_data} />
       <TokeGraph data={data} />
-      <Divider />
+
       <ResourcesCard geckoData={geckoData} />
     </Page>
   );

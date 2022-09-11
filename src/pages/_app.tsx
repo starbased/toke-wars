@@ -1,20 +1,14 @@
-import "../styles/globals.css";
+import "../styles/globals.scss";
 import type { AppProps } from "next/app";
-import { Container } from "@chakra-ui/react";
-import { Header } from "../components/Header";
-import { Footer } from "../components/Footer";
-import { ChakraProvider } from "@chakra-ui/react";
-import { extendTheme } from "@chakra-ui/react";
+import { Header } from "components/Header";
+import { Footer } from "components/Footer";
 import Head from "next/head";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { useState } from "react";
 
-const config = {
-  initialColorMode: "dark",
-  useSystemColorMode: false,
-};
-
-const theme = extendTheme({ config });
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+config.autoAddCss = false;
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient());
@@ -26,17 +20,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/favicon.png" />
         <meta name="description" content="Informative tokemak dashboard" />
       </Head>
-      <ChakraProvider theme={theme}>
-        <QueryClientProvider client={queryClient}>
-          <Header />
-          <main>
-            <Container maxW="container.xl" my="10">
-              <Component {...pageProps} />
-            </Container>
-          </main>
-          <Footer />
-        </QueryClientProvider>
-      </ChakraProvider>
+      <Header />
+      <QueryClientProvider client={queryClient}>
+        <Component {...pageProps} />
+      </QueryClientProvider>
+
+      <Footer />
     </>
   );
 }

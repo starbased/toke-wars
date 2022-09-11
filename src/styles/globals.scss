@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-800 text-white
+}
+
+main {
+  @apply py-10 px-2
+}
+
+table.styledTable {
+  width: 100%;
+
+  td, th {
+    padding: 0.75rem 0.75rem;
+  }
+
+  th {
+    @apply font-normal
+  }
+
+  tr {
+    @apply border-b border-gray-600;
+    text-align: left;
+  }
+
+  tbody {
+    tr:nth-child(odd) {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
+}

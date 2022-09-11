@@ -1,11 +1,12 @@
 import { useQuery } from "react-query";
-import { Stat, StatHelpText, StatNumber } from "@chakra-ui/react";
+
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
-import { BaseCard } from "./DaoDetailsCard";
-import { ManagerContract__factory } from "../typechain";
+
+import { ManagerContract__factory } from "@/typechain";
 import { providers } from "ethers";
-import { TOKEMAK_MANAGER } from "../constants";
+import { TOKEMAK_MANAGER } from "@/constants";
+import { StatCard } from "components/StatCard";
 
 export function CycleInfo() {
   const { data } = useQuery("managerContract", async () => {
@@ -26,25 +27,22 @@ export function CycleInfo() {
   const [nextCycle, setNextCycle] = useState("");
   useEffect(() => {
     function updateCycle() {
-      setNextCycle(
-        // @ts-ignore
-        formatDistanceToNow(data.nextCycle, { includeSeconds: true })
-      );
+      if (data?.nextCycle) {
+        setNextCycle(
+          formatDistanceToNow(data.nextCycle, { includeSeconds: true })
+        );
+      }
     }
-    if (data) {
-      updateCycle();
-    }
-    const interval = setInterval(updateCycle, 1000 * 60);
+    updateCycle();
+    let interval = setInterval(updateCycle, 1000 * 60);
     return () => clearInterval(interval);
   }, [data]);
 
   return (
-    <BaseCard title="Current Cycle">
-      <Stat>
-        <StatNumber>{data?.cycleIndex}</StatNumber>
-        {/* calc days until next cycle */}
-        <StatHelpText>Next Cycle in {nextCycle}</StatHelpText>
-      </Stat>
-    </BaseCard>
+    <StatCard
+      top="Current Cycle"
+      middle={data?.cycleIndex}
+      bottom={`Next Cycle in ${nextCycle}`}
+    />
   );
 }

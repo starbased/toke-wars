@@ -1,26 +1,12 @@
-import {
-  Box,
-  Button,
-  LinkBox,
-  Table,
-  TableCaption,
-  Tbody,
-  Td,
-  Tfoot,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faListCheck } from "@fortawesome/free-solid-svg-icons";
-import { Page } from "../../components/Page";
-import { formatMoney, formatNumber } from "../../util/maths";
+import { formatMoney, formatNumber } from "utils/maths";
 import { GetStaticProps } from "next";
 import Link from "next/link";
-import { prisma } from "../../util/db";
+import { prisma } from "utils/db";
 import { Dao } from "@prisma/client";
-import { tokePrice, useTokePrice } from "../../util/api/tokemak";
-import { Coin } from "../../components/coin";
+import { tokePrice, useTokePrice } from "utils/api/tokemak";
+import { Coin } from "components/coin";
+import { Card } from "components/Card";
+import { Page } from "components/Page";
 
 type Props = {
   toke_price: number;
@@ -41,58 +27,48 @@ export default function Leaderboard({
   const toke_price = useTokePrice(cachedTokePrice);
 
   return (
-    <Page header="Leaderboard">
-      <LinkBox>
-        <Link href="/stages" passHref>
-          <Button
-            w={"full"}
-            maxW={"md"}
-            variant={"outline"}
-            leftIcon={<FontAwesomeIcon icon={faListCheck} />}
-          >
-            Discover the Stages of Liquidity
-          </Button>
-        </Link>
-      </LinkBox>
+    <Page header="Leaderboard" className="items-center">
+      <Link href="/stages" passHref>
+        <a className="p-2 border border-gray-500 rounded-md">
+          Discover the Stages of Liquidity
+        </a>
+      </Link>
 
-      <Box borderWidth="1px" borderRadius="lg" shadow="md" p="6">
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Name</Th>
-              <Th>Stage</Th>
-              <Th isNumeric>TOKE Holdings</Th>
-              <Th isNumeric>USD Value</Th>
-              <Th isNumeric>%</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
+      <Card className="md:w-2/3 self-center">
+        <table className="styledTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Stage</th>
+              <th>TOKE Holdings</th>
+              <th>USD Value</th>
+              <th>%</th>
+            </tr>
+          </thead>
+          <tbody>
             {daos.map((dao) => (
-              <Tr key={dao.name}>
-                <Td>
+              <tr key={dao.name}>
+                <td>
                   <Coin coin={dao.coin}>{dao.name}</Coin>
-                </Td>
-                <Td>{dao.stage}</Td>
-                <Td isNumeric>{formatNumber(dao.toke)}</Td>
-                <Td isNumeric>{formatMoney(dao.toke * toke_price || 0)}</Td>
-                <Td isNumeric>{((dao.toke / total) * 100).toFixed(1)}%</Td>
-              </Tr>
+                </td>
+                <td>{dao.stage}</td>
+                <td>{formatNumber(dao.toke)}</td>
+                <td>{formatMoney(dao.toke * toke_price || 0)}</td>
+                <td>{((dao.toke / total) * 100).toFixed(1)}%</td>
+              </tr>
             ))}
-          </Tbody>
-          <Tfoot>
-            <Tr>
-              <Th>Name</Th>
-              <Th>Stage</Th>
-              <Th isNumeric>TOKE Holdings</Th>
-              <Th isNumeric>USD Value</Th>
-              <Th isNumeric>%</Th>
-            </Tr>
-          </Tfoot>
-          <TableCaption>
-            Leaderboard tracks the DAOs with the top TOKE holdings
-          </TableCaption>
-        </Table>
-      </Box>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th>Name</th>
+              <th>Stage</th>
+              <th>TOKE Holdings</th>
+              <th>USD Value</th>
+              <th>%</th>
+            </tr>
+          </tfoot>
+        </table>
+      </Card>
     </Page>
   );
 }

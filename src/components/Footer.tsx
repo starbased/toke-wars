@@ -1,76 +1,49 @@
-import {
-  Box,
-  chakra,
-  Container,
-  Stack,
-  Text,
-  useColorModeValue,
-  VisuallyHidden,
-} from "@chakra-ui/react";
-import { FaTwitter, FaYoutube } from "react-icons/fa";
-import { ReactNode } from "react";
+import { faTwitter, faYoutube } from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 const SocialButton = ({
-  children,
-  label,
   href,
+  icon,
+  label,
 }: {
-  children: ReactNode;
+  icon: IconDefinition;
   label: string;
   href: string;
 }) => {
   return (
-    <chakra.button
-      bg={useColorModeValue("blackAlpha.100", "whiteAlpha.100")}
-      rounded={"full"}
-      w={8}
-      h={8}
-      cursor={"pointer"}
-      as={"a"}
+    <a
       href={href}
-      display={"inline-flex"}
-      alignItems={"center"}
-      justifyContent={"center"}
-      transition={"background 0.3s ease"}
-      _hover={{
-        bg: useColorModeValue("blackAlpha.200", "whiteAlpha.200"),
-      }}
+      title={label}
+      className="bg-gray-800 p-2 rounded-full"
+      target="_blank"
+      rel="noreferrer"
     >
-      <VisuallyHidden>{label}</VisuallyHidden>
-      {children}
-    </chakra.button>
+      <FontAwesomeIcon icon={icon} />
+    </a>
   );
 };
 
 export function Footer() {
   return (
-    <Box
-      as="footer"
-      bg={useColorModeValue("gray.50", "gray.900")}
-      color={useColorModeValue("gray.700", "gray.200")}
-    >
-      <Container
-        as={Stack}
-        maxW={"6xl"}
-        py={4}
-        direction={{ base: "column", md: "row" }}
-        spacing={4}
-        justify={{ base: "center", md: "space-between" }}
-        align={{ base: "center", md: "center" }}
-      >
-        <Text>Tokebase</Text>
-        <Stack direction={"row"} spacing={6}>
-          <SocialButton label={"Twitter"} href={"https://twitter.com/tokebase"}>
-            <FaTwitter />
-          </SocialButton>
+    <footer className="sticky bottom-0 bg-gray-900 ">
+      <div className="p-4 container flex justify-between mx-auto">
+        <a href="https://www.tokebase.xyz/" target="_blank" rel="noreferrer">
+          Tokebase
+        </a>
+        <div className="flex space-x-2">
           <SocialButton
-            label={"YouTube"}
-            href={"https://www.youtube.com/channel/UCCrMQKsLLstyVeEodicKbjg"}
-          >
-            <FaYoutube />
-          </SocialButton>
-        </Stack>
-      </Container>
-    </Box>
+            icon={faTwitter}
+            label="Twitter"
+            href="https://twitter.com/tokebase"
+          />
+          <SocialButton
+            icon={faYoutube}
+            label="YouTube"
+            href="https://www.youtube.com/channel/UCCrMQKsLLstyVeEodicKbjg"
+          />
+        </div>
+      </div>
+    </footer>
   );
 }

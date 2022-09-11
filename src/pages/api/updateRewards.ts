@@ -1,7 +1,7 @@
-import { prisma } from "../../util/db";
+import { prisma } from "../../utils/db";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { RewardsHash__factory } from "../../typechain";
-import { getProvider } from "../../util";
+import { getProvider } from "../../utils";
 import { REWARDS_CONTRACT } from "../../constants";
 import axios from "axios";
 import { toBuffer } from "./updateEvents";

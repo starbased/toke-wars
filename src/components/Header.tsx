@@ -1,129 +1,74 @@
-import { ReactNode } from "react";
-import {
-  Box,
-  Flex,
-  HStack,
-  Link as DisplayLink,
-  IconButton,
-  Button,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  useDisclosure,
-  useColorModeValue,
-  Stack,
-} from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
-import { sortBy } from "lodash";
-import { DAOS } from "../constants";
-import { useRouter } from "next/router";
-import Image from "next/image";
+import Image from "next/future/image";
 import Link from "next/link";
-
-const NavLink = ({ children, to }: { children: ReactNode; to: string }) => (
-  <Link href={to} passHref>
-    <DisplayLink
-      px={2}
-      py={1}
-      rounded="md"
-      _hover={{
-        textDecoration: "none",
-        bg: useColorModeValue("gray.200", "gray.700"),
-      }}
-    >
-      {children}
-    </DisplayLink>
-  </Link>
-);
+import { Menu, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 
 export function Header() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const router = useRouter();
-
-  const links = (
-    <>
-      <NavLink to="/reactor/0xd3b5d9a561c293fb42b446fe7e237daa9bf9aa84">
-        Reactors
-      </NavLink>
-      {["Leaderboard", "Revenue", "Emissions", "Stages", "Rewards"].map(
-        (link) => (
-          <NavLink to={"/" + link.toLowerCase()} key={link}>
-            {link}
-          </NavLink>
-        )
-      )}
-    </>
-  );
+  const links = [
+    "Reactors",
+    "Leaderboard",
+    "Revenue",
+    "Emissions",
+    "Stages",
+    "Rewards",
+  ];
 
   return (
-    <Box
-      as="nav"
-      bg={useColorModeValue("gray.100", "gray.900")}
-      px={4}
-      zIndex={100}
-    >
-      <Flex h={16} alignItems="center" gap={2}>
-        <IconButton
-          size="md"
-          icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
-          aria-label="Open Menu"
-          display={{ md: "none" }}
-          onClick={isOpen ? onClose : onOpen}
-        />
-        <Box
-          onClick={() => router.push("/")}
-          style={{ cursor: "pointer", display: "flex" }}
-          mr="4"
-        >
+    <header className="sticky top-0 bg-gray-900 p-4 flex items-center gap-5 z-10">
+      <Link href="/" passHref>
+        <a>
           <Image
+            className="cursor-pointer"
             src="/images/tokewars.png" // Route of the image file
             height={22} // Desired size with correct aspect ratio
             width={160} // Desired size with correct aspect ratio
             alt="Toke Wars Logo"
           />
-        </Box>
+        </a>
+      </Link>
 
-        <HStack spacing={4} display={{ base: "none", md: "flex" }}>
-          {links}
+      <div className="hidden md:flex gap-5 items-center">
+        {links.map((link) => (
+          <Link href={`/${link.toLowerCase()}`} key={link} passHref>
+            <a className="p-1">{link}</a>
+          </Link>
+        ))}
 
-          <Menu>
-            <MenuButton as={Button} minW={0}>
+        <Menu as="div" className="relative inline-block text-left">
+          <div>
+            <Menu.Button className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100">
               DAOs
-            </MenuButton>
-            <MenuList>
-              {sortBy(DAOS, "name").map(({ name }) => (
-                <MenuItem
-                  key={name}
-                  onClick={() => router.push(`/dao/${name}`)}
-                >
-                  {name}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-        </HStack>
-      </Flex>
+            </Menu.Button>
+          </div>
 
-      {isOpen ? (
-        <Box pb={4} display={{ md: "none" }}>
-          <Stack as="nav" spacing={4}>
-            {links}
-            <Menu>
-              <MenuButton as={Button} minW={0}>
-                DAOs
-              </MenuButton>
-              <MenuList>
-                {sortBy(DAOS, "name").map(({ name }) => (
-                  <MenuItem key={name}>
-                    <Link href={`/dao/${name}`}>{name}</Link>
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
-          </Stack>
-        </Box>
-      ) : null}
-    </Box>
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-100"
+            enterFrom="transform opacity-0 scale-95"
+            enterTo="transform opacity-100 scale-100"
+            leave="transition ease-in duration-75"
+            leaveFrom="transform opacity-100 scale-100"
+            leaveTo="transform opacity-0 scale-95"
+          >
+            <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      href="#"
+                      className={`block px-4 py-2 text-sm ${
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700"
+                      }`}
+                    >
+                      Account settings
+                    </a>
+                  )}
+                </Menu.Item>
+              </div>
+            </Menu.Items>
+          </Transition>
+        </Menu>
+      </div>
+    </header>
   );
 }

@@ -1,11 +1,11 @@
 import { isEqual, startOfDay } from "date-fns";
-import { prisma } from "./util/db";
+import { prisma } from "./utils/db";
 import {
   T_TOKE_CONTRACT,
   TOKE_CONTRACT,
   TOKE_STAKING_CONTRACT,
 } from "./constants";
-import { addressToHex } from "./util";
+import { addressToHex } from "./utils";
 
 export async function groupByTokeType(daoName?: string) {
   const records = await prisma.$queryRawUnsafe<

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/future/image";
 import { ReactNode } from "react";
 
 export function Coin({
@@ -9,7 +9,7 @@ export function Coin({
   children?: ReactNode;
 }) {
   return (
-    <div style={{ display: "flex", gap: "5px" }}>
+    <div className="flex gap-1 items-center">
       <Image
         height={20}
         width={20}

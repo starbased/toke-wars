@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { formatNumber } from "../util/maths";
+import { formatNumber } from "utils/maths";
 import { addMonths, differenceInMonths, intlFormat, parseISO } from "date-fns";
 import { ReactNode } from "react";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
@@ -43,8 +43,8 @@ export function BaseAreaGraph({
   let formatter = Intl.NumberFormat("en", { notation: "compact" });
 
   return (
-    <div style={{ width: "100%", height: "400px" }}>
-      <ResponsiveContainer width="100%" height="100%">
+    <div style={{ height: "400px" }}>
+      <ResponsiveContainer>
         <AreaChart
           data={data}
           margin={{
