@@ -261,6 +261,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
     .filter((pool) => pool !== T_TOKE_CONTRACT)
     .map((pool) => pool.toLowerCase());
 
+  if (process.env.FAST_BUILD) {
+    pools = [pools[0]];
+  }
+
   return {
     paths: pools.map((address) => ({ params: { address } })),
     fallback: false,

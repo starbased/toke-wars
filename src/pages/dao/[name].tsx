@@ -103,7 +103,12 @@ export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const daos = await prisma.dao.findMany();
+  let daos = await prisma.dao.findMany();
+
+  if (process.env.FAST_BUILD) {
+    daos = [daos[0]];
+  }
+
   return {
     paths: daos.map((dao) => ({ params: { name: dao.name } })),
     fallback: false,
