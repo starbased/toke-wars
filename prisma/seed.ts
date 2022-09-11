@@ -1,4 +1,4 @@
-import { prisma } from "../src/util/db";
+import { prisma } from "../src/utils/db";
 import blocks from "./postgres_public_blocks.json";
 import daos from "./postgres_public_daos.json";
 import dao_addresses from "./postgres_public_dao_addresses.json";

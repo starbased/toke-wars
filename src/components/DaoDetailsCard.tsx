@@ -1,56 +1,14 @@
-import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { formatMoney, formatNumber, shortenAddress } from "utils/maths";
+import { stageMap } from "@/pages/stages";
+import { useTokePrice } from "utils/api/tokemak";
+import { StatCard } from "components/StatCard";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  Badge,
-  Box,
-  Flex,
-  Link,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Stat,
-  StatArrow,
-  StatGroup,
-  StatHelpText,
-  StatLabel,
-  StatNumber,
-  useColorModeValue,
-} from "@chakra-ui/react";
-import { ReactNode } from "react";
-import { formatMoney, formatNumber, shortenAddress } from "../util/maths";
-import { stageMap } from "../pages/stages";
-import { useTokePrice } from "../util/api/tokemak";
-
-type BaseCardProps = {
-  title: string;
-  children: ReactNode;
-};
-
-export function BaseCard({ title, children }: BaseCardProps) {
-  return (
-    <Stat
-      px={{ base: 2, md: 4 }}
-      py="5"
-      shadow="xl"
-      border="1px solid"
-      borderColor={useColorModeValue("gray.800", "gray.500")}
-      rounded="lg"
-    >
-      <Flex justifyContent="space-between">
-        <Box pl={{ base: 2, md: 4 }}>
-          <StatLabel fontWeight="medium">{title}</StatLabel>
-          <StatGroup>{children}</StatGroup>
-        </Box>
-        <Box
-          my="auto"
-          color={useColorModeValue("gray.800", "gray.200")}
-          alignContent="center"
-        >
-          {/* {icon} */}
-        </Box>
-      </Flex>
-    </Stat>
-  );
-}
+  faExternalLink,
+  faCaretUp,
+  faCaretDown,
+} from "@fortawesome/free-solid-svg-icons";
+import { SizeProp } from "@fortawesome/fontawesome-svg-core";
 
 interface StatsCardProps {
   title: string;
@@ -61,34 +19,42 @@ interface StatsCardProps {
 function StatsCard({ title, total, changePercent }: StatsCardProps) {
   const toke_price = useTokePrice();
 
+  const arrowCommon = {
+    size: "lg" as SizeProp,
+    className: "pr-1",
+  };
+
   let arrow = null;
   if (total && total >= 0) {
     if (changePercent < 0) {
-      arrow = <StatArrow type="decrease" />;
+      arrow = (
+        <FontAwesomeIcon icon={faCaretDown} color="red" {...arrowCommon} />
+      );
     } else if (changePercent > 0) {
-      arrow = <StatArrow type="increase" />;
+      arrow = (
+        <FontAwesomeIcon icon={faCaretUp} color="green" {...arrowCommon} />
+      );
     }
   }
 
   return (
-    <BaseCard title={title}>
-      <Stat>
-        <Skeleton isLoaded={total >= 0}>
-          <StatNumber>
-            {formatNumber(total)}
-            <Badge ml="2" variant="subtle">
-              {formatMoney(total * toke_price)}
-            </Badge>
-          </StatNumber>
-        </Skeleton>
-        <Skeleton isLoaded={total >= 0}>
-          <StatHelpText>
-            {arrow}
-            {arrow ? changePercent.toFixed(2) + "%" : "No change"} over 30 days
-          </StatHelpText>
-        </Skeleton>
-      </Stat>
-    </BaseCard>
+    <StatCard
+      top={title}
+      middle={
+        <div className="flex gap-1 items-center">
+          {formatNumber(total)}
+          <div className="text-sm font-light bg-gray-600 px-1 rounded">
+            {formatMoney(total * toke_price)}
+          </div>
+        </div>
+      }
+      bottom={
+        <>
+          {arrow}
+          {arrow ? changePercent.toFixed(2) + "%" : "No change"} over 30 days
+        </>
+      }
+    />
   );
 }
 
@@ -100,50 +66,30 @@ interface StageCardProps {
 function StageCard({ title, stage }: StageCardProps) {
   const stageText = stageMap[stage].title || "";
 
-  return (
-    <BaseCard title={title}>
-      <Stat>
-        <StatNumber>{stage}</StatNumber>
-        <StatHelpText>{stageText}</StatHelpText>
-      </Stat>
-    </BaseCard>
-  );
+  return <StatCard top={title} middle={stage} bottom={stageText} />;
 }
 
 interface StatsLinkCardProps {
   title: string;
   addresses: string[];
-  /* icon: ReactNode; */
 }
 function StatsLinkCard({ title, addresses }: StatsLinkCardProps) {
   return (
-    <BaseCard title={title}>
-      <Stat>
-        {addresses.map((address) => (
-          <StatNumber fontSize={20} key={address}>
-            <Link href={"https://zapper.fi/account/" + address} isExternal>
-              {shortenAddress(address, 7)} <ExternalLinkIcon mx="2px" />
-            </Link>
-          </StatNumber>
-        ))}
-      </Stat>
-    </BaseCard>
-  );
-}
-
-interface SkeletonCardProps {}
-
-function SkeletonCard({}: SkeletonCardProps) {
-  return (
-    <BaseCard title={""}>
-      <Stat>
-        <Stack>
-          <Skeleton height="20px" width="225px" />
-          <Skeleton height="20px" width="225px" />
-          <Skeleton height="20px" width="225px" />
-        </Stack>
-      </Stat>
-    </BaseCard>
+    <StatCard
+      top={title}
+      middle={addresses.map((address) => (
+        <a
+          href={"https://zapper.fi/account/" + address}
+          target="_blank"
+          key={address}
+          className="underline"
+          rel="noreferrer"
+        >
+          {shortenAddress(address, 7)}
+          <FontAwesomeIcon icon={faExternalLink} className="ml-2" />
+        </a>
+      ))}
+    />
   );
 }
 
@@ -160,34 +106,18 @@ export function DaoDetailsCard({
   total,
   changePercent,
 }: Props) {
-  if (total < 0) {
-    return (
-      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
-        <SkeletonCard />
-        <SkeletonCard />
-        <SkeletonCard />
-      </SimpleGrid>
-    );
-  }
-
   return (
-    <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
+    <div className="grid md:grid-cols-3">
       <StatsCard
         title="Total TOKE Owned"
         total={total}
         changePercent={changePercent}
-        /* icon="┻┳" */
       />
-      <StageCard
-        title="DAO Stage"
-        stage={stage}
-        /* icon={<FiServer size={'3em'} />} */
-      />
+      <StageCard title="DAO Stage" stage={stage} />
       <StatsLinkCard
         title={`Tracked address${addresses.length > 1 ? "es" : ""}`}
         addresses={addresses}
-        /* icon={<GoLocation size={'3em'} />} */
       />
-    </SimpleGrid>
+    </div>
   );
 }

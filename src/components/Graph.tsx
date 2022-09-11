@@ -13,17 +13,9 @@ import {
 } from "recharts";
 import mapValues from "lodash/mapValues";
 import mergeWith from "lodash/mergeWith";
-import {
-  Box,
-  Center,
-  Flex,
-  FormControl,
-  FormLabel,
-  Spacer,
-  Switch,
-} from "@chakra-ui/react";
+
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
-import { IpfsRewardsRecord } from "../pages/rewards/[address]";
+import { IpfsRewardsRecord } from "@/pages/rewards/[address]";
 
 type Props = {
   rewards: IpfsRewardsRecord[];
@@ -114,8 +106,8 @@ export function Graph({ rewards }: Props) {
           data={showByCycle ? byCycle : aggregate}
           margin={{
             top: 0,
-            right: 25,
-            left: 25,
+            right: 0,
+            left: 20,
             bottom: 5,
           }}
         >
@@ -174,22 +166,19 @@ export function Graph({ rewards }: Props) {
         </AreaChart>
       </ResponsiveContainer>
 
-      <FormControl display="flex" alignItems="center">
-        <Center>
-          <Flex>
-            <Box px="2">
-              <FormLabel>Aggregate</FormLabel>
-            </Box>
-            <Spacer />
-            <Box px="2">
-              <Switch
-                isChecked={!showByCycle}
-                onChange={() => setShowByCycle(!showByCycle)}
-              />
-            </Box>
-          </Flex>
-        </Center>
-      </FormControl>
+      <div>
+        <label htmlFor="checkbox" className="cursor-pointer">
+          Aggregate data
+        </label>
+
+        <input
+          id="checkbox"
+          type="checkbox"
+          className="ml-2 cursor-pointer"
+          checked={!showByCycle}
+          onChange={() => setShowByCycle(!showByCycle)}
+        />
+      </div>
     </div>
   );
 }

@@ -1,8 +1,8 @@
-import { ManagerContract__factory, TAsset__factory } from "../../typechain";
-import { addressToHex, getProvider } from "../../util";
+import { TAsset__factory } from "@/typechain";
+import { addressToHex, getProvider } from "@/utils";
 import { GetStaticPaths, GetStaticProps } from "next";
-import { T_TOKE_CONTRACT, TOKEMAK_MANAGER } from "../../constants";
-import { prisma } from "../../util/db";
+import { T_TOKE_CONTRACT } from "@/constants";
+import { prisma } from "utils/db";
 import {
   eachMonthOfInterval,
   getUnixTime,
@@ -23,33 +23,21 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  Box,
-  chakra,
-  Divider,
-  HStack,
-  Select,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
-import { FaRadiationAlt } from "react-icons/fa/index"; //Don't use all next.js doesn't like it
-import { Page } from "../../components/Page";
-import { LinkCard } from "../../components/LinkCard";
+import { faRadiationAlt } from "@fortawesome/free-solid-svg-icons";
+import { Page } from "components/Page";
+import { LinkCard } from "components/LinkCard";
 import {
   CoinInfo,
   getGeckoData,
   getHistoricalPrice,
-} from "../../util/api/coinGecko";
+} from "utils/api/coinGecko";
 import { BigNumber } from "bignumber.js";
-import { formatNumber } from "../../util/maths";
+import { formatNumber } from "utils/maths";
 import { Reactor } from "@prisma/client";
-import { ResourcesCard } from "../../components/ResourcesCard";
+import { ResourcesCard } from "components/ResourcesCard";
 import { getAllReactors, toBuffer } from "../api/updateEvents";
 import { formatUnits } from "ethers/lib/utils";
+import { Divider } from "components/Divider";
 
 type Props = {
   reactors: (Omit<Reactor, "address"> & { address: string })[];
@@ -101,9 +89,9 @@ function Graph({ events }: { events: Event[] }) {
         data={formattedEvents}
         margin={{
           top: 0,
-          right: 75,
-          left: 75,
-          bottom: 5,
+          right: 10,
+          left: 20,
+          bottom: 0,
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
@@ -175,34 +163,33 @@ export default function Index({
   const totalHeld = holders.reduce((acc, { total }) => acc + total, 0);
 
   return (
-    <Page header="Reactor Value Locked">
-      <HStack spacing="24px">
-        <Box w="220px">
-          <Select
-            placeholder="Select Token"
-            name="token"
-            value={address}
-            onChange={(event) =>
-              router.replace(`/reactor/${event.currentTarget.value}`)
-            }
-          >
-            {sortBy(reactors, ({ symbol }) => symbol.toLowerCase()).map(
-              ({ symbol, address }) => (
-                <option value={address} key={address}>
-                  {symbol}
-                </option>
-              )
-            )}
-          </Select>
-        </Box>
-        <Box>
-          <LinkCard
-            title="View on Tokemak.xyz"
-            url={"https://tokemak.xyz/"}
-            icon={<FaRadiationAlt />}
-          />
-        </Box>
-      </HStack>
+    <Page header="Reactor Value Locked" className="items-center">
+      <div className="flex flex-wrap gap-5">
+        <select
+          className="bg-gray-800 border-gray-600 border p-1  rounded-md"
+          style={{ minWidth: "200px" }}
+          placeholder="Select Token"
+          name="token"
+          value={address}
+          onChange={(event) =>
+            router.replace(`/reactors/${event.currentTarget.value}`)
+          }
+        >
+          {sortBy(reactors, ({ symbol }) => symbol.toLowerCase()).map(
+            ({ symbol, address }) => (
+              <option value={address} key={address}>
+                {symbol}
+              </option>
+            )
+          )}
+        </select>
+
+        <LinkCard
+          title="View on Tokemak.xyz"
+          url={"https://tokemak.xyz/"}
+          icon={faRadiationAlt}
+        />
+      </div>
 
       <div>
         {formatNumber(
@@ -224,30 +211,29 @@ export default function Index({
           CoinGecko
         </a>
       </div>
+
       <Divider />
 
-      <div>
-        <chakra.h2 fontSize="xl" fontWeight="bold">
-          Top Holders
-        </chakra.h2>
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Account</Th>
-              <Th>Amount</Th>
-              <Th>Percent</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
+      <div className="w-full overflow-x-auto">
+        <h2>Top Holders</h2>
+        <table className="styledTable">
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Amount</th>
+              <th>Percent</th>
+            </tr>
+          </thead>
+          <tbody>
             {holders.slice(0, 10).map(({ named_account, account, total }) => (
-              <Tr key={account}>
-                <Td>{named_account || account.replace("\\", "0")}</Td>
-                <Td>{formatNumber(total, 2)}</Td>
-                <Td>{formatNumber((total / totalHeld) * 100, 2)}%</Td>
-              </Tr>
+              <tr key={account}>
+                <td>{named_account || account.replace("\\", "0")}</td>
+                <td>{formatNumber(total, 2)}</td>
+                <td>{formatNumber((total / totalHeld) * 100, 2)}%</td>
+              </tr>
             ))}
-          </Tbody>
-        </Table>
+          </tbody>
+        </table>
       </div>
 
       {geckoData ? <ResourcesCard geckoData={geckoData} /> : null}

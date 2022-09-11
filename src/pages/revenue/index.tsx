@@ -1,35 +1,19 @@
-import {
-  Box,
-  Button,
-  chakra,
-  Icon as UiIcon,
-  Link,
-  LinkBox,
-  SimpleGrid,
-  Stat,
-  StatNumber,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
 import { orderBy } from "lodash";
-import { Page } from "../../components/Page";
-import { ERC20__factory } from "../../typechain";
-import { shortenAddress } from "../../util/maths";
-import { Formatter } from "../../components/Formatter";
+import { Page } from "components/Page";
+import { ERC20__factory } from "@/typechain";
+import { shortenAddress } from "utils/maths";
+import { Formatter } from "components/Formatter";
 import { GetStaticProps } from "next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTerminal } from "@fortawesome/free-solid-svg-icons";
-import { getBlocks, getProvider } from "../../util";
-import { getGeckoData } from "../../util/api/coinGecko";
+import { getBlocks, getProvider } from "@/utils";
+import { getGeckoData } from "utils/api/coinGecko";
 import { BigNumber } from "bignumber.js";
-import { Coin } from "../../components/coin";
+import { Coin } from "components/coin";
 import { formatISO, intlFormat, isAfter, isBefore, sub } from "date-fns";
-import { BaseCard } from "../../components/DaoDetailsCard";
 import { useState } from "react";
+import { StatCard } from "components/StatCard";
+import { Card } from "components/Card";
 
 type Props = {
   values: {
@@ -113,65 +97,44 @@ export default function Revenue({ values }: Props) {
   }
 
   return (
-    <Page header="Protocol Revenue">
-      <SimpleGrid
-        columns={{ base: 1, md: 3 }}
-        spacing={{ base: 5, lg: 8 }}
-        style={{ alignSelf: "stretch" }}
-        px={5}
-      >
-        <span
+    <Page header="Protocol Revenue" className="items-center">
+      <div className="grid md:grid-cols-3 w-full">
+        <StatCard
+          className="cursor-pointer"
           onClick={() => setTotalDuration({ weeks: 1 })}
-          style={{ cursor: "pointer" }}
-        >
-          <BaseCard title="Total Weekly Revenue">
-            <Stat>
-              <StatNumber>
-                {" "}
-                <Formatter
-                  currency
-                  value={usdValueOverRange(data, { weeks: 1 })}
-                />
-              </StatNumber>
-            </Stat>
-          </BaseCard>
-        </span>
+          top="Total Weekly Revenue"
+          middle={
+            <Formatter currency value={usdValueOverRange(data, { weeks: 1 })} />
+          }
+        />
 
-        <span
+        <StatCard
+          className="cursor-pointer"
           onClick={() => setTotalDuration({ months: 1 })}
-          style={{ cursor: "pointer" }}
-        >
-          <BaseCard title="Total Monthly Revenue">
-            <Stat>
-              <StatNumber>
-                <Formatter
-                  currency
-                  value={usdValueOverRange(data, { months: 1 })}
-                />
-              </StatNumber>
-            </Stat>
-          </BaseCard>
-        </span>
+          top="Total Monthly Revenue"
+          middle={
+            <Formatter
+              currency
+              value={usdValueOverRange(data, { months: 1 })}
+            />
+          }
+        />
 
-        <BaseCard title="Estimated Yearly Revenue">
-          <Stat>
-            <StatNumber>
-              <Formatter
-                currency
-                value={usdValueOverRange(data, { months: 1 }) * 12}
-              />
-            </StatNumber>
-          </Stat>
-        </BaseCard>
-      </SimpleGrid>
-      <Box
-        borderWidth="1px"
-        borderRadius="lg"
-        shadow="md"
-        p="6"
-        marginBottom="2"
-      >
-        <chakra.h2 textAlign="center" fontSize="xl" pb={8} fontWeight="bold">
+        <StatCard
+          className="cursor-pointer"
+          onClick={() => setTotalDuration(null)}
+          top="Estimated Yearly Revenue"
+          middle={
+            <Formatter
+              currency
+              value={usdValueOverRange(data, { months: 1 }) * 12}
+            />
+          }
+        />
+      </div>
+
+      <Card>
+        <h2 className="text-center text-xl">
           Totals
           {totalDuration ? (
             <>
@@ -180,33 +143,34 @@ export default function Revenue({ values }: Props) {
               {formatISO(sub(new Date(), totalDuration), {
                 representation: "date",
               })}{" "}
-              <Button
-                size="xs"
+              <button
                 title="clear"
                 onClick={() => setTotalDuration(null)}
+                className="p-1 bg-gray-500 rounded-md"
               >
                 X
-              </Button>
+              </button>
             </>
           ) : (
             ""
           )}
-        </chakra.h2>
-        <Table>
-          <Thead>
-            <Tr>
-              <Th>Coin</Th>
-              <Th>Amount</Th>
-              <Th>USD Value</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
+        </h2>
+
+        <table className="styledTable">
+          <thead>
+            <tr>
+              <th>Coin</th>
+              <th>Amount</th>
+              <th>USD Value</th>
+            </tr>
+          </thead>
+          <tbody>
             {totals?.map(({ coin, amount, usdValue }) => (
-              <Tr key={coin}>
-                <Td>
+              <tr key={coin}>
+                <td>
                   <Coin coin={coin}>{coin}</Coin>
-                </Td>
-                <Td>
+                </td>
+                <td>
                   <Formatter
                     value={amount.toNumber()}
                     options={{
@@ -214,63 +178,60 @@ export default function Revenue({ values }: Props) {
                       maximumFractionDigits: 2,
                     }}
                   />
-                </Td>
-                <Td>
+                </td>
+                <td>
                   <Formatter currency value={usdValue} />
-                </Td>
-              </Tr>
+                </td>
+              </tr>
             ))}
-            <Tr>
-              <Td>Total</Td>
-              <Td>
+            <tr>
+              <td>Total</td>
+              <td>
                 {/* no point in summing token quantities since they are not comparable */}
-              </Td>
-              <Td>
+              </td>
+              <td>
                 <Formatter
                   currency
                   value={totals
                     .map((obj) => obj.usdValue)
                     .reduce<number>((a, b) => a + b, 0)}
                 />
-              </Td>
-            </Tr>
-          </Tbody>
-        </Table>
-      </Box>
-      <LinkBox>
-        <Link
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </Card>
+
+      <Card>
+        <a
           target="_blank"
+          rel="noreferrer"
           href="https://tokenterminal.com/terminal/projects/tokemak"
         >
-          <Button
-            w={"full"}
-            maxW={"md"}
-            variant={"outline"}
-            leftIcon={<UiIcon as={FontAwesomeIcon} icon={faTerminal} />}
-          >
+          <button>
+            <FontAwesomeIcon icon={faTerminal} />
             More Data via Token Terminal
-          </Button>
-        </Link>
-      </LinkBox>
-      <Box borderWidth="1px" borderRadius="lg" shadow="md" p="6">
-        <chakra.h2 textAlign="center" fontSize="xl" pb={8} fontWeight="bold">
-          Events
-        </chakra.h2>
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Time</Th>
-              <Th>Tx</Th>
-              <Th>Coin</Th>
-              <Th>Amount</Th>
-              <Th>USD Value</Th>
-            </Tr>
-          </Thead>
+          </button>
+        </a>
+      </Card>
+      <Card className="overflow-x-auto w-full md:w-auto">
+        <h2 className="text-center text-xl">Events</h2>
 
-          <Tbody>
+        <table className="styledTable">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Tx</th>
+              <th>Coin</th>
+              <th>Amount</th>
+              <th>USD Value</th>
+            </tr>
+          </thead>
+
+          <tbody>
             {filteredData?.map((tx) => (
-              <Tr key={tx.transactionHash + tx.coin + tx.amount}>
-                <Td>
+              <tr key={tx.transactionHash + tx.coin + tx.amount}>
+                <td>
                   {intlFormat(new Date(tx.timestamp), {
                     year: "2-digit",
                     month: "2-digit",
@@ -278,20 +239,21 @@ export default function Revenue({ values }: Props) {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
-                </Td>
-                <Td>
-                  <Link
+                </td>
+                <td>
+                  <a
                     href={`https://etherscan.io/tx/${tx.transactionHash}`}
                     target="_blank"
+                    rel="noreferrer"
                   >
                     {shortenAddress(tx.transactionHash)}
-                  </Link>
-                </Td>
-                <Td>
+                  </a>
+                </td>
+                <td>
                   <Coin coin={tx.coin}>{tx.coin}</Coin>
-                </Td>
+                </td>
 
-                <Td>
+                <td>
                   <Formatter
                     value={tx.amount}
                     options={{
@@ -299,15 +261,15 @@ export default function Revenue({ values }: Props) {
                       maximumFractionDigits: 2,
                     }}
                   />
-                </Td>
-                <Td>
+                </td>
+                <td>
                   <Formatter currency value={tx.usdValue} />
-                </Td>
-              </Tr>
+                </td>
+              </tr>
             ))}
-          </Tbody>
-        </Table>
-      </Box>
+          </tbody>
+        </table>
+      </Card>
     </Page>
   );
 }

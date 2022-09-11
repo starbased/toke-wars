@@ -1,34 +1,16 @@
 import { GetStaticProps } from "next";
-import { prisma } from "../../util/db";
-import { Page } from "../../components/Page";
+import { prisma } from "utils/db";
+import { Page } from "components/Page";
 import { toBuffer } from "../api/updateEvents";
-import { useTokePrice } from "../../util/api/tokemak";
-import {
-  Box,
-  chakra,
-  Divider,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Stat,
-  StatHelpText,
-  StatNumber,
-  Table,
-  TableCaption,
-  Tbody,
-  Td,
-  Tfoot,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { useTokePrice } from "utils/api/tokemak";
 import { formatEther } from "ethers/lib/utils";
-import { CycleInfo } from "../../components/CycleInfo";
-import { BaseCard } from "../../components/DaoDetailsCard";
-import { formatMoney, formatNumber } from "../../util/maths";
-import { Graph } from "../../components/Graph";
+import { formatMoney, formatNumber } from "utils/maths";
+import { Graph } from "components/Graph";
 import orderBy from "lodash/orderBy";
-import { UserInput } from "../../components/UserInput";
+import { UserInput } from "components/UserInput";
+import { Divider } from "components/Divider";
+import { Card } from "components/Card";
+import { StatCard } from "components/StatCard";
 
 export type IpfsRewardsRecord = {
   cycle: number;
@@ -44,24 +26,6 @@ type Props = {
 
 export default function Index({ rewards: known_rewards, latest_cycle }: Props) {
   const toke_price = useTokePrice();
-
-  const loading = !known_rewards;
-
-  if (loading) {
-    return (
-      <div>
-        <Stack>
-          <chakra.h2>Waiting for Cycle Index</chakra.h2>
-          <Skeleton width="200px" height="60px" />
-          <Skeleton width="200px" height="40px" />
-          <Skeleton width="200px" height="60px" />
-          <Skeleton width="200px" height="40px" />
-          <Skeleton width="200px" height="60px" />
-          <Skeleton width="200px" height="40px" />
-        </Stack>
-      </div>
-    );
-  }
 
   const rewards = Array.from(Array(latest_cycle + 1)).map((_, i) => {
     let rewards = known_rewards.find(({ cycle }) => cycle === i);
@@ -111,89 +75,65 @@ export default function Index({ rewards: known_rewards, latest_cycle }: Props) {
   }
 
   return (
-    <Page header="Rewards">
+    <Page header="Rewards" className="items-center">
       <UserInput />
-      <>
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 5, lg: 8 }}>
-          <CycleInfo />
-          <BaseCard title="Total Earned">
-            <Stat>
-              <StatNumber>
-                {formatNumber(parseFloat(formattedTotal))}
-              </StatNumber>
-              {toke_price ? (
-                <StatHelpText>
-                  {formatMoney(parseFloat(formattedTotal) * toke_price)}
-                </StatHelpText>
-              ) : null}
-            </Stat>
-          </BaseCard>
 
-          <BaseCard title="Rewards This Cycle">
-            <Stat>
-              <StatNumber>
-                {formatNumber(parseFloat(rewardsThisCycle), 3)}
-              </StatNumber>
-              {toke_price ? (
-                <StatHelpText>
-                  {formatMoney(parseFloat(rewardsThisCycle) * toke_price)}
-                </StatHelpText>
-              ) : null}
-            </Stat>
-          </BaseCard>
-        </SimpleGrid>
+      <div className="grid md:grid-cols-3">
+        <StatCard top="Last Logged Cycle" middle={latest_cycle} />
 
-        <Graph rewards={rewards} />
+        <StatCard
+          top="Total Earned"
+          middle={formatNumber(parseFloat(formattedTotal))}
+          bottom={
+            toke_price
+              ? formatMoney(parseFloat(formattedTotal) * toke_price)
+              : null
+          }
+        />
 
-        <Divider />
+        <StatCard
+          top="Rewards This Cycle"
+          middle={formatNumber(parseFloat(rewardsThisCycle), 3)}
+          bottom={
+            toke_price
+              ? formatMoney(parseFloat(rewardsThisCycle) * toke_price)
+              : null
+          }
+        />
+      </div>
 
-        <Box maxW="7xl" mx="auto" p={5}>
-          <chakra.h1 textAlign="center" fontSize="2xl" fontWeight="bold">
-            Total Earned by Token
-          </chakra.h1>
-        </Box>
-        <Box
-          maxW="7xl"
-          mx="auto"
-          pt={5}
-          borderWidth="1px"
-          borderRadius="lg"
-          shadow="md"
-          p="6"
-        >
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th>Token</Th>
-                <Th isNumeric>Reward (TOKE)</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {orderBy(Object.entries(byToken), ([_, v]) => v, "desc").map(
-                ([k, v]) => (
-                  <Tr key={k}>
-                    <Td>{k}</Td>
-                    <Td isNumeric>
-                      {formatNumber(Number(formatEther(v.toString())), 2)}
-                    </Td>
-                  </Tr>
-                )
-              )}
-            </Tbody>
+      <Graph rewards={rewards} />
 
-            <Tfoot>
-              <Tr>
-                <Th>Token</Th>
-                <Th isNumeric>Reward (TOKE)</Th>
-              </Tr>
-            </Tfoot>
+      <Divider />
 
-            <TableCaption>
-              Total TOKE Earned Across All Cycles Per Reactor
-            </TableCaption>
-          </Table>
-        </Box>
-      </>
+      <h2>Total Earned By Token</h2>
+      <Card>
+        <table className="styledTable">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Reward (TOKE)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orderBy(Object.entries(byToken), ([_, v]) => v, "desc").map(
+              ([k, v]) => (
+                <tr key={k}>
+                  <td>{k}</td>
+                  <td>{formatNumber(Number(formatEther(v.toString())), 2)}</td>
+                </tr>
+              )
+            )}
+          </tbody>
+
+          <tfoot>
+            <tr>
+              <th>Token</th>
+              <th>Reward (TOKE)</th>
+            </tr>
+          </tfoot>
+        </table>
+      </Card>
     </Page>
   );
 }

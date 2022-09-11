@@ -1,6 +1,6 @@
-import { Page } from "../../components/Page";
+import { Page } from "components/Page";
 import { GetStaticProps } from "next";
-import { prisma } from "../../util/db";
+import { prisma } from "utils/db";
 import {
   Area,
   ComposedChart,
@@ -15,26 +15,19 @@ import {
 } from "recharts";
 
 import { orderBy } from "lodash";
-import { graphColors } from "../../components/DaosGraph";
+import { graphColors } from "components/DaosGraph";
 import { formatEther } from "ethers/lib/utils";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
-import { formatNumber } from "../../util/maths";
-import { useHiddenLabels } from "../../hooks/useHiddenLabel";
-import { getHistoricalPrice } from "../../util/api/coinGecko";
+import { formatNumber } from "utils/maths";
+import { useHiddenLabels } from "hooks/useHiddenLabel";
+import { getHistoricalPrice } from "utils/api/coinGecko";
 import { addDays } from "date-fns";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
 
-import {
-  chakra,
-  Link,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
-import { useTokePrice } from "../../util/api/tokemak";
+import { useTokePrice } from "utils/api/tokemak";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { faExternalLink } from "@fortawesome/free-solid-svg-icons";
+import { Divider } from "components/Divider";
 
 type Metric = {
   cycle: number;
@@ -81,16 +74,16 @@ export default function Leaderboard({ data, metrics }: Props) {
   let yformatter = Intl.NumberFormat("en", { notation: "compact" });
 
   return (
-    <Page header="Reward Emissions">
+    <Page header="Reward Emissions" className="items-center">
       <div style={{ width: "100%", height: "500px" }}>
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={data}
             margin={{
               top: 0,
-              right: 75,
-              left: 75,
-              bottom: 5,
+              right: 0,
+              left: 0,
+              bottom: 0,
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
@@ -157,12 +150,14 @@ export default function Leaderboard({ data, metrics }: Props) {
           </ComposedChart>
         </ResponsiveContainer>
       </div>
+
       <div style={{ alignSelf: "flex-end", color: "gray" }}>
         Price data from{" "}
         <a href="https://www.coingecko.com" target="_blank" rel="noreferrer">
           CoinGecko
         </a>
       </div>
+
       <div>
         <p>
           This displays information about toke rewards that can be claimed each
@@ -170,12 +165,14 @@ export default function Leaderboard({ data, metrics }: Props) {
         </p>
         <p>
           Data is pulled from ipfs. Read more about how rewards work in the{" "}
-          <Link
+          <a
             href="https://docs.tokemak.xyz/toke/liquidity-direction/claiming-rewards-from-contract"
-            isExternal
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
           >
-            tokemak docs <ExternalLinkIcon mx="2px" />
-          </Link>
+            tokemak docs <FontAwesomeIcon icon={faExternalLink} />
+          </a>
         </p>
         <p style={{ marginTop: "15px" }}>
           USD Value is calculated taking the total for a cycle and multiplying
@@ -186,34 +183,36 @@ export default function Leaderboard({ data, metrics }: Props) {
         </p>
       </div>
 
-      <chakra.h2 fontSize="xl" fontWeight="bold">
-        Stats
-      </chakra.h2>
+      <Divider />
 
-      <Table variant="simple">
-        <Thead>
-          <Tr>
-            <Th>Cycle</Th>
-            <Th>Mean</Th>
-            <Th>Median</Th>
-            <Th>Max</Th>
-            <Th>Standard Deviation</Th>
-            <Th>Wallets</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {metrics.map((metric) => (
-            <Tr key={metric.cycle}>
-              <Td>{metric.cycle}</Td>
-              <Td>{formatNumber(metric.mean, 2)}</Td>
-              <Td>{formatNumber(metric.median, 2)}</Td>
-              <Td>{formatNumber(metric.max, 2)}</Td>
-              <Td>{formatNumber(metric.standard_deviation, 2)}</Td>
-              <Td>{metric.count}</Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+      <div className="overflow-x-auto w-full md:w-auto">
+        <h2 className="self-center text-2xl">Stats</h2>
+
+        <table className="styledTable">
+          <thead>
+            <tr>
+              <th>Cycle</th>
+              <th>Mean</th>
+              <th>Median</th>
+              <th>Max</th>
+              <th>Standard Deviation</th>
+              <th>Wallets</th>
+            </tr>
+          </thead>
+          <tbody>
+            {metrics.map((metric) => (
+              <tr key={metric.cycle}>
+                <td>{metric.cycle}</td>
+                <td>{formatNumber(metric.mean, 2)}</td>
+                <td>{formatNumber(metric.median, 2)}</td>
+                <td>{formatNumber(metric.max, 2)}</td>
+                <td>{formatNumber(metric.standard_deviation, 2)}</td>
+                <td>{metric.count}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Page>
   );
 }

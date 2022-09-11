@@ -1,34 +1,24 @@
-import { ReactNode } from "react";
-import { Box, chakra } from "@chakra-ui/react";
+import { HTMLAttributes } from "react";
 
-export function Page({
-  children,
-  header,
-}: {
-  children: ReactNode;
-  header?: string;
-}) {
+export function Page(
+  props: {
+    header?: string;
+  } & HTMLAttributes<HTMLDivElement>
+) {
+  const { header, ...divProps } = props;
+
   return (
-    <Box
-      maxW="7xl"
-      mx="auto"
-      pt={5}
-      px={{ base: 2, sm: 12, md: 17 }}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        gap: "25px",
-      }}
+    <main
+      {...divProps}
+      className={`container mx-auto flex flex-col space-y-10 ${
+        props.className || ""
+      }`}
     >
       {header ? (
-        <chakra.h1 textAlign="center" fontSize="4xl" fontWeight="bold">
-          {header}
-        </chakra.h1>
+        <h1 className="text-4xl font-bold text-center">{header}</h1>
       ) : null}
 
-      {children}
-    </Box>
+      {props.children}
+    </main>
   );
 }

@@ -1,19 +1,19 @@
 import { BaseContract, Contract, EventFilter, Event } from "ethers";
 import { arrayify } from "ethers/lib/utils";
 
-import ERC20 from "../../abi/ERC20.json";
-import TokeStaking from "../../abi/TokeStaking.json";
+import ERC20 from "@/abi/ERC20.json";
+import TokeStaking from "@/abi/TokeStaking.json";
 
-import { addressToHex, getProvider, updateDbBlocks } from "../../util";
-import { prisma } from "../../util/db";
+import { addressToHex, getProvider, updateDbBlocks } from "@/utils";
+import { prisma } from "utils/db";
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ManagerContract__factory } from "../../typechain";
+import { ManagerContract__factory } from "@/typechain";
 import {
   TOKE_CONTRACT,
   TOKE_STAKING_CONTRACT,
   TOKEMAK_MANAGER,
-} from "../../constants";
+} from "@/constants";
 
 export default async function handler(
   req: NextApiRequest,

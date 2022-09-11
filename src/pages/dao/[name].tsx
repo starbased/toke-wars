@@ -1,17 +1,16 @@
 import { GetStaticPaths, GetStaticProps } from "next";
-import { prisma } from "../../util/db";
+import { prisma } from "utils/db";
 import { Dao } from "@prisma/client";
-import { Page } from "../../components/Page";
+import { Page } from "components/Page";
 import { isEmpty } from "lodash";
-import { TokeGraph } from "../../components/TokeGraph";
-import { DaoDetailsCard } from "../../components/DaoDetailsCard";
-import { Divider } from "@chakra-ui/react";
+import { TokeGraph } from "components/TokeGraph";
+import { DaoDetailsCard } from "components/DaoDetailsCard";
 import { addDays } from "date-fns";
-import { ResourcesCard } from "../../components/ResourcesCard";
-import { CoinInfo, getGeckoData } from "../../util/api/coinGecko";
-import { groupByTokeType } from "../../queries";
+import { ResourcesCard } from "components/ResourcesCard";
+import { CoinInfo, getGeckoData } from "utils/api/coinGecko";
+import { groupByTokeType } from "@/queries";
 import axios from "axios";
-import { addressToHex } from "../../util";
+import { addressToHex } from "@/utils";
 
 type Props = {
   dao: Dao;
@@ -23,12 +22,6 @@ type Props = {
     newStake?: number;
   }[];
   geckoData: CoinInfo | null;
-};
-
-type LocalRecord = {
-  type: string;
-  timestamp: number;
-  total: number;
 };
 
 function getTotal(obj?: { timestamp: number } & Record<string, number>) {
@@ -64,7 +57,6 @@ export default function Index({ dao, data, addresses, geckoData }: Props) {
         changePercent={changePercent}
       />
       <TokeGraph data={data} />
-      <Divider />
       {geckoData ? <ResourcesCard geckoData={geckoData} /> : null}
     </Page>
   );
