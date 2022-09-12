@@ -4,7 +4,7 @@ import { Header } from "components/Header";
 import { Footer } from "components/Footer";
 import Head from "next/head";
 import Script from "next/script";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 import { config } from "@fortawesome/fontawesome-svg-core";

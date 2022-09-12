@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
@@ -9,7 +9,7 @@ import { TOKEMAK_MANAGER } from "@/constants";
 import { StatCard } from "components/StatCard";
 
 export function CycleInfo() {
-  const { data } = useQuery("managerContract", async () => {
+  const { data } = useQuery(["managerContract"], async () => {
     const contract = ManagerContract__factory.connect(
       TOKEMAK_MANAGER,
       //TODO: move this call elsewhere
