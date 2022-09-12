@@ -15,6 +15,9 @@ type GTagEvent = {
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/events
 export const event = ({ action, category, label, value }: GTagEvent) => {
+  if (!window.gtag) {
+    return;
+  }
   window.gtag("event", action, {
     event_category: category,
     event_label: label,
