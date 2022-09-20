@@ -1,7 +1,6 @@
 import { orderBy } from "lodash";
 import { Page } from "components/Page";
-import { ERC20__factory } from "@/typechain";
-import { shortenAddress } from "utils/maths";
+import { ERC20__factory, ManagerContract__factory } from "@/typechain";
 import { Formatter } from "components/Formatter";
 import { GetStaticProps } from "next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,23 +9,36 @@ import { getBlocks, getProvider } from "@/utils";
 import { getGeckoData } from "utils/api/coinGecko";
 import { BigNumber } from "bignumber.js";
 import { Coin } from "components/coin";
-import { formatISO, intlFormat, isAfter, isBefore, sub } from "date-fns";
+import { formatISO, isAfter, isBefore, sub } from "date-fns";
 import { useState } from "react";
 import { StatCard } from "components/StatCard";
 import { Card } from "components/Card";
 import Head from "next/head";
+import { CycleRevenue } from "components/CycleRevenue";
+import { TOKEMAK_MANAGER } from "@/constants";
+
+type RevenueTransaction = {
+  transactionHash: string;
+  blockNumber: number;
+  value: string;
+  timestamp: number;
+};
+
+export type RevenueTransactionExtended = {
+  amount: number;
+  usdValue: number;
+  coin: string;
+} & RevenueTransaction;
+
+type Value = {
+  coin: string;
+  transactions: RevenueTransaction[];
+  price: number;
+};
 
 type Props = {
-  values: {
-    coin: string;
-    transactions: {
-      transactionHash: string;
-      blockNumber: number;
-      value: string;
-      timestamp: number;
-    }[];
-    price: number;
-  }[];
+  values: Value[];
+  cycleTimes: number[];
 };
 
 function usdValueOverRange(
@@ -45,7 +57,7 @@ function usdValueOverRange(
     .reduce((a, b) => a + b, 0);
 }
 
-export default function Revenue({ values }: Props) {
+export default function Revenue({ values, cycleTimes }: Props) {
   const [totalDuration, setTotalDuration] = useState<Duration | null>(null);
 
   let totals = values
@@ -94,6 +106,17 @@ export default function Revenue({ values }: Props) {
   if (totalDuration) {
     filteredData = filteredData.filter(({ timestamp }) =>
       isBefore(sub(new Date(), totalDuration), new Date(timestamp))
+    );
+  }
+
+  const groupedTotals = {} as Record<number, RevenueTransactionExtended[]>;
+  for (let i = 0; i < cycleTimes.length; i++) {
+    const start = cycleTimes[i];
+    const nextCycle = cycleTimes[i + 1] || new Date();
+
+    groupedTotals[i + 201] = filteredData.filter(
+      ({ timestamp }) =>
+        isAfter(timestamp, start) && isBefore(timestamp, nextCycle)
     );
   }
 
@@ -169,7 +192,7 @@ export default function Revenue({ values }: Props) {
             <tr>
               <th>Coin</th>
               <th>Amount</th>
-              <th>USD Value</th>
+              <th>Current USD Value</th>
             </tr>
           </thead>
           <tbody>
@@ -222,62 +245,11 @@ export default function Revenue({ values }: Props) {
           </button>
         </a>
       </Card>
-      <Card className="overflow-x-auto w-full md:w-auto">
-        <h2 className="text-center text-xl">Events</h2>
-
-        <table className="styledTable">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Tx</th>
-              <th>Coin</th>
-              <th>Amount</th>
-              <th>USD Value</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredData?.map((tx) => (
-              <tr key={tx.transactionHash + tx.coin + tx.amount}>
-                <td>
-                  {intlFormat(new Date(tx.timestamp), {
-                    year: "2-digit",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </td>
-                <td>
-                  <a
-                    href={`https://etherscan.io/tx/${tx.transactionHash}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {shortenAddress(tx.transactionHash)}
-                  </a>
-                </td>
-                <td>
-                  <Coin coin={tx.coin}>{tx.coin}</Coin>
-                </td>
-
-                <td>
-                  <Formatter
-                    value={tx.amount}
-                    options={{
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }}
-                  />
-                </td>
-                <td>
-                  <Formatter currency value={tx.usdValue} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
+      {Object.entries(groupedTotals)
+        .reverse()
+        .map(([cycle, events]) => (
+          <CycleRevenue cycle={cycle} events={events} key={cycle} />
+        ))}
     </Page>
   );
 }
@@ -312,11 +284,15 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
       name: "SUSHI",
       gecko_id: "sushi",
     },
+    "0x4104b135dbc9609fc1a9490e61369036497660c8": {
+      name: "APW",
+      gecko_id: "apwine",
+    },
   };
 
   const provider = getProvider();
 
-  const values = [];
+  let values: Value[] = [];
 
   for (let [tokenContract, { gecko_id, name }] of Object.entries(tokens)) {
     const contract = ERC20__factory.connect(tokenContract, provider);
@@ -354,8 +330,19 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     });
   }
 
+  const contract = ManagerContract__factory.connect(TOKEMAK_MANAGER, provider);
+
+  const cycles = await contract.queryFilter(
+    contract.filters.CycleRolloverStarted(),
+    13088665
+  );
+
+  const toNumber = (obj: { args: any[] }) => obj.args[0].toNumber() * 1000;
+
+  const cycleTimes = cycles.map(toNumber);
+
   return {
-    props: { values },
+    props: { values, cycleTimes: [...cycleTimes] },
     revalidate: 60 * 5,
   };
 };
