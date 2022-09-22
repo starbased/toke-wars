@@ -154,7 +154,7 @@ export default function Revenue({ values, cycleTimes }: Props) {
         <StatCard
           className="cursor-pointer"
           onClick={() => setTotalDuration(null)}
-          top="Estimated Yearly Revenue"
+          top="Estimated Yearly Revenue (last month x 12)"
           middle={
             <Formatter
               currency
@@ -294,6 +294,21 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 
   let values: Value[] = [];
 
+  const excludedTransactions = [
+    "0xf125f3f952d721930fd9289fbe458c4c595a83863917a2edd59f9cf22d196e1e",
+    "0x3f342f0612b8f1d1ad24ed0d0bdfe84c3fe67699d78fa681b06c96673596db91",
+    "0x10e8b9cd6db6eb2b7f80930f39a6049e07ee1dac26ca4ce8d53c678c3f92c293",
+    "0x586ca0b67b79a2a0cb8bfbf818fefd737ec3e104d342526e2455054758af0eb9",
+    "0x210a91b4c203b8a437a2dac17354be02f4462122e65c57d7147197e000ea5e02",
+    "0x787a355752dedb75f296c494a68d7d21e4e7294176957178682e9c750a703523",
+    "0xdd39d1bc78706d20a2ac84c236b129a59ca53247e951aa1baf2c16999c4b5eba",
+    "0x434ca35257385af8b9089a36e96862fa9409ae54874b5e17b4caba54f9a3ad36",
+    "0x652297c3a60693c3c5948e5c920dfaa8671c1dc02be4ff3158f04a93a2bf4194",
+    "0xdfb01dab686d7121eb5440ca81c41163b325ef55de54c2c80b4aa94c37bd91ef",
+    "0xeb9a9326eab51172b57a7e12945e880e1703a06793060b69f668e7e1463a5784",
+    "0x28fcfaf89634f8c3f51e08bd353320fcc5f46d56bf4e092ed6bd3b1fa88dc332",
+  ];
+
   for (let [tokenContract, { gecko_id, name }] of Object.entries(tokens)) {
     const contract = ERC20__factory.connect(tokenContract, provider);
 
@@ -305,11 +320,27 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
         ),
         14489954
       )
-    ).map(({ transactionHash, blockNumber, args: { value } }) => ({
-      transactionHash,
-      blockNumber,
-      value: value.toString(),
-    }));
+    )
+      .filter(
+        (transaction) =>
+          !excludedTransactions.includes(transaction.transactionHash)
+      )
+      .map(({ transactionHash, blockNumber, args: { value } }) => {
+        let adjustedValue;
+
+        if (
+          transactionHash ===
+            "0xd922cbd281af2fd6a167fd336454e94573216f36e2a86610a06f4cf3fbe0ac19" &&
+          tokenContract === "0xdBdb4d16EdA451D0503b854CF79D55697F90c8DF"
+        ) {
+          adjustedValue = "294951379654954300000";
+        }
+        return {
+          transactionHash,
+          blockNumber,
+          value: adjustedValue || value.toString(),
+        };
+      });
 
     const timestamps = (
       await getBlocks(transactions.map((obj) => obj.blockNumber))
