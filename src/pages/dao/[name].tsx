@@ -52,7 +52,7 @@ export default function Index({ dao, data, addresses, geckoData }: Props) {
   return (
     <Page header={dao.name}>
       <Head>
-        <title>{dao.name} Toke Accumulation</title>
+        <title>{`${dao.name} Toke Accumulation`}</title>
         <meta
           name="description"
           content={`Follow the Tokemak accumulation for ${dao.name}`}
@@ -75,9 +75,8 @@ export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
 }) => {
   const name = params!.name;
 
-  const dao = await prisma.dao.findUnique({
+  const dao = await prisma.dao.findUniqueOrThrow({
     where: { name },
-    rejectOnNotFound: true,
   });
 
   const data = await groupByTokeType(name);
