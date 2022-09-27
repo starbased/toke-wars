@@ -1,9 +1,16 @@
 import { getAddress } from "ethers/lib/utils";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useLocalStorage } from "hooks/useLocalStorage";
 
 export function UserInput() {
   const router = useRouter();
+  const [previousAddresses, setPreviousAddresses] = useLocalStorage<string[]>(
+    "previousAddresses",
+    []
+  );
 
   const {
     handleSubmit,
@@ -11,11 +18,17 @@ export function UserInput() {
     formState: { errors, isSubmitting },
   } = useForm<{ address: string }>();
 
-  const onSubmit = handleSubmit((data) =>
-    router.push(`/rewards/${getAddress(data.address)}`, undefined, {
-      shallow: true,
-    })
-  );
+  const onSubmit = handleSubmit(({ address }) => {
+    if (
+      !previousAddresses
+        .map((address) => address.toLowerCase())
+        .includes(address.toLowerCase())
+    ) {
+      setPreviousAddresses([...previousAddresses, address]);
+    }
+
+    router.push(`/rewards/${getAddress(address)}`);
+  });
 
   return (
     <form onSubmit={onSubmit}>
@@ -33,7 +46,19 @@ export function UserInput() {
           },
         })}
       />
-      <button type="submit">Submit</button>
+
+      <button
+        type="submit"
+        className="border border-gray-600 rounded p-1 ml-1 bg-gray-700"
+        style={{ width: "62px" }}
+      >
+        {isSubmitting ? (
+          <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
+        ) : (
+          "Submit"
+        )}
+      </button>
+      <div>{errors.address?.message}</div>
     </form>
   );
 }
