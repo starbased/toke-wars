@@ -1,4 +1,8 @@
-import { faTwitter, faYoutube } from "@fortawesome/free-brands-svg-icons";
+import {
+  faTwitter,
+  faYoutube,
+  faGithub,
+} from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
@@ -32,6 +36,11 @@ export function Footer() {
           Tokebase
         </a>
         <div className="flex space-x-2">
+          <SocialButton
+            icon={faGithub}
+            label="Github"
+            href="https://github.com/starbased/toke-wars"
+          />
           <SocialButton
             icon={faTwitter}
             label="Twitter"
