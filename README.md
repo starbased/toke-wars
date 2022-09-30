@@ -1,5 +1,7 @@
 # Toke Wars
 
+An informational dashboard for the [Tokemak](https://www.tokemak.xyz) cryptocurrency
+
 ## Development with a local db
 ### Setup
 
