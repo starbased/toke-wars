@@ -1,6 +1,6 @@
 import { TAsset__factory } from "@/typechain";
 import { addressToHex, getProvider } from "@/utils";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import { T_TOKE_CONTRACT } from "@/constants";
 import { prisma } from "utils/db";
 import {
@@ -254,27 +254,33 @@ export default function Index({
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  let pools = await getAllReactors();
+// export const getStaticPaths: GetStaticPaths = async () => {
+//   let pools = await getAllReactors();
+//
+//   pools = pools
+//     .filter((pool) => pool !== T_TOKE_CONTRACT)
+//     .map((pool) => pool.toLowerCase());
+//
+//   if (process.env.FAST_BUILD) {
+//     pools = [pools[0]];
+//   }
+//
+//   return {
+//     paths: pools.map((address) => ({ params: { address } })),
+//     fallback: false,
+//   };
+// };
 
-  pools = pools
-    .filter((pool) => pool !== T_TOKE_CONTRACT)
-    .map((pool) => pool.toLowerCase());
-
-  if (process.env.FAST_BUILD) {
-    pools = [pools[0]];
-  }
-
-  return {
-    paths: pools.map((address) => ({ params: { address } })),
-    fallback: false,
-  };
-};
-
-export const getStaticProps: GetStaticProps<
+export const getServerSideProps: GetServerSideProps<
   Props,
   { address: string }
-> = async ({ params }) => {
+> = async ({ params, res }) => {
+  res.setHeader(
+    "Cache-Control",
+    `public, s-maxage=${60 * 60}, stale-while-revalidate=${60 * 60 * 24}`
+  );
+  console.log("here");
+
   let address = params?.address!;
   address = address.toLowerCase();
 
@@ -371,7 +377,6 @@ export const getStaticProps: GetStaticProps<
       withheldLiquidity,
       holders: await getHolders(address, decimals),
     },
-    revalidate: 60 * 5,
   };
 };
 
