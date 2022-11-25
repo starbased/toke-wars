@@ -24,6 +24,7 @@ module.exports = withBundleAnalyzer({
     ];
   },
   experimental: {
+    appDir: true,
     modularizeImports: {
       lodash: {
         transform: "lodash/{{member}}",

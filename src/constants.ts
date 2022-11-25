@@ -65,3 +65,24 @@ export const TOKEMAK_MANAGER = "0xA86e412109f77c45a3BC1c5870b880492Fb86A14";
 export const BURN = "0x0000000000000000000000000000000000000000";
 
 export const REWARDS_CONTRACT = "0x5ec3EC6A8aC774c7d53665ebc5DDf89145d02fB6";
+
+export const GRAPH_COLORS = [
+  "#63b598",
+  "#ce7d78",
+  "#ea9e70",
+  "#a48a9e",
+  "#c6e1e8",
+  "#648177",
+  "#0d5ac1",
+  "#f205e6",
+  "#f2510e",
+  "#4ca2f9",
+  "#a4e43f",
+  "#d298e2",
+  "#6119d0",
+  "#d2737d",
+  "#c0a43c",
+  "#651be6",
+  "#79806e",
+  "#61da5e",
+];

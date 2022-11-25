@@ -1,8 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Menu, Transition, Disclosure } from "@headlessui/react";
 import { forwardRef, Fragment, ReactNode } from "react";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 import { DAOS } from "@/constants";
 import {
   faBars,
@@ -17,17 +19,15 @@ const MenuLink = forwardRef<
 >((props, ref) => {
   let { href, children, ...rest } = props;
   return (
-    (<Link href={href} ref={ref} {...rest}>
-
+    <Link href={href} ref={ref} {...rest} prefetch={false}>
       {children}
-
-    </Link>)
+    </Link>
   );
 });
 MenuLink.displayName = "MenuLink";
 
 export function Header() {
-  const router = useRouter();
+  const pathname = usePathname();
 
   const links = [
     "Reactors",
@@ -43,7 +43,7 @@ export function Header() {
     return {
       link,
       href,
-      active: router.pathname.startsWith(href),
+      active: pathname?.startsWith(href),
     };
   });
 
@@ -54,8 +54,7 @@ export function Header() {
           <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6">
             <div className="flex h-16 items-center justify-between">
               <div className="flex items-center">
-                <Link href="/" passHref>
-
+                <Link href="/" prefetch={false}>
                   <Image
                     className="cursor-pointer "
                     src="/images/tokewars.png" // Route of the image file
@@ -64,26 +63,24 @@ export function Header() {
                     alt="Toke Wars Logo"
                     draggable={false}
                   />
-
                 </Link>
 
                 <div className="hidden md:block">
                   <div className="ml-5 flex items-baseline space-x-4">
                     {navigation.map((item) => (
-                      (<Link
+                      <Link
                         key={item.link}
                         href={item.href}
-                        passHref
+                        prefetch={false}
                         className={`px-2 py-2 rounded-md text-sm font-medium ${
                           item.active
                             ? "bg-gray-800 text-white"
                             : "text-gray-300 hover:bg-gray-700 hover:text-white"
                         }`}
-                        aria-current={item.active ? "page" : undefined}>
-
+                        aria-current={item.active ? "page" : undefined}
+                      >
                         {item.link}
-
-                      </Link>)
+                      </Link>
                     ))}
 
                     <Menu as="div" className="relative inline-block text-left">

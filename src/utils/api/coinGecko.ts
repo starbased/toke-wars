@@ -35,6 +35,19 @@ export type CoinInfo = {
   };
 };
 
+export async function getHistoricalPriceRaw(coin: string, from: number) {
+  const result: { prices: [number, number][] } = await fetch(
+    `https://api.coingecko.com/api/v3/coins/${coin}/market_chart/range?` +
+      new URLSearchParams({
+        vs_currency: "usd",
+        from: from.toString(),
+        to: getUnixTime(new Date()).toString(),
+      })
+  ).then((res) => res.json());
+
+  return result.prices;
+}
+
 export async function getHistoricalPrice(coin: string, from: number) {
   const { data } = await geckoAPI.get<{ prices: [number, number][] }>(
     `coins/${coin}/market_chart/range`,
