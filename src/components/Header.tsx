@@ -1,4 +1,4 @@
-import Image from "next/future/image";
+import Image from "next/image";
 import Link from "next/link";
 import { Menu, Transition, Disclosure } from "@headlessui/react";
 import { forwardRef, Fragment, ReactNode } from "react";
@@ -17,11 +17,11 @@ const MenuLink = forwardRef<
 >((props, ref) => {
   let { href, children, ...rest } = props;
   return (
-    <Link href={href}>
-      <a ref={ref} {...rest}>
-        {children}
-      </a>
-    </Link>
+    (<Link href={href} ref={ref} {...rest}>
+
+      {children}
+
+    </Link>)
   );
 });
 MenuLink.displayName = "MenuLink";
@@ -55,33 +55,35 @@ export function Header() {
             <div className="flex h-16 items-center justify-between">
               <div className="flex items-center">
                 <Link href="/" passHref>
-                  <a>
-                    <Image
-                      className="cursor-pointer "
-                      src="/images/tokewars.png" // Route of the image file
-                      height={22} // Desired size with correct aspect ratio
-                      width={160} // Desired size with correct aspect ratio
-                      alt="Toke Wars Logo"
-                      draggable={false}
-                    />
-                  </a>
+
+                  <Image
+                    className="cursor-pointer "
+                    src="/images/tokewars.png" // Route of the image file
+                    height={22} // Desired size with correct aspect ratio
+                    width={160} // Desired size with correct aspect ratio
+                    alt="Toke Wars Logo"
+                    draggable={false}
+                  />
+
                 </Link>
 
                 <div className="hidden md:block">
                   <div className="ml-5 flex items-baseline space-x-4">
                     {navigation.map((item) => (
-                      <Link key={item.link} href={item.href} passHref>
-                        <a
-                          className={`px-2 py-2 rounded-md text-sm font-medium ${
-                            item.active
-                              ? "bg-gray-800 text-white"
-                              : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                          }`}
-                          aria-current={item.active ? "page" : undefined}
-                        >
-                          {item.link}
-                        </a>
-                      </Link>
+                      (<Link
+                        key={item.link}
+                        href={item.href}
+                        passHref
+                        className={`px-2 py-2 rounded-md text-sm font-medium ${
+                          item.active
+                            ? "bg-gray-800 text-white"
+                            : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                        }`}
+                        aria-current={item.active ? "page" : undefined}>
+
+                        {item.link}
+
+                      </Link>)
                     ))}
 
                     <Menu as="div" className="relative inline-block text-left">
