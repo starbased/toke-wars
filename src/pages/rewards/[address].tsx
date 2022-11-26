@@ -2,7 +2,7 @@ import { GetStaticProps } from "next";
 import { prisma } from "utils/db";
 import { Page } from "components/Page";
 import { toBuffer } from "../api/updateEvents";
-import { useTokePrice } from "utils/api/tokemak";
+import { useTokePrice } from "hooks/useTokenPrice";
 import { formatEther } from "ethers/lib/utils";
 import { formatMoney, formatNumber } from "utils/maths";
 import { Graph } from "components/Graph";

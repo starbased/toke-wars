@@ -2,20 +2,10 @@ import { Page } from "components/Page";
 import { faMedium } from "@fortawesome/free-brands-svg-icons";
 import { LinkCard } from "components/LinkCard";
 import { Card } from "components/Card";
-import Head from "next/head";
 
-type Props = {};
-
-export default function Index({}: Props) {
+export default function Index() {
   return (
     <Page header="Stages of Liquidity" className="items-center">
-      <Head>
-        <title>Stages of Liquidity</title>
-        <meta
-          name="description"
-          content="Learn about the stages of DAO integration into the Tokemak ecosystem"
-        />
-      </Head>
       <LinkCard
         title={'Read More on "The Evolution of DAOs"'}
         url="https://medium.com/tokemak/the-evolution-of-daos-1692509bbb41"

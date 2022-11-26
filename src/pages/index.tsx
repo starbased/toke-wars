@@ -1,4 +1,4 @@
-import { useTokePrice } from "utils/api/tokemak";
+import { useTokePrice } from "hooks/useTokenPrice";
 import { Page } from "components/Page";
 import { GetStaticProps } from "next";
 import { prisma } from "utils/db";

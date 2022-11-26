@@ -1,6 +1,6 @@
 import { formatMoney, formatNumber, shortenAddress } from "utils/maths";
 import { stageMap } from "@/pages/stages";
-import { useTokePrice } from "utils/api/tokemak";
+import { useTokePrice } from "hooks/useTokenPrice";
 import { StatCard } from "components/StatCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

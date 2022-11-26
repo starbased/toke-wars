@@ -18,7 +18,7 @@ import type { Payload } from "recharts/types/component/DefaultTooltipContent";
 import { useHiddenLabels } from "@/hooks/useHiddenLabel";
 import { formatNumber } from "@/utils/maths";
 import { GRAPH_COLORS } from "@/constants";
-import { useTokePrice } from "utils/api/tokemak";
+import { useTokePrice } from "hooks/useTokenPrice";
 
 export function Graph({
   totals,
