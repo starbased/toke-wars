@@ -1,5 +1,4 @@
 import { formatMoney, formatNumber, shortenAddress } from "utils/maths";
-import { stageMap } from "@/pages/stages";
 import { useTokePrice } from "hooks/useTokenPrice";
 import { StatCard } from "components/StatCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,6 +8,7 @@ import {
   faCaretDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { SizeProp } from "@fortawesome/fontawesome-svg-core";
+import { STAGE_MAP } from "@/constants";
 
 interface StatsCardProps {
   title: string;
@@ -58,7 +58,7 @@ interface StageCardProps {
   /* icon: ReactNode; */
 }
 function StageCard({ title, stage }: StageCardProps) {
-  const stageText = stageMap[stage].title || "";
+  const stageText = STAGE_MAP[stage].title || "";
 
   return <StatCard top={title} middle={stage} bottom={stageText} />;
 }

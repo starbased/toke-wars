@@ -1,3 +1,5 @@
+"use client";
+
 import { LinkCard } from "./LinkCard";
 import { faTwitter, faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { faBitcoin } from "@fortawesome/free-brands-svg-icons";
