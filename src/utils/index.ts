@@ -21,6 +21,10 @@ export async function updateDbBlocks() {
             select "blockNumber"
             from erc20_transfers
             inner join reactors on reactors.address = erc20_transfers.address
+            union all
+            select "blockNumber"
+            from erc20_transfers
+            inner join revenue_tokens rt on erc20_transfers.address = rt.address
             ) b
       where not exists(select 1 from blocks where number = block_number)
 order by block_number

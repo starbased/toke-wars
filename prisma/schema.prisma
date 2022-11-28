@@ -1,6 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["improvedQueryRaw"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -11,7 +10,7 @@ datasource db {
 model DaoAddress {
   daoName String @map("dao_name") @db.VarChar
   address Bytes  @id(map: "dao_addresses_pk") @unique(map: "dao_addresses_address_uindex")
-  daos    Dao    @relation("dao_addressesTodaos", fields: [daoName], references: [name], onDelete: Cascade, onUpdate: NoAction, map: "dao_addresses_daos_name_fk")
+  daos    Dao    @relation("dao_addressesTodaos", fields: [daoName], references: [name], map: "dao_addresses_daos_name_fk")
 
   @@map("dao_addresses")
 }
@@ -99,10 +98,26 @@ model TokeStakingWithdrawCompleted {
 model IpfsReward {
   address    Bytes
   cycle      Int
-  data       Json     @db.Json
-  amount     Decimal  @db.Decimal
-  cycleTotal Decimal  @map("cycle_total") @db.Decimal
+  data       Json    @db.Json
+  amount     Decimal @db.Decimal
+  cycleTotal Decimal @map("cycle_total") @db.Decimal
 
   @@id([cycle, address], map: "ipfs_rewards_pk")
   @@map("ipfs_rewards")
+}
+
+model RevenueToken {
+  address Bytes  @id(map: "revenue_tokens_pk")
+  symbol  String
+  geckoId String @map("gecko_id")
+
+  @@map("revenue_tokens")
+}
+
+model RevenueIgnoredTransactions {
+  logIndex        Int
+  transactionHash Bytes
+
+  @@id([transactionHash, logIndex], map: "revenue_ignored_transactions_pk")
+  @@map("revenue_ignored_transactions")
 }

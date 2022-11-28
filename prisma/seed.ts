@@ -1,10 +1,16 @@
-import { prisma } from "../src/utils/db";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+
 import blocks from "./postgres_public_blocks.json";
 import daos from "./postgres_public_daos.json";
 import dao_addresses from "./postgres_public_dao_addresses.json";
 import reactors from "./postgres_public_reactors.json";
-import { toBuffer } from "../src/pages/api/updateEvents";
 import fs from "fs";
+import { arrayify } from "ethers/lib/utils";
+
+export function toBuffer(hexString: string) {
+  return Buffer.from(arrayify(hexString));
+}
 
 async function main() {
   await prisma.block.createMany({

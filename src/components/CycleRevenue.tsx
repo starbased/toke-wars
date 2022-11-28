@@ -3,15 +3,19 @@ import { shortenAddress } from "utils/maths";
 import { Coin } from "components/coin";
 import { Formatter } from "components/Formatter";
 import { Card } from "components/Card";
-import { RevenueTransactionExtended } from "@/pages/revenue";
+import { TransactionExtended } from "@/pages/revenue";
 import { groupBy, isEmpty, orderBy } from "lodash";
 import { PropsWithChildren, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import { MouseEvent } from "react";
+import { useRouter } from "next/router";
+
+type TransactionExtendedCoin = TransactionExtended & { coin: string };
 
 type Props = {
   cycle: string;
-  events: RevenueTransactionExtended[];
+  events: TransactionExtendedCoin[];
 };
 
 export function CycleRevenue({ cycle, events }: Props) {
@@ -57,8 +61,8 @@ export function CycleRevenue({ cycle, events }: Props) {
   );
 }
 
-function Row({ events }: { events: RevenueTransactionExtended[] }) {
-  const totalAmount = events.reduce((acc, { amount }) => acc + amount, 0);
+function Row({ events }: { events: TransactionExtendedCoin[] }) {
+  const totalAmount = events.reduce((acc, { value }) => acc + value, 0);
   const totalUsdValue = events.reduce((acc, { usdValue }) => acc + usdValue, 0);
   const coin = events[0].coin;
 
@@ -110,7 +114,7 @@ function Row({ events }: { events: RevenueTransactionExtended[] }) {
 
       {expanded
         ? events.map((tx) => (
-            <tr className="bg-gray-700" key={tx.amount}>
+            <tr className="bg-gray-700" key={tx.value}>
               <SingleRow event={tx} hideCoin />
             </tr>
           ))
@@ -124,17 +128,33 @@ function SingleRow({
   hideCoin,
   children,
 }: PropsWithChildren<{
-  event: RevenueTransactionExtended;
+  event: TransactionExtendedCoin;
   hideCoin?: boolean;
 }>) {
+  const router = useRouter();
+
+  async function onClick(event: MouseEvent) {
+    if (!event.altKey || !router.query.hasOwnProperty("edit")) {
+      return;
+    }
+
+    await fetch("/api/excludeRevenue", {
+      method: "POST",
+      body: JSON.stringify({
+        transactionHash: tx.transactionHash,
+        logIndex: tx.logIndex,
+      }),
+    });
+  }
+
   return (
     <>
       {children ? (
         children
       ) : (
         <>
-          <td>
-            {intlFormat(new Date(tx.timestamp), {
+          <td onClick={onClick}>
+            {intlFormat(new Date(tx.timestamp * 1000), {
               year: "2-digit",
               month: "2-digit",
               day: "2-digit",
@@ -157,7 +177,7 @@ function SingleRow({
 
       <td>
         <Formatter
-          value={tx.amount}
+          value={tx.value}
           options={{
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
