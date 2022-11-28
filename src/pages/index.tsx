@@ -3,7 +3,7 @@ import { Page } from "components/Page";
 import { GetStaticProps } from "next";
 import { prisma } from "utils/db";
 import { TokeGraph } from "components/TokeGraph";
-import { DAOS, REACTORS } from "@/constants";
+import { REACTORS } from "@/constants";
 import { formatMoney, formatNumber } from "utils/maths";
 import { CoinInfo, getGeckoData } from "utils/api/coinGecko";
 import { DaosGraph } from "components/DaosGraph";
@@ -18,14 +18,19 @@ type Props = {
     tToke?: number;
     newStake?: number;
   }[];
-  dao_data: {
+  dao_data: ({
     timestamp: number;
-  }[];
+  } & Record<string, number>)[];
   geckoData: CoinInfo;
 };
 
 export default function Home({ dao_data, data, geckoData }: Props) {
   const toke_price = useTokePrice();
+
+  // count the number of daos that currently have a non-zero balance
+  const daos_accumulating = Object.entries(
+    dao_data[dao_data.length - 1]
+  ).filter(([name, value]) => value !== 0 && name !== "timestamp").length;
 
   const { timestamp, ...lastValues } = data[data.length - 1];
 
@@ -46,7 +51,7 @@ export default function Home({ dao_data, data, geckoData }: Props) {
         />
         <StatCard
           top="DAOs Accumulating"
-          middle={DAOS.length}
+          middle={daos_accumulating}
           bottom={<>Total Reactors: {REACTORS.length}</>}
         />
       </div>
