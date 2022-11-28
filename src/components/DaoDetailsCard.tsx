@@ -25,16 +25,10 @@ function StatsCard({ title, total, changePercent }: StatsCardProps) {
   };
 
   let arrow = null;
-  if (total && total >= 0) {
-    if (changePercent < 0) {
-      arrow = (
-        <FontAwesomeIcon icon={faCaretDown} color="red" {...arrowCommon} />
-      );
-    } else if (changePercent > 0) {
-      arrow = (
-        <FontAwesomeIcon icon={faCaretUp} color="green" {...arrowCommon} />
-      );
-    }
+  if (changePercent < 0) {
+    arrow = <FontAwesomeIcon icon={faCaretDown} color="red" {...arrowCommon} />;
+  } else if (changePercent > 0) {
+    arrow = <FontAwesomeIcon icon={faCaretUp} color="green" {...arrowCommon} />;
   }
 
   return (
