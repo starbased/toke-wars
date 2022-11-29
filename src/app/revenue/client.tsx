@@ -1,37 +1,15 @@
+"use client";
 import { orderBy } from "lodash";
-import { Page } from "components/Page";
-import { ManagerContract__factory } from "@/typechain";
 import { Formatter } from "components/Formatter";
-import { GetStaticProps } from "next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTerminal } from "@fortawesome/free-solid-svg-icons";
-import { getProvider } from "@/utils";
-import { getGeckoData } from "utils/api/coinGecko";
 import { Coin } from "components/coin";
 import { formatISO, isAfter, isBefore, sub } from "date-fns";
 import { useState } from "react";
 import { StatCard } from "components/StatCard";
 import { Card } from "components/Card";
-import Head from "next/head";
 import { CycleRevenue } from "components/CycleRevenue";
-import { TOKEMAK_MANAGER } from "@/constants";
-import { prisma } from "utils/db";
-
-type Transaction = {
-  transactionHash: string;
-  value: number;
-  timestamp: number;
-  logIndex: number;
-};
-
-export type TransactionExtended = Transaction & {
-  usdValue: number;
-};
-
-type Value = {
-  coin: string;
-  transactions: TransactionExtended[];
-};
+import type { Value, TransactionExtended } from "@/app/revenue/page";
 
 type Props = {
   values: Value[];
@@ -54,7 +32,7 @@ function usdValueOverRange(
     .reduce((a, b) => a + b, 0);
 }
 
-export default function Revenue({ values, cycleTimes }: Props) {
+export function RevenueClient({ values, cycleTimes }: Props) {
   const [totalDuration, setTotalDuration] = useState<Duration | null>(null);
 
   let filteredValues = values;
@@ -86,6 +64,12 @@ export default function Revenue({ values, cycleTimes }: Props) {
   totals = orderBy(totals, "usdValue", "desc");
 
   const data = orderBy(
+    values.flatMap(({ transactions }) => transactions),
+    "timestamp",
+    "desc"
+  );
+
+  const filteredTransactions = orderBy(
     filteredValues.flatMap(({ coin, transactions }) =>
       transactions.map((tx) => {
         return {
@@ -106,21 +90,14 @@ export default function Revenue({ values, cycleTimes }: Props) {
     const start = cycleTimes[i];
     const nextCycle = cycleTimes[i + 1] || new Date();
 
-    groupedTotals[i + 201] = data.filter(
+    groupedTotals[i + 201] = filteredTransactions.filter(
       ({ timestamp }) =>
         isAfter(timestamp, start) && isBefore(timestamp, nextCycle)
     );
   }
 
   return (
-    <Page header="Protocol Revenue" className="items-center">
-      <Head>
-        <title>Protocol Revenue</title>
-        <meta
-          name="description"
-          content="Find out how much Protocol Revenue Tokemak is bringing in"
-        />
-      </Head>
+    <>
       <div className="grid md:grid-cols-3 w-full">
         <StatCard
           className="cursor-pointer"
@@ -242,57 +219,6 @@ export default function Revenue({ values, cycleTimes }: Props) {
         .map(([cycle, events]) => (
           <CycleRevenue cycle={cycle} events={events} key={cycle} />
         ))}
-    </Page>
+    </>
   );
-}
-
-export const getStaticProps: GetStaticProps<Props> = async () => {
-  const tokens = await prisma.revenueToken.findMany({});
-
-  const values: Value[] = [];
-
-  for (let token of tokens) {
-    const gecko_data = await getGeckoData(token.geckoId);
-    const transactions = await prisma.$queryRaw<Transaction[]>`
-        select ('0'||substring(erc20_transfers."transactionHash"::varchar from 2)) as "transactionHash",
-               (value / 10 ^ 18)::float           as value,
-               extract(epoch from timestamp)::int as timestamp,
-               erc20_transfers."logIndex"
-        from erc20_transfers
-                 inner join blocks on blocks.number = erc20_transfers."blockNumber"
-        left outer join revenue_ignored_transactions rit on erc20_transfers."logIndex" = rit."logIndex" and erc20_transfers."transactionHash" = rit."transactionHash"
-        where rit."transactionHash" is null
-          and erc20_transfers.address = ${token.address}
-    `;
-
-    values.push({
-      coin: token.symbol,
-      transactions: transactions.map((transactions) => ({
-        ...transactions,
-        usdValue: gecko_data.market_data.current_price.usd * transactions.value,
-      })),
-    });
-  }
-
-  return {
-    props: { values, cycleTimes: await getCycleTimes() },
-    revalidate: 60 * 5,
-  };
-};
-
-async function getCycleTimes() {
-  const contract = ManagerContract__factory.connect(
-    TOKEMAK_MANAGER,
-    getProvider()
-  );
-
-  const cycles = await contract.queryFilter(
-    contract.filters.CycleRolloverStarted(),
-    13088665
-  );
-
-  const cycleTimes = cycles.map((obj) => obj.args[0].toNumber());
-
-  //dedup on cycle 239 the event was called twice
-  return Array.from(new Set(cycleTimes));
 }

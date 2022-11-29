@@ -1,15 +1,16 @@
+"use client";
 import { intlFormat } from "date-fns";
 import { shortenAddress } from "utils/maths";
 import { Coin } from "components/coin";
 import { Formatter } from "components/Formatter";
 import { Card } from "components/Card";
-import { TransactionExtended } from "@/pages/revenue";
 import { groupBy, isEmpty, orderBy } from "lodash";
 import { PropsWithChildren, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { MouseEvent } from "react";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
+import { TransactionExtended } from "@/app/revenue/page";
 
 type TransactionExtendedCoin = TransactionExtended & { coin: string };
 
@@ -131,10 +132,10 @@ function SingleRow({
   event: TransactionExtendedCoin;
   hideCoin?: boolean;
 }>) {
-  const router = useRouter();
+  const searchParams = useSearchParams();
 
   async function onClick(event: MouseEvent) {
-    if (!event.altKey || !router.query.hasOwnProperty("edit")) {
+    if (!event.altKey || !searchParams.has("edit")) {
       return;
     }
 
