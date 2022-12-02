@@ -1,9 +1,12 @@
 import axios from "axios";
-import { addDays, getUnixTime } from "date-fns";
+import { getUnixTime } from "date-fns";
 import axiosRetry from "axios-retry";
+import pRetry, { AbortError } from "p-retry";
+
+const baseURL = "https://api.coingecko.com/api/v3/";
 
 const geckoAPI = axios.create({
-  baseURL: "https://api.coingecko.com/api/v3/",
+  baseURL,
   headers: {
     accept: "application/json",
   },
@@ -54,6 +57,21 @@ export async function getHistoricalPrice(coin: string, from: number) {
   );
 }
 
+export function getPrices(
+  ids: string[]
+): Promise<Record<string, { usd: number }>> {
+  return retry(() =>
+    fetch(
+      baseURL +
+        "simple/price?" +
+        new URLSearchParams({
+          vs_currencies: "usd",
+          ids: ids.join(","),
+        })
+    )
+  ).then((res) => res.json());
+}
+
 export async function getGeckoData(geckoId: string) {
   const { data } = await geckoAPI.get<CoinInfo>(`coins/${geckoId}`, {
     params: {
@@ -65,4 +83,18 @@ export async function getGeckoData(geckoId: string) {
     },
   });
   return data;
+}
+
+function retry<T extends Response>(callback: () => Promise<T>) {
+  return pRetry(
+    async () => {
+      const response = await callback();
+
+      if (response.status === 429) {
+        throw new AbortError(response.statusText);
+      }
+      return response;
+    },
+    { retries: 5, minTimeout: 60 * 1000 }
+  );
 }
