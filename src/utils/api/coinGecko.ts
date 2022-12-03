@@ -91,8 +91,9 @@ function retry<T extends Response>(callback: () => Promise<T>) {
       const response = await callback();
 
       if (response.status === 429) {
-        throw new AbortError(response.statusText);
+        throw new Error("backoff");
       }
+
       return response;
     },
     { retries: 5, minTimeout: 60 * 1000 }
