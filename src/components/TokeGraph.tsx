@@ -9,7 +9,7 @@ import {
   YAxis,
 } from "recharts";
 import { formatNumber } from "utils/maths";
-import { addMonths, differenceInMonths, intlFormat, parseISO } from "date-fns";
+import { eachMonthOfInterval, intlFormat, parseISO } from "date-fns";
 import { ReactNode } from "react";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
@@ -20,6 +20,9 @@ type Props = {
 };
 
 export const dateFormatter = (date: number) => intlFormat(new Date(date));
+
+export const tickFormatter = (date: number) =>
+  intlFormat(new Date(date), { year: "2-digit", month: "2-digit" });
 
 export const labelFunction = (
   label: number,
@@ -36,9 +39,10 @@ export function BaseAreaGraph({
 }: Props & { children: ReactNode }) {
   const startDate = parseISO("2021-10-01");
 
-  const ticks = Array.from(
-    Array(differenceInMonths(new Date(), startDate) + 1)
-  ).map((_, i) => addMonths(startDate, i).getTime());
+  const ticks = eachMonthOfInterval({
+    start: startDate,
+    end: new Date(),
+  }).map((obj) => obj.getTime());
 
   let formatter = Intl.NumberFormat("en", { notation: "compact" });
 
@@ -58,7 +62,7 @@ export function BaseAreaGraph({
           dataKey="timestamp"
           scale="time"
           type="number"
-          tickFormatter={dateFormatter}
+          tickFormatter={tickFormatter}
           domain={[() => startDate.getTime(), "dataMax"]}
           ticks={ticks}
         />

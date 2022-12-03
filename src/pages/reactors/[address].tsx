@@ -6,6 +6,7 @@ import { prisma } from "utils/db";
 import {
   eachMonthOfInterval,
   getUnixTime,
+  intlFormat,
   isEqual,
   startOfDay,
 } from "date-fns";
@@ -39,6 +40,7 @@ import { getAllReactors, toBuffer } from "../api/updateEvents";
 import { formatUnits } from "ethers/lib/utils";
 import { Divider } from "components/Divider";
 import Head from "next/head";
+import { dateFormatter, tickFormatter } from "components/TokeGraph";
 
 type Props = {
   reactors: (Omit<Reactor, "address"> & { address: string })[];
@@ -66,9 +68,6 @@ function Graph({ events }: { events: Event[] }) {
     total: parseFloat(obj.total),
     value: parseFloat(obj.value),
   }));
-
-  const dateFormatter = (date: number) =>
-    new Date(date).toLocaleDateString("en-US");
 
   const ticks = eachMonthOfInterval({
     start: new Date(formattedEvents[0].date),
@@ -101,7 +100,7 @@ function Graph({ events }: { events: Event[] }) {
           scale="time"
           type="number"
           domain={["dataMin", "dataMax"]}
-          tickFormatter={dateFormatter}
+          tickFormatter={tickFormatter}
           tickCount={5}
           ticks={ticks}
         />
