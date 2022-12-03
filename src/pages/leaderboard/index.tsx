@@ -36,10 +36,8 @@ export default function Leaderboard({
           content="Track the Top DAOs accumulating Tokemak"
         />
       </Head>
-      <Link href="/stages" passHref>
-        <a className="p-2 border border-gray-500 rounded-md">
+      <Link href="/stages" passHref className="p-2 border border-gray-500 rounded-md">
           Discover the Stages of Liquidity
-        </a>
       </Link>
 
       <Card className="md:w-2/3 self-center overflow-x-auto w-full md:w-auto">
