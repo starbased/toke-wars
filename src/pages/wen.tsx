@@ -85,7 +85,7 @@ export default function Wen({
           <tbody>
             {averageTimes.map((obj, i) => (
               <tr key={i}>
-                <td>{cycle - i - (inProgress ? 2 : 1)}</td>
+                <td>{cycle - i - 1}</td>
                 <td>{secondsToDuration(obj.diff)}</td>
                 <td>
                   {" "}
