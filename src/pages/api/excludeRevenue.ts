@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { prisma } from "utils/db";
-import { toBuffer } from "@/pages/api/updateEvents";
+import { toBuffer } from "@/utils";
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,7 +11,7 @@ export default async function handler(
     .object({ transactionHash: z.string(), logIndex: z.number() })
     .parse(JSON.parse(req.body));
 
-  await prisma.revenueIgnoredTransactions.create({
+  await prisma.revenueIgnoredTransaction.create({
     data: { transactionHash: toBuffer(transactionHash), logIndex },
   });
 

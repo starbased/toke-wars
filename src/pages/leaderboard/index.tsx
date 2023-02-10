@@ -36,8 +36,12 @@ export default function Leaderboard({
           content="Track the Top DAOs accumulating Tokemak"
         />
       </Head>
-      <Link href="/stages" passHref className="p-2 border border-gray-500 rounded-md">
-          Discover the Stages of Liquidity
+      <Link
+        href="/stages"
+        passHref
+        className="p-2 border border-gray-500 rounded-md"
+      >
+        Discover the Stages of Liquidity
       </Link>
 
       <Card className="md:w-2/3 self-center overflow-x-auto w-full md:w-auto">
@@ -83,8 +87,8 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
   const daos = await prisma.$queryRaw<(Dao & { toke: number })[]>`
     select daos.*, round((sum(dt.adjusted_value )/10^18)::numeric,2)::integer as toke 
     from daos
-    inner join dao_addresses da on daos.name = da.dao_name
-    inner join dao_transactions_v dt on da.address = dt.account
+    inner join dao_txs dt on dao_name = name
+    inner join contracts c on dt.address = c.address
     group by daos.name
     order by toke desc
 `;

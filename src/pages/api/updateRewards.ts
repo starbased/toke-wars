@@ -1,10 +1,9 @@
-import { prisma } from "../../utils/db";
+import { prisma } from "utils/db";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { RewardsHash__factory } from "../../typechain";
-import { getProvider } from "../../utils";
-import { REWARDS_CONTRACT } from "../../constants";
+import { RewardsHash__factory } from "@/typechain";
+import { getProvider, toBuffer } from "@/utils";
+import { REWARDS_CONTRACT } from "@/constants";
 import axios from "axios";
-import { toBuffer } from "./updateEvents";
 
 export default async function handler(
   req: NextApiRequest,

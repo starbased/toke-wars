@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getUnixTime } from "date-fns";
 import axiosRetry from "axios-retry";
-import pRetry, { AbortError } from "p-retry";
+import pRetry from "p-retry";
 
 const baseURL = "https://api.coingecko.com/api/v3/";
 
@@ -14,8 +14,11 @@ const geckoAPI = axios.create({
 
 axiosRetry(geckoAPI, {
   retries: 10,
-  retryDelay: (retryCount) => 60 * 1000,
+  retryDelay: () => 60 * 1000,
   retryCondition: (error) => error.response?.status === 429,
+  onRetry: () => {
+    console.log("slowing down for rate limiting");
+  },
 });
 
 export type CoinInfo = {

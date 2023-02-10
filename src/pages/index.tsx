@@ -73,9 +73,9 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
                    0)::integer as total,
              timestamp
       from daos
-               inner join dao_addresses da on daos.name = da.dao_name
-               inner join dao_transactions_v dt on da.address = dt.account
+               inner join dao_txs dt on dt.dao_name = name
                inner join blocks on block_number = number
+               inner join contracts c on dt.address = c.address
       order by block_number
       `;
 

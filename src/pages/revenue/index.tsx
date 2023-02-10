@@ -268,18 +268,19 @@ async function getValues() {
   const transactions = await prisma.$queryRaw<
     (Transaction & { address: Buffer })[]
   >`
-      select ('0' || substring(erc20_transfers."transactionHash"::varchar from 2)) as "transactionHash",
-             (value / 10 ^ 18)::float                                              as value,
+      select ('0' || substring(erc20_transfers_v.transaction_hash::varchar from 2)) as "transactionHash",
+             (amount / 10 ^ 18)::float                                              as value,
              extract(epoch from timestamp)::int                                    as timestamp,
-             erc20_transfers."logIndex",
-             erc20_transfers.address
-      from erc20_transfers
-               inner join blocks on blocks.number = erc20_transfers."blockNumber"
-               inner join revenue_tokens on revenue_tokens.address = erc20_transfers.address
-               left outer join revenue_ignored_transactions rit on erc20_transfers."logIndex" = rit."logIndex" and
-                                                                   erc20_transfers."transactionHash" =
+             erc20_transfers_v.log_index,
+             erc20_transfers_v.address
+      from erc20_transfers_v
+               inner join blocks on blocks.number = erc20_transfers_v.block_number
+               inner join revenue_tokens on revenue_tokens.address = erc20_transfers_v.address
+               left outer join revenue_ignored_transactions rit on erc20_transfers_v.log_index = rit."logIndex" and
+                                                                   erc20_transfers_v.transaction_hash =
                                                                    rit."transactionHash"
       where rit."transactionHash" is null
+      and "to" = '\\x8B4334D4812C530574BD4F2763FCD22DE94A969B'
     `;
 
   const prices = await getPrices(tokens.map((token) => token.geckoId));

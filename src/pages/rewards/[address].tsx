@@ -1,7 +1,6 @@
 import { GetStaticProps } from "next";
 import { prisma } from "utils/db";
 import { Page } from "components/Page";
-import { toBuffer } from "../api/updateEvents";
 import { useTokePrice } from "utils/api/tokemak";
 import { formatEther } from "ethers/lib/utils";
 import { formatMoney, formatNumber } from "utils/maths";
@@ -15,6 +14,7 @@ import Head from "next/head";
 import { useEffect } from "react";
 import { event } from "utils/analytics";
 import { useRouter } from "next/router";
+import { toBuffer } from "@/utils";
 
 export type IpfsRewardsRecord = {
   cycle: number;

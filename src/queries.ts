@@ -1,6 +1,7 @@
 import { isEqual, startOfDay } from "date-fns";
-import { prisma } from "./utils/db";
+import { prisma } from "utils/db";
 import {
+  ACC_CONTRACT,
   T_TOKE_CONTRACT,
   TOKE_CONTRACT,
   TOKE_STAKING_CONTRACT,
@@ -15,21 +16,21 @@ export async function groupByTokeType(daoName?: string) {
       timestamp: Date;
     }[]
   >(`
-      select dt.address as type,
-             round(sum(adjusted_value) over (PARTITION BY dt.address order by block_number) / 10 ^ 18::numeric,
+      select transactions.address as type,
+             round(sum(adjusted_value) over (PARTITION BY transactions.address order by block_number) / 10 ^ 18::numeric,
                    0)::integer as total,
              timestamp
-      from daos
-               inner join dao_addresses da on daos.name = da.dao_name
-               inner join dao_transactions_v dt on da.address = dt.account
-               inner join blocks on block_number = number
-        ${daoName ? `where daos.name ='${daoName}'` : ""}
+      from dao_txs transactions
+         inner join blocks on block_number = number
+         inner join contracts on contracts.address = transactions.address
+        ${daoName ? `where dao_name ='${daoName}'` : ""}
       order by block_number
   `);
   const typeMap: Record<string, string> = {
     [TOKE_CONTRACT.toLowerCase()]: "toke",
     [T_TOKE_CONTRACT.toLowerCase()]: "tToke",
     [TOKE_STAKING_CONTRACT.toLowerCase()]: "newStake",
+    [ACC_CONTRACT.toLowerCase()]: "acc",
   };
 
   return getData(

@@ -1,10 +1,26 @@
 import { providers } from "ethers";
 import { prisma } from "./db";
 import { Block } from "@prisma/client";
-import { chunk, isEmpty } from "lodash";
+import { chunk } from "lodash";
+import { arrayify } from "ethers/lib/utils";
+import { ManagerContract__factory } from "@/typechain";
+import { TOKEMAK_MANAGER } from "@/constants";
 
 export function addressToHex(buffer: Buffer) {
   return "0x" + buffer.toString("hex");
+}
+
+export function toBuffer(hexString: string) {
+  return Buffer.from(arrayify(hexString));
+}
+
+export function getAllReactors() {
+  const managerContract = ManagerContract__factory.connect(
+    TOKEMAK_MANAGER,
+    getProvider()
+  );
+
+  return managerContract.getPools();
 }
 
 export function getProvider() {
@@ -13,22 +29,13 @@ export function getProvider() {
 
 export async function updateDbBlocks() {
   const numbers = await prisma.$queryRaw<{ block_number: number }[]>`
-      select distinct block_number
-      from (select block_number
-            from dao_transactions_v
-            inner join dao_addresses da on dao_transactions_v.account = da.address
-            union all 
-            select "blockNumber"
-            from erc20_transfers
-            inner join reactors on reactors.address = erc20_transfers.address
-            union all
-            select "blockNumber"
-            from erc20_transfers
-            inner join revenue_tokens rt on erc20_transfers.address = rt.address
-            ) b
-      where not exists(select 1 from blocks where number = block_number)
-order by block_number
+      select distinct block_number 
+      from events
+        left outer join blocks on events.block_number = number
+      where number is null
+      order by block_number
   `;
+
   const provider = getProvider();
   // if running a local node this will speed up block imports
   // const provider = new providers.StaticJsonRpcProvider();
@@ -52,41 +59,4 @@ order by block_number
   }
 
   return toSave;
-}
-
-export async function getBlocks(rawNumbers: number[]) {
-  //dedup
-  const numbers = Array.from(new Set(rawNumbers));
-
-  const output = [];
-  for (let numberChunk of chunk(numbers, 100)) {
-    output.push(...(await getBlocksChunk(numberChunk)));
-  }
-
-  return output;
-}
-
-async function getBlocksChunk(numbers: number[]) {
-  const provider = getProvider();
-
-  const known = await prisma.block.findMany({
-    where: { number: { in: numbers } },
-  });
-
-  const knownSet = new Set(known.map((obj) => obj.number));
-
-  const needed = numbers.filter((number) => !knownSet.has(number));
-
-  let toSave: Block[] = [];
-  for (let number of needed) {
-    const block = await provider.getBlock(number);
-    console.log("Adding new block:", number);
-    toSave.push({ number, timestamp: new Date(block.timestamp * 1000) });
-  }
-
-  if (!isEmpty(toSave)) {
-    await prisma.block.createMany({ data: toSave });
-  }
-
-  return [...known, ...toSave];
 }

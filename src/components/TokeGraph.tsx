@@ -114,6 +114,14 @@ export function TokeGraph({ data }: Props) {
         fill="#82ca9d"
         stackId="1"
       />
+      <Area
+        type="stepAfter"
+        dataKey="acc"
+        name="ACC TOKE"
+        stroke="#ea9e70"
+        fill="#ea9e70"
+        stackId="1"
+      />
     </BaseAreaGraph>
   );
 }

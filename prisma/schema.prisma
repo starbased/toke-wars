@@ -18,18 +18,20 @@ model DaoAddress {
 model Dao {
   name         String       @id(map: "daos_pk") @db.VarChar
   stage        Int
-  coin         String       @default("TBD") @db.VarChar
-  geckoId      String       @default("something") @map("gecko_id") @db.VarChar
+  coin         String       @db.VarChar
+  coingeckoId  String       @map("coingecko_id") @db.VarChar
   daoAddresses DaoAddress[] @relation("dao_addressesTodaos")
+  geckoInfo    GeckoInfo    @relation(fields: [coingeckoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "daos_gecko_info_id_fk")
 
   @@map("daos")
 }
 
 model Reactor {
-  symbol       String   @db.VarChar
-  coingeckoId  String?  @map("coingecko_id") @db.VarChar
-  isStablecoin Boolean? @default(false) @map("is_stablecoin")
-  address      Bytes    @id(map: "reactors_pk") @unique(map: "reactors_address_b_uindex")
+  symbol       String     @db.VarChar
+  coingeckoId  String?    @map("coingecko_id") @db.VarChar
+  isStablecoin Boolean?   @default(false) @map("is_stablecoin")
+  address      Bytes      @id(map: "reactors_pk") @unique(map: "reactors_address_b_uindex")
+  geckoInfo    GeckoInfo? @relation(fields: [coingeckoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reactors_gecko_info_id_fk")
 
   @@map("reactors")
 }
@@ -46,53 +48,6 @@ model CycleHash {
   hash  String @db.VarChar
 
   @@map("cycle_hashes")
-}
-
-model Erc20Transfer {
-  blockNumber      Int
-  transactionHash  Bytes
-  transactionIndex Int
-  address          Bytes
-  to               Bytes
-  from             Bytes
-  value            Decimal @db.Decimal
-  logIndex         Int
-  data             Bytes
-
-  @@id([transactionHash, logIndex], map: "erc20_transfers_pk")
-  @@index([address], map: "erc20_transfers_address_index")
-  @@index([address], map: "toke_staking_deposit_address_index")
-  @@map("erc20_transfers")
-}
-
-model TokeStakingDeposit {
-  blockNumber      Int
-  transactionHash  Bytes
-  transactionIndex Int
-  address          Bytes
-  logIndex         Int
-  data             Bytes
-  account          Bytes
-  scheduleIx       Decimal @db.Decimal
-  amount           Decimal @db.Decimal
-
-  @@id([transactionHash, logIndex], map: "toke_staking_deposit_pk")
-  @@map("toke_staking_deposits")
-}
-
-model TokeStakingWithdrawCompleted {
-  blockNumber      Int
-  transactionHash  Bytes
-  transactionIndex Int
-  address          Bytes
-  logIndex         Int
-  data             Bytes
-  account          Bytes
-  scheduleIdx      Decimal @db.Decimal
-  amount           Decimal @db.Decimal
-
-  @@id([transactionHash, logIndex], map: "toke_staking_withdraw_completed_pk")
-  @@map("toke_staking_withdraw_completed")
 }
 
 model IpfsReward {
@@ -114,10 +69,42 @@ model RevenueToken {
   @@map("revenue_tokens")
 }
 
-model RevenueIgnoredTransactions {
+model RevenueIgnoredTransaction {
   logIndex        Int
   transactionHash Bytes
 
   @@id([transactionHash, logIndex], map: "revenue_ignored_transactions_pk")
   @@map("revenue_ignored_transactions")
+}
+
+model Event {
+  transactionHash  Bytes   @map("transaction_hash")
+  logIndex         Int     @map("log_index")
+  blockNumber      Int     @map("block_number")
+  data             Bytes
+  topics           Bytes[]
+  address          Bytes
+  transactionIndex Int     @map("transaction_index")
+  removed          Boolean
+
+  @@id([blockNumber, transactionIndex, logIndex], map: "events_pk")
+  @@index([topics], map: "events_idx_topics", type: Gin)
+  @@index([address], map: "events_address_index")
+  @@map("events")
+}
+
+model Contract {
+  name    String
+  address Bytes  @id(map: "contracts_pk")
+
+  @@map("contracts")
+}
+
+model GeckoInfo {
+  id      String    @id(map: "gecko_info_pk")
+  data    Json
+  Dao     Dao[]
+  Reactor Reactor[]
+
+  @@map("gecko_info")
 }

@@ -1,12 +1,11 @@
 import { TAsset__factory } from "@/typechain";
-import { addressToHex, getProvider } from "@/utils";
+import { addressToHex, getAllReactors, getProvider, toBuffer } from "@/utils";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { T_TOKE_CONTRACT } from "@/constants";
 import { prisma } from "utils/db";
 import {
   eachMonthOfInterval,
   getUnixTime,
-  intlFormat,
   isEqual,
   startOfDay,
 } from "date-fns";
@@ -36,7 +35,6 @@ import { BigNumber } from "bignumber.js";
 import { formatNumber } from "utils/maths";
 import { Reactor } from "@prisma/client";
 import { ResourcesCard } from "components/ResourcesCard";
-import { getAllReactors, toBuffer } from "../api/updateEvents";
 import { formatUnits } from "ethers/lib/utils";
 import { Divider } from "components/Divider";
 import Head from "next/head";
@@ -254,11 +252,11 @@ export default function Index({
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  let pools = await getAllReactors();
+  let reactors = await prisma.reactor.findMany();
 
-  pools = pools
-    .filter((pool) => pool !== T_TOKE_CONTRACT)
-    .map((pool) => pool.toLowerCase());
+  let pools = reactors.map(({ address }) =>
+    addressToHex(address).toLowerCase()
+  );
 
   if (process.env.FAST_BUILD) {
     pools = [pools[0]];
@@ -279,6 +277,9 @@ export const getStaticProps: GetStaticProps<
 
   const reactor = await prisma.reactor.findUnique({
     where: { address: toBuffer(address) },
+    include: {
+      geckoInfo: true,
+    },
   });
 
   if (!reactor || !reactor.symbol) {
@@ -296,18 +297,15 @@ export const getStaticProps: GetStaticProps<
   >`
       select timestamp,
              round(sum(adjusted_value) over (order by block_number) / 10 ^ ${decimals}::numeric, 0)::integer as total
-      from (select "transactionHash" as transaction_hash,
-                   "blockNumber"     as block_number,
-                   address,
-                   "to"              as account,
-                   value * -1        as adjusted_value
-            from erc20_transfers
+      from (select -amount as adjusted_value, *
+            from erc20_deposit_v
             union all
-            select "transactionHash", "blockNumber", address, "from" as account, value
-            from erc20_transfers) erc20_transfers
+            select amount as adjusted_value, *
+            from erc20_withdrawals_v) erc20_transfers
                inner join blocks on block_number = number
       where address = ${toBuffer(address)}
         and account = '\\x0000000000000000000000000000000000000000'
+        and topics @> array ['\\xDDF252AD1BE2C89B69C2B068FC378DAA952BA7F163C4A11628F55A4DF523B3EF'::bytea,'\\x0000000000000000000000000000000000000000000000000000000000000000'::bytea]
       order by number`;
 
   let historicalPrices: Record<string, number> = { "1": 0 };
@@ -346,9 +344,7 @@ export const getStaticProps: GetStaticProps<
         !isEqual(startOfDay(date), startOfDay(array[i + 1]?.date))
     );
 
-  const geckoData = reactor.coingeckoId
-    ? await getGeckoData(reactor.coingeckoId)
-    : null;
+  const geckoData = (reactor.geckoInfo?.data as CoinInfo) || null;
 
   const reactors = (await prisma.reactor.findMany()).map((reactor) => ({
     ...reactor,
@@ -370,7 +366,7 @@ export const getStaticProps: GetStaticProps<
       withheldLiquidity,
       holders: await getHolders(address, decimals),
     },
-    revalidate: 60 * 5,
+    revalidate: 60 * 60,
   };
 };
 
@@ -387,21 +383,11 @@ function getHolders(address: string, decimal: number) {
              dao_name as named_account
       from (select account,
                    sum(adjusted_value) / 10^${decimal} as total
-            from (select "transactionHash" as transaction_hash,
-                         "blockNumber"     as block_number,
-                         address,
-                         "to"              as account,
-                         value             as adjusted_value,
-                         value
-                  from erc20_transfers
+            from (select amount as adjusted_value, *
+                  from erc20_deposit_v
                   union all
-                  select "transactionHash" as transaction_hash,
-                         "blockNumber"     as block_number,
-                         address,
-                         "from"            as account,
-                         value * -1        as adjusted_value,
-                         value
-                  from erc20_transfers) foo
+                  select -amount as adjusted_value, *
+                  from erc20_withdrawals_v) foo
             where address = ${toBuffer(address)}
               and account != '\\x0000000000000000000000000000000000000000'
             group by account) totals

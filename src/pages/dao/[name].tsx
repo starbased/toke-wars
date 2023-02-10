@@ -77,28 +77,31 @@ export const getStaticProps: GetStaticProps<Props, { name: string }> = async ({
 
   const dao = await prisma.dao.findUniqueOrThrow({
     where: { name },
+    include: {
+      daoAddresses: true,
+      geckoInfo: true,
+    },
   });
 
   const data = await groupByTokeType(name);
 
-  const addresses = (
-    await prisma.daoAddress.findMany({
-      where: { daos: dao },
-    })
-  ).map(({ address }) => addressToHex(address));
+  const addresses = dao.daoAddresses.map(({ address }) =>
+    addressToHex(address)
+  );
 
-  let geckoData = null;
-  try {
-    geckoData = await getGeckoData(dao.geckoId);
-  } catch (e) {
-    if (axios.isAxiosError(e)) {
-      if (e.response?.status !== 404) {
-        throw e;
-      }
-    }
-  }
+  let geckoData = dao.geckoInfo.data as CoinInfo;
 
-  return { props: { dao, data, addresses, geckoData }, revalidate: 60 * 5 };
+  const { stage, coin, coingeckoId } = dao;
+
+  return {
+    props: {
+      dao: { name, stage, coin, coingeckoId },
+      data,
+      addresses,
+      geckoData,
+    },
+    revalidate: 60 * 5,
+  };
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
